@@ -45,10 +45,14 @@ const Splash = () => {
             alignItems: 'center',
             gap: 10,
           }}>
-          <TouchableOpacity onPress={handlegetstarted}>
+          <TouchableOpacity
+            onPress={handlegetstarted}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 10,
+            }}>
             <GradientText style={styles.headingtext}>Get Started</GradientText>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handlegetstarted}>
             <MaterialIcons
               name="arrow-forward"
               size={24}

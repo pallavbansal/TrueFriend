@@ -17,6 +17,7 @@ import {useVerify} from '../Hooks/Query/AuthQuery';
 import Loading from './Loading';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useSelector} from 'react-redux';
+import Toast from 'react-native-toast-message';
 
 const Verify = () => {
   const navigation = useNavigation();
@@ -59,6 +60,11 @@ const Verify = () => {
       {
         onSuccess: data => {
           console.log('Verify success', data);
+          Toast.show({
+            type: 'success',
+            text1: 'Verify Success',
+            text2: 'Redirecting to Login Page',
+          });
           return navigation.reset({
             index: 0,
             routes: [{name: 'Login'}],

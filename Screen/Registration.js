@@ -6,11 +6,9 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
-  Button,
   Pressable,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
-import {BackHandler} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {colors} from '../Styles/ColorData';
 import GradientButton from '../Components/Common/GradientButton';
@@ -27,33 +25,28 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import {useDispatch} from 'react-redux';
 import {VerifyRed} from '../Store/Auth';
 import {validateRegistrationForm, validateinputs} from '../Utils/Rules';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-// import MultipleImagePicker from '@baronha/react-native-multiple-image-picker';
-// name: 'test21',
-//     email: 'test21@gamil.com',
-//     password: '1234567',
-//     confirmpassword: '1234567',
-//     phone: '0123456789',
-//     dob: '2005-11-11',
-//     address: 'Delhi',
+import SingleErrorWarning from '../Components/Registration/SingleErrorWarning';
+import MultipleImagePicker from '@baronha/react-native-multiple-image-picker';
 
 const Registration = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const {mutate, isPending, error} = useRegister();
+  const {mutate, isPending, error, reset} = useRegister();
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [showindividualerror, setShowIndividualError] = useState(false);
+  const [image, setImage] = useState('');
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
   const [registerdata, setRegisterData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmpassword: '',
-    phone: '',
-    dob: '',
-    address: '',
+    name: 'Jhon',
+    email: '@gmail.com',
+    password: '1234567',
+    confirmpassword: '1234567',
+    phone: '8384863081',
+    dob: '1997-10-20',
+    address: 'Delhi',
+    image: '',
   });
-  const [formvalid, setFormValid] = useState(false);
   const [registerdatavalidation, setRegisterDataValidation] = useState({
     name: false,
     email: false,
@@ -62,10 +55,9 @@ const Registration = () => {
     phone: false,
     dob: false,
     address: false,
+    image: false,
   });
-  const [defaultimage, setDefaultImage] = useState(
-    require('../assets/favicon.png'),
-  );
+  const [formvalid, setFormValid] = useState(false);
 
   useEffect(() => {
     const formvalid = validateRegistrationForm({
@@ -76,6 +68,7 @@ const Registration = () => {
       phone: registerdata.phone,
       dob: registerdata.dob,
       address: registerdata.address,
+      image: image,
     });
     setFormValid(formvalid);
     const invalid = validateinputs({
@@ -86,6 +79,7 @@ const Registration = () => {
       phone: registerdata.phone,
       dob: registerdata.dob,
       address: registerdata.address,
+      image: image,
     });
     setRegisterDataValidation(prev => ({...prev, ...invalid}));
   }, [registerdata]);
@@ -102,7 +96,37 @@ const Registration = () => {
     return navigation.navigate('Login');
   }
 
+  function resetalldata() {
+    setRegisterData({
+      name: '',
+      email: '',
+      password: '',
+      confirmpassword: '',
+      phone: '',
+      dob: '',
+      address: '',
+      image: '',
+    });
+    setRegisterDataValidation({
+      name: false,
+      email: false,
+      password: false,
+      confirmpassword: false,
+      phone: false,
+      dob: false,
+      address: false,
+      image: false,
+    });
+    setImage('');
+    setDate(new Date());
+  }
+
   function handleRegistration() {
+    if (!formvalid) {
+      setShowIndividualError(true);
+      return;
+    }
+    setShowIndividualError(false);
     const data = {
       name: registerdata.name,
       email: registerdata.email,
@@ -110,15 +134,26 @@ const Registration = () => {
       mobile_number: registerdata.phone,
       dob: registerdata.dob,
       city: registerdata.address,
+      profile_picture: registerdata.image,
     };
     mutate(
       {data},
       {
         onSuccess: data => {
-          console.log('register success', data);
-          dispatch(VerifyRed({id: data.data.id, otp: data.test_otp}));
-          resetalldata();
-          return navigation.navigate('Verify');
+          if (data.status_code == 1) {
+            console.log('register success', data);
+            dispatch(VerifyRed({id: data.data.id, otp: data.test_otp}));
+            resetalldata();
+            return navigation.navigate('Verify');
+          } else {
+            setTimeout(() => {
+              reset();
+            }, 4000);
+            throw new Error(data.message);
+          }
+        },
+        onError: error => {
+          // console.log('register error', error.message);
         },
       },
     );
@@ -128,21 +163,21 @@ const Registration = () => {
     return <Loading />;
   }
 
-  function handleImageUpload() {
-    // const options = {
-    //   mediaType: 'photo',
-    //   includeBase64: true,
-    // };
-    // launchImageLibrary(options, response => {
-    //   if (response.didCancel) {
-    //     console.log('User cancelled image picker');
-    //   } else if (response.error) {
-    //     console.log('ImagePicker Error: ', response.error);
-    //   } else {
-    //     setDefaultImage({uri: response.assets[0].uri});
-    //   }
-    // });
-  }
+  const handleImageUpload = async () => {
+    try {
+      const response = await MultipleImagePicker.openPicker({
+        mediaType: 'image',
+        maxSelectedAssets: 1,
+      });
+      console.log('response', response);
+      if (response && response.length > 0) {
+        setImage(response[0].path);
+        setRegisterData({...registerdata, image: response[0]});
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   return (
     <GradientScreen>
@@ -172,7 +207,14 @@ const Registration = () => {
           </View>
 
           <View style={styles.imagecontainer}>
-            <FontAwesome name="user" size={60} color="#C2ADDA" />
+            {image ? (
+              <Image
+                source={{uri: image}}
+                style={{width: 60, height: 60, borderRadius: 30}}
+              />
+            ) : (
+              <FontAwesome name="user" size={60} color="#C2ADDA" />
+            )}
             <TouchableOpacity onPress={handleImageUpload}>
               <GradientButton
                 style={[
@@ -190,6 +232,23 @@ const Registration = () => {
               </GradientButton>
             </TouchableOpacity>
           </View>
+          <View
+            style={{
+              width: '100%',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginLeft: 40,
+              marginTop: -10,
+              marginBottom: 10,
+            }}>
+            {showindividualerror && !registerdatavalidation.image && (
+              <SingleErrorWarning
+                type={'registrationprofilepicture'}
+                valid={registerdatavalidation.image}
+              />
+            )}
+          </View>
 
           <View style={styles.inputsContainer}>
             <GradientInput style={styles.gradientborder}>
@@ -200,13 +259,21 @@ const Registration = () => {
                   value={registerdata.name}
                   placeholderTextColor={colors.login.headingtext2}
                   cursorColor={colors.login.headingtext2}
-                  style={{color: colors.login.headingtext2}}
+                  style={{color: colors.login.headingtext2, flex: 1}}
                   onChangeText={text =>
                     setRegisterData({...registerdata, name: text})
                   }
                 />
               </View>
             </GradientInput>
+
+            {showindividualerror && !registerdatavalidation.name && (
+              <SingleErrorWarning
+                type={'registrationname'}
+                valid={registerdatavalidation.name}
+              />
+            )}
+
             <GradientInput style={styles.gradientborder}>
               <View style={styles.inputcontainer}>
                 <TextInput
@@ -215,13 +282,19 @@ const Registration = () => {
                   value={registerdata.email}
                   placeholderTextColor={colors.login.headingtext2}
                   cursorColor={colors.login.headingtext2}
-                  style={{color: colors.login.headingtext2}}
+                  style={{color: colors.login.headingtext2, flex: 1}}
                   onChangeText={text =>
                     setRegisterData({...registerdata, email: text})
                   }
                 />
               </View>
             </GradientInput>
+            {showindividualerror && !registerdatavalidation.email && (
+              <SingleErrorWarning
+                type={'registrationemail'}
+                valid={registerdatavalidation.email}
+              />
+            )}
             <GradientInput style={styles.gradientborder}>
               <View style={styles.inputcontainer}>
                 <TextInput
@@ -245,6 +318,12 @@ const Registration = () => {
                 />
               </View>
             </GradientInput>
+            {showindividualerror && !registerdatavalidation.password && (
+              <SingleErrorWarning
+                type={'registrationpassword'}
+                valid={registerdatavalidation.password}
+              />
+            )}
             <GradientInput style={styles.gradientborder}>
               <View style={styles.inputcontainer}>
                 <TextInput
@@ -268,6 +347,12 @@ const Registration = () => {
                 />
               </View>
             </GradientInput>
+            {showindividualerror && !registerdatavalidation.confirmpassword && (
+              <SingleErrorWarning
+                type={'registrationconfirmpassword'}
+                valid={registerdatavalidation.confirmpassword}
+              />
+            )}
             <GradientInput style={styles.gradientborder}>
               <View style={styles.inputcontainer}>
                 <TextInput
@@ -276,13 +361,19 @@ const Registration = () => {
                   value={registerdata.phone}
                   placeholderTextColor={colors.login.headingtext2}
                   cursorColor={colors.login.headingtext2}
-                  style={{color: colors.login.headingtext2}}
+                  style={{color: colors.login.headingtext2, flex: 1}}
                   onChangeText={text =>
                     setRegisterData({...registerdata, phone: text})
                   }
                 />
               </View>
             </GradientInput>
+            {showindividualerror && !registerdatavalidation.phone && (
+              <SingleErrorWarning
+                type={'registrationphone'}
+                valid={registerdatavalidation.phone}
+              />
+            )}
             <GradientInput style={styles.gradientborder}>
               <Pressable onPress={() => setShow(true)}>
                 <View style={styles.inputcontainer}>
@@ -292,7 +383,7 @@ const Registration = () => {
                     value={registerdata.dob}
                     placeholderTextColor={colors.login.headingtext2}
                     cursorColor={colors.login.headingtext2}
-                    style={{color: colors.login.headingtext2}}
+                    style={{color: colors.login.headingtext2, flex: 1}}
                     editable={false}
                   />
                 </View>
@@ -310,6 +401,12 @@ const Registration = () => {
                 />
               )}
             </GradientInput>
+            {showindividualerror && !registerdatavalidation.dob && (
+              <SingleErrorWarning
+                type={'registrationdob'}
+                valid={registerdatavalidation.dob}
+              />
+            )}
             <GradientInput style={styles.gradientborder}>
               <View style={styles.inputcontainer}>
                 <TextInput
@@ -318,62 +415,29 @@ const Registration = () => {
                   value={registerdata.address}
                   placeholderTextColor={colors.login.headingtext2}
                   cursorColor={colors.login.headingtext2}
-                  style={{color: colors.login.headingtext2}}
+                  style={{color: colors.login.headingtext2, flex: 1}}
                   onChangeText={text =>
                     setRegisterData({...registerdata, address: text})
                   }
                 />
               </View>
             </GradientInput>
+            {showindividualerror && !registerdatavalidation.address && (
+              <SingleErrorWarning
+                type={'registrationaddress'}
+                valid={registerdatavalidation.address}
+              />
+            )}
 
-            {/* <GradientInput
-              style={{
-                padding: 2,
-                borderRadius: 32,
-              }}>
-              <View
-                style={{
-                  padding: 10,
-                  borderRadius: 30,
-                  overflow: 'hidden',
-                  width: '100%',
-                  backgroundColor: colors.text.primary,
-                }}>
-                {Object.keys(registerdatavalidation).map(key => (
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 10,
-                      marginBottom: 5,
-                    }}
-                    key={key}>
-                    <AntDesign
-                      name={
-                        registerdatavalidation[key]
-                          ? 'checkCircle'
-                          : 'closecircle'
-                      }
-                      size={20}
-                      color={registerdatavalidation[key] ? 'green' : 'red'}
-                    />
-                    <Text
-                      style={[
-                        styles.headingtext2,
-                        {color: colors.login.headingtext},
-                      ]}>
-                      {key} is{' '}
-                      {registerdatavalidation[key] ? 'valid' : 'invalid'}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            </GradientInput> */}
+            {error && (
+              <GradientText style={styles.headingtext2}>
+                {error.message}
+              </GradientText>
+            )}
 
             <TouchableOpacity
               onPress={handleRegistration}
-              style={{marginTop: 10}}
-              disabled={!formvalid}>
+              style={{marginTop: 10}}>
               <GradientButton style={styles.submitbutton}>
                 <Text style={styles.submittext}>Registration</Text>
               </GradientButton>

@@ -6,22 +6,39 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import GradientScreen from '../Layouts/GradientScreen';
+import GradientText from '../Components/Common/GradientText';
 import GradientButton from '../Components/Common/GradientButton';
 import GradientInput from '../Components/Common/GradientInput';
 import {colors} from '../Styles/ColorData';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
 import {useForgotPassword} from '../Hooks/Query/AuthQuery';
+import {validateEmail} from '../Utils/Rules';
 
 const ForgotPassword = () => {
   const navigation = useNavigation();
-  const [email, setEmail] = useState('test20@gmail.com');
-  const {mutate, isPending, error} = useForgotPassword();
+  const [shownewpassword, setShownewpassword] = useState(false);
+  const [newpassword, setnewpassword] = useState('');
+  const [showerror, setShowerror] = useState(false);
+  const [validemail, setValidemail] = useState(false);
+  const [email, setEmail] = useState('test2@gmail.com');
+  const {mutate, isPending, error, reset} = useForgotPassword();
+
+  useEffect(() => {
+    setValidemail(validateEmail(email));
+  }, [email]);
 
   function handleSent() {
+    if (!email) {
+      setShowerror(true);
+      return;
+    }
+    setShowerror(false);
+    setShownewpassword(false);
+    setnewpassword('');
     const data = {
       email: email,
     };
@@ -30,18 +47,32 @@ const ForgotPassword = () => {
       {data},
       {
         onSuccess: data => {
-          console.log('forgot passsword email', data);
-          navigation.navigate('Login');
+          if (data.status_code === 1) {
+            setShownewpassword(true);
+            setnewpassword(data.password);
+            console.log('forgot passsword email', data);
+          } else {
+            setTimeout(() => {
+              reset();
+            }, 3000);
+            throw new Error(data.message);
+          }
+          // navigation.navigate('Login');
         },
         onError: error => {
           console.log('forgot passsword email error', error);
         },
       },
     );
-    // return navigation.reset({
-    //   index: 0,
-    //   routes: [{name: 'Discover'}],
-    // });
+  }
+
+  function handleOk() {
+    setShownewpassword(false);
+    setnewpassword('');
+    return navigation.reset({
+      index: 0,
+      routes: [{name: 'Login'}],
+    });
   }
 
   return (
@@ -85,11 +116,26 @@ const ForgotPassword = () => {
                   value={email}
                   placeholderTextColor={colors.login.headingtext2}
                   cursorColor={colors.login.headingtext2}
-                  style={{color: colors.login.headingtext2}}
+                  style={{color: colors.login.headingtext2, flex: 1}}
                   onChangeText={text => setEmail(text)}
                 />
               </View>
             </GradientInput>
+            {showerror && email.length === 0 && (
+              <GradientText style={styles.headingtext2}>
+                Please enter your email
+              </GradientText>
+            )}
+            {showerror && !validemail && email.length > 0 && (
+              <GradientText style={styles.headingtext2}>
+                Please enter a valid email
+              </GradientText>
+            )}
+            {error && (
+              <GradientText style={styles.headingtext2}>
+                {error.message}
+              </GradientText>
+            )}
             <TouchableOpacity onPress={handleSent} style={{marginTop: 20}}>
               <GradientButton style={styles.submitbutton}>
                 <Text style={styles.submittext}>Send</Text>
@@ -100,6 +146,15 @@ const ForgotPassword = () => {
                 />
               </GradientButton>
             </TouchableOpacity>
+
+            {shownewpassword && (
+              <TouchableOpacity onPress={handleOk} style={{marginTop: 20}}>
+                <GradientButton style={styles.submitbutton}>
+                  <Text style={styles.submittext}>{newpassword}</Text>
+                  <Text style={styles.submittext}>Ok</Text>
+                </GradientButton>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </ScrollView>
