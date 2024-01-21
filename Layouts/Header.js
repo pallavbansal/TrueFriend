@@ -67,7 +67,7 @@ const Header = () => {
                 keyboardType="default"
                 placeholderTextColor={colors.login.headingtext2}
                 cursorColor={colors.login.headingtext2}
-                style={{color: colors.login.headingtext2}}
+                style={{color: colors.login.headingtext2, flex: 1}}
               />
             </View>
           </GradientInput>

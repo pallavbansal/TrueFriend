@@ -8,8 +8,7 @@ export function validatePassword(password) {
 }
 
 export function validateAddress(address) {
-  console.log('address', address);
-  return address.length > 0;
+  return address.length > 3;
 }
 
 export function validatePhoneNumber(phoneNumber) {
@@ -18,6 +17,9 @@ export function validatePhoneNumber(phoneNumber) {
 }
 export function validateName(name) {
   return name.length >= 3;
+}
+export function validateImage(image) {
+  return image.length > 0;
 }
 
 export function validateDOB(dob) {
@@ -35,6 +37,7 @@ export function validateRegistrationForm({
   name,
   dob,
   address,
+  image,
 }) {
   return (
     validateEmail(email) &&
@@ -43,7 +46,8 @@ export function validateRegistrationForm({
     validatePhoneNumber(phone) &&
     validateName(name) &&
     validateDOB(dob) &&
-    validateAddress(address)
+    validateAddress(address) &&
+    validateImage(image)
   );
 }
 
@@ -55,6 +59,7 @@ export function validateinputs({
   name,
   dob,
   address,
+  image,
 }) {
   const data = {
     name: false,
@@ -64,6 +69,7 @@ export function validateinputs({
     phone: false,
     dob: false,
     address: false,
+    image: false,
   };
   if (validateEmail(email)) {
     data.email = true;
@@ -71,7 +77,7 @@ export function validateinputs({
   if (validatePassword(password)) {
     data.password = true;
   }
-  if (password == confirmpassword) {
+  if (password == confirmpassword && validatePassword(password)) {
     data.confirmpassword = true;
   }
   if (validatePhoneNumber(phone)) {
@@ -86,14 +92,8 @@ export function validateinputs({
   if (validateAddress(address)) {
     data.address = true;
   }
+  if (validateImage(image)) {
+    data.image = true;
+  }
   return data;
 }
-
-export const emailValidationText = 'Please enter a valid email address.';
-export const passwordValidationText =
-  'Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character.';
-export const phoneNumberValidationText =
-  'Please enter a valid phone number (10 digits).';
-export const nameValidationText =
-  'Name must be at least 2 characters long and can only contain letters and spaces.';
-export const dobValidationText = 'You must be at least 18 years old.';

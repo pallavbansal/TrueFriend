@@ -23,6 +23,7 @@ import {
   Recharge,
   Splash,
   Chat,
+  Temp,
 } from './Screen/index';
 import Protect from './Auth/Protect';
 
@@ -33,6 +34,11 @@ const MainNavigator = () => {
       <Stack.Screen
         name="Splash"
         component={Splash}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Temp"
+        component={Temp}
         options={{headerShown: false}}
       />
       <Stack.Screen

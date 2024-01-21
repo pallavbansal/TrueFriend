@@ -7,7 +7,7 @@ export const logindata = [
   {
     name: 'Jhon Doe',
     email: 'test2@gmail.com',
-    password: '1234567',
+    password: '19850064',
   },
   {
     name: 'test21',

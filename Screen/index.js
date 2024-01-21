@@ -14,6 +14,7 @@ import Payment from './Payment';
 import Recharge from './Recharge';
 import Splash from './Splash';
 import Chat from './Chat';
+import Temp from './Temp';
 
 export {
   Discover,
@@ -32,4 +33,5 @@ export {
   Recharge,
   Splash,
   Chat,
+  Temp,
 };

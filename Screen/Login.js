@@ -27,29 +27,41 @@ const Login = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [logininputerror, setLoginInputError] = useState({
+    showerror: false,
+    message: '',
+  });
   const [logininputs, setLoginInputs] = useState({
     email: '',
     password: '',
   });
   const {mutate, isPending, error, reset} = useLogin();
-  useEffect(() => {
-    const backAction = () => {
-      navigation.reset({
-        index: 0,
-        routes: [{name: 'Login'}],
-      });
-      return true;
-    };
+  // useEffect(() => {
+  //   const backAction = () => {
+  //     navigation.reset({
+  //       index: 0,
+  //       routes: [{name: 'Login'}],
+  //     });
+  //     return true;
+  //   };
 
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      backAction,
-    );
+  //   const backHandler = BackHandler.addEventListener(
+  //     'hardwareBackPress',
+  //     backAction,
+  //   );
 
-    return () => backHandler.remove();
-  }, [navigation]);
+  //   return () => backHandler.remove();
+  // }, [navigation]);
 
   const handleSubmit = () => {
+    if (logininputs.email == '' || logininputs.password == '') {
+      setLoginInputError({
+        showerror: true,
+        message: 'Please fill all the fields',
+      });
+      return;
+    }
+    setLoginInputError({showerror: false, message: ''});
     const data = {
       email: logininputs.email,
       password: logininputs.password,
@@ -68,18 +80,22 @@ const Login = () => {
               }),
             );
             setLoginInputs({email: '', password: ''});
-            return navigation.navigate('Discover');
-          } else {
-            Toast.show({
-              type: 'error',
-              text1: data.message,
-              text2: 'Try Again',
+            return navigation.reset({
+              index: 0,
+              routes: [{name: 'Temp'}],
             });
+          } else {
+            // Toast.show({
+            //   type: 'error',
+            //   text1: data.message,
+            //   text2: 'Try Again',
+            // });
             setTimeout(() => {
               reset();
-            }, 2000);
-            console.log('login error', data.message);
+            }, 4000);
+            // console.log('login error', data.message);
             throw new Error(data.message);
+            // throw new Error('Invalid Credentials');
           }
         },
       },
@@ -132,7 +148,7 @@ const Login = () => {
                   value={logininputs.email}
                   placeholderTextColor={colors.login.headingtext2}
                   cursorColor={colors.login.headingtext2}
-                  style={{color: colors.login.headingtext2}}
+                  style={{color: colors.login.headingtext2, flex: 1}}
                   onChangeText={text =>
                     setLoginInputs({...logininputs, email: text})
                   }
@@ -169,26 +185,31 @@ const Login = () => {
               </View>
             </GradientInput>
 
+            {(logininputs.email.length == 0 ||
+              logininputs.password.length == 0) &&
+              logininputerror.showerror && (
+                <GradientText style={styles.headingtext2}>
+                  {logininputerror.message}
+                </GradientText>
+              )}
+
+            {error && (
+              <GradientText style={styles.headingtext2}>
+                {error.message}
+              </GradientText>
+            )}
+
             <TouchableOpacity
               onPress={handleForgotPassword}
               style={styles.forgottext}>
               <Text style={styles.headingtext2}>Forgot Password?</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={handleSubmit}
-              style={{marginTop: 20}}
-              disabled={
-                logininputs.email == '' || logininputs.password == ''
-                  ? true
-                  : false
-              }>
+            <TouchableOpacity onPress={handleSubmit} style={{marginTop: 20}}>
               <GradientButton style={styles.submitbutton}>
                 <Text style={styles.submittext}>Submit</Text>
               </GradientButton>
             </TouchableOpacity>
-
-            {error && <Text style={styles.headingtext2}>{error.message}</Text>}
           </View>
 
           <View style={styles.registerContainer}>
@@ -223,7 +244,7 @@ const Login = () => {
             })}
           </ScrollView>
 
-          <View style={styles.dividerContainer}>
+          {/* <View style={styles.dividerContainer}>
             <View
               style={{
                 height: 1,
@@ -262,7 +283,7 @@ const Login = () => {
                 G
               </Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
         </View>
       </ScrollView>
     </GradientScreen>

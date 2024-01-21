@@ -28,8 +28,8 @@ export const useRegister = () => {
 };
 
 export const useForgotPassword = () => {
-  const {isPending, error, mutate} = useMutation({
+  const {isPending, error, mutate, reset} = useMutation({
     mutationFn: ({data}) => forgotPassword(data),
   });
-  return {isPending, error, mutate};
+  return {isPending, error, mutate, reset};
 };
