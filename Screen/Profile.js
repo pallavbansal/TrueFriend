@@ -1,18 +1,14 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-  Image,
-} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
 import React, {useState} from 'react';
 import BottomBar from '../Layouts/BottomBar';
 import GradientScreen from '../Layouts/GradientScreen';
 import {colors} from '../Styles/ColorData';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import AntDesign from 'react-native-vector-icons/AntDesign';
 import SingleMedia from '../Components/Profile/SingleMedia';
+import {useFetchProfile} from '../Hooks/Query/ProfileQuery';
+import ProfileTop from '../Components/Profile/ProfileTop';
+import EditProfile from '../Components/Profile/EditProfile';
+import Loading from './Loading';
 const picturesdata = [
   {
     id: '1',
@@ -151,63 +147,44 @@ const videosdata = [
 ];
 
 const Profile = () => {
+  const {isPending, error, data: profiledata, isError} = useFetchProfile();
+
   const [selectedmediatype, setselectedmediatype] = useState('pictures');
-  const backgroundimage =
-    'https://images.unsplash.com/photo-1613521140785-e85e427f8002?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
-  const profileimage =
-    'https://images.unsplash.com/photo-1524738258074-f8125c6a7588?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8bWVuJTIwd2F0Y2h8ZW58MHx8MHx8fDA%3D';
+  const [showeditmodel, setshoweditmodel] = useState(false);
+
+  function handleeditprofile() {
+    setshoweditmodel(true);
+  }
+
+  if (isPending) {
+    return <Loading />;
+  }
+
+  // if (isError) {
+  //   return <Text>Error: {error.message}</Text>;
+  // }
+  const finaldata = profiledata.data.profile;
+  if (showeditmodel) {
+    return (
+      <EditProfile
+        setshoweditmodel={setshoweditmodel}
+        initialdata={finaldata}
+      />
+    );
+  }
 
   return (
     <GradientScreen>
       <View style={styles.container}>
         <View style={styles.imagecontainer}>
-          <Image
-            source={{uri: backgroundimage}}
-            style={{width: '100%', height: '100%'}}
+          <ProfileTop
+            finaldata={finaldata}
+            handleeditprofile={handleeditprofile}
           />
-          <View
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-            }}>
-            <Image
-              source={{uri: profileimage}}
-              style={{
-                width: 125,
-                height: 125,
-                borderRadius: 75,
-                alignSelf: 'center',
-                marginTop: 50,
-              }}
-            />
-          </View>
-          <View
-            style={{
-              position: 'absolute',
-              right: 10,
-              bottom: -20,
-            }}>
-            <View
-              style={{
-                backgroundColor: colors.profile.edit,
-                height: 40,
-                width: 40,
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 20,
-              }}>
-              <TouchableOpacity>
-                <AntDesign name="edit" size={28} color="white" />
-              </TouchableOpacity>
-            </View>
-          </View>
         </View>
         <View style={styles.biocontainer}>
           <View>
-            <Text style={styles.headingtext}>Geet Singhania</Text>
+            <Text style={styles.headingtext}>{finaldata.name}</Text>
           </View>
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <View style={{flexDirection: 'row', gap: 5, alignItems: 'center'}}>
@@ -216,7 +193,7 @@ const Profile = () => {
                 size={18}
                 color={colors.login.headingtext2}
               />
-              <Text style={styles.headingtext3}>8281623841</Text>
+              <Text style={styles.headingtext3}>{finaldata.phone_number}</Text>
             </View>
             <View style={{flexDirection: 'row', gap: 5, alignItems: 'center'}}>
               <MaterialIcons
@@ -224,17 +201,14 @@ const Profile = () => {
                 size={18}
                 color={colors.login.headingtext2}
               />
-              <Text style={styles.headingtext3}>geetsingh@123gmail.com</Text>
+              <Text style={styles.headingtext3}>{finaldata.email}</Text>
             </View>
           </View>
           <View>
             <Text style={styles.headingtext2}>Short Bio</Text>
           </View>
           <View>
-            <Text style={styles.headingtext3}>
-              Love music, cooking, swimming, going out, travelling etc . Wanna
-              be friends??
-            </Text>
+            <Text style={styles.headingtext3}>{finaldata.bio}</Text>
           </View>
         </View>
         <View style={styles.mediacontainer}>

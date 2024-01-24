@@ -24,7 +24,7 @@ const ForgotPassword = () => {
   const [newpassword, setnewpassword] = useState('');
   const [showerror, setShowerror] = useState(false);
   const [validemail, setValidemail] = useState(false);
-  const [email, setEmail] = useState('test2@gmail.com');
+  const [email, setEmail] = useState('test21@gmail.com');
   const {mutate, isPending, error, reset} = useForgotPassword();
 
   useEffect(() => {

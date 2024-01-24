@@ -10,19 +10,23 @@ import {useNavigation} from '@react-navigation/native';
 import {colors} from '../Styles/ColorData';
 import GradientButton from '../Components/Common/GradientButton';
 import GradientScreen from '../Layouts/GradientScreen';
+import GradientText from '../Components/Common/GradientText';
+import {useProfileCreation} from '../Hooks/Query/ProfileQuery';
+import Loading from './Loading';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import ProfileCreationDropdown from '../Components/ProfileCreation/ProfileCreationDropdown';
 
 const ProfileCreation = () => {
   const navigation = useNavigation();
+
   const [sexdata, setsexData] = useState({
     open: false,
     value: null,
     placeholder: 'Sex',
     items: [
       {
-        label: 'Male',
-        value: 'Male',
+        label: 'male',
+        value: 'male',
       },
       {
         label: 'Female',
@@ -40,12 +44,12 @@ const ProfileCreation = () => {
     placeholder: 'Martial Status',
     items: [
       {
-        label: 'Single',
-        value: 'Single',
+        label: 'married',
+        value: 'married',
       },
       {
-        label: 'Married',
-        value: 'Married',
+        label: 'Single',
+        value: 'Single',
       },
       {
         label: 'Divorced',
@@ -63,8 +67,8 @@ const ProfileCreation = () => {
     placeholder: "I'm looking for",
     items: [
       {
-        label: 'Dating',
-        value: 'Dating',
+        label: 'dating',
+        value: 'dating',
       },
       {
         label: 'Friendship',
@@ -94,6 +98,10 @@ const ProfileCreation = () => {
     placeholder: 'Religion',
     items: [
       {
+        label: 'hindu',
+        value: 'hindu',
+      },
+      {
         label: 'Christianity',
         value: 'Christianity',
       },
@@ -101,10 +109,7 @@ const ProfileCreation = () => {
         label: 'Islam',
         value: 'Islam',
       },
-      {
-        label: 'Hinduism',
-        value: 'Hinduism',
-      },
+
       {
         label: 'Buddhism',
         value: 'Buddhism',
@@ -129,8 +134,8 @@ const ProfileCreation = () => {
     placeholder: 'Drinking',
     items: [
       {
-        label: 'Never',
-        value: 'Never',
+        label: 'no',
+        value: 'no',
       },
       {
         label: 'Socially',
@@ -152,8 +157,8 @@ const ProfileCreation = () => {
     placeholder: 'Smoking',
     items: [
       {
-        label: 'Never',
-        value: 'Never',
+        label: 'no',
+        value: 'no',
       },
       {
         label: 'Socially',
@@ -169,13 +174,31 @@ const ProfileCreation = () => {
       },
     ],
   });
+  const [showerror, setshowerror] = useState(false);
+  const [validform, setvalidform] = useState(false);
+  const {mutate, isPending, error, reset} = useProfileCreation();
 
-  function handleContinue() {
-    return navigation.reset({
-      index: 0,
-      routes: [{name: 'Discover'}],
-    });
-  }
+  useEffect(() => {
+    if (
+      sexdata.value &&
+      martialstatusdata.value &&
+      searchingfordata.value &&
+      religiondata.value &&
+      drinkingdata.value &&
+      smokingdata.value
+    ) {
+      setvalidform(true);
+    } else {
+      setvalidform(false);
+    }
+  }, [
+    sexdata,
+    martialstatusdata,
+    searchingfordata,
+    religiondata,
+    drinkingdata,
+    smokingdata,
+  ]);
 
   function closeall() {
     setsexData({
@@ -202,6 +225,51 @@ const ProfileCreation = () => {
       ...smokingdata,
       open: false,
     });
+  }
+
+  function handleContinue() {
+    if (!validform) {
+      setshowerror(true);
+      return;
+    }
+    setshowerror(false);
+
+    const formdata = {
+      sex: sexdata.value,
+      marital_status: martialstatusdata.value,
+      looking_for: searchingfordata.value,
+      religion: religiondata.value,
+      drinking: drinkingdata.value,
+      smoking: smokingdata.value,
+    };
+    // const formdata = {
+    //   sex: 'male',
+    //   marital_status: 'married',
+    //   looking_for: 'dating',
+    //   religion: 'hindu',
+    //   drinking: 'no',
+    //   smoking: 'no',
+    // };
+    console.log('formdata', formdata);
+    mutate(
+      {data: formdata},
+      {
+        onSuccess: data => {
+          console.log('Success profile creation', data);
+          return navigation.reset({
+            index: 0,
+            routes: [{name: 'Discover'}],
+          });
+        },
+        onError: error => {
+          console.log('Error profile creation', error);
+        },
+      },
+    );
+  }
+
+  if (isPending) {
+    return <Loading />;
   }
 
   return (
@@ -263,6 +331,18 @@ const ProfileCreation = () => {
               setData={setsmokingData}
               closeall={closeall}
             />
+
+            {showerror && !validform && (
+              <GradientText style={styles.headingtext2}>
+                Please fill all the details
+              </GradientText>
+            )}
+
+            {error && (
+              <GradientText style={styles.headingtext2}>
+                {error.message}
+              </GradientText>
+            )}
 
             <TouchableOpacity
               onPress={handleContinue}
