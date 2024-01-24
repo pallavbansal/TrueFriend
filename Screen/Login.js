@@ -82,7 +82,7 @@ const Login = () => {
             setLoginInputs({email: '', password: ''});
             return navigation.reset({
               index: 0,
-              routes: [{name: 'Temp'}],
+              routes: [{name: 'Discover'}],
             });
           } else {
             // Toast.show({

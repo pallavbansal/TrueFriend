@@ -11,13 +11,24 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {colors} from '../Styles/ColorData';
 import GradientInput from '../Components/Common/GradientInput';
 import {useNavigation} from '@react-navigation/native';
+import {useDispatch} from 'react-redux';
+import {LogoutRed} from '../Store/Auth';
 
 const Header = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   const [showsearch, setshowsearch] = useState(false);
 
   const handlenotification = () => {
     return navigation.navigate('Notification');
+  };
+
+  const handleLogout = () => {
+    dispatch(LogoutRed());
+    return navigation.reset({
+      index: 0,
+      routes: [{name: 'Login'}],
+    });
   };
 
   return (
@@ -44,9 +55,13 @@ const Header = () => {
           </Text>
         </View>
         <View style={styles.headericoncontainer}>
-          <TouchableOpacity onPress={handlenotification}>
-            <MaterialIcons name="notifications" size={28} color="white" />
+          <TouchableOpacity onPress={handleLogout}>
+            <MaterialIcons name="logout" size={28} color="white" />
           </TouchableOpacity>
+
+          {/* <TouchableOpacity onPress={handlenotification}>
+            <MaterialIcons name="notifications" size={28} color="white" />
+          </TouchableOpacity> */}
 
           <TouchableOpacity onPress={() => setshowsearch(!showsearch)}>
             <MaterialIcons name="search" size={28} color="white" />
