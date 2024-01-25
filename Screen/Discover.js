@@ -1,21 +1,19 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  FlatList,
-} from 'react-native';
-import React, {useState} from 'react';
+import {View, Text, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
+import React, {useState, useEffect} from 'react';
 import BottomBar from '../Layouts/BottomBar';
 import {useNavigation} from '@react-navigation/native';
-import Header from '../Layouts/Header';
+import DiscoverHeader from '../Components/Discover/DiscoverHeader';
 import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../Styles/ColorData';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import GradientInput from '../Components/Common/GradientInput';
 import SingleUser from '../Components/Discover/SingleUser';
+import Geolocation from '@react-native-community/geolocation';
+import {
+  useLocationUpdate,
+  useFetchDiscoverProfile,
+} from '../Hooks/Query/HomeQuery';
 
 const categories = [
   {
@@ -286,44 +284,87 @@ const categories = [
 
 const Discover = () => {
   const navigation = useNavigation();
+  const {
+    mutate: locationUpdate,
+    isPending: isLocationPending,
+    error: locationError,
+    reset: locationReset,
+  } = useLocationUpdate();
+
+  const [locationupdated, setlocationupdated] = useState(false);
   const [pageoption, setpageOption] = useState('Discover');
   const [showfilter, setshowfilter] = useState(false);
   const [filterdata, setfilterdata] = useState({
     items: [
       {
-        value: '1 Km',
+        item: '1 Km',
+        value: '1',
       },
       {
-        value: '3 Km',
+        item: '3 Km',
+        value: '3',
       },
       {
-        value: '5 Km',
+        item: '5 Km',
+        value: '5 ',
       },
       {
+        item: 'All',
         value: 'All',
       },
     ],
+    applied: '1',
   });
+  const {
+    isPending: isDiscoverPending,
+    error: discoverError,
+    data: discoverData,
+    isError: isDiscoverError,
+  } = useFetchDiscoverProfile(filterdata.applied);
+
+  useEffect(() => {
+    if (!locationupdated) {
+      handlelocation();
+    }
+  }, []);
+
+  if (isDiscoverPending) {
+    return <Text>Loading...</Text>;
+  }
+
+  console.log('discoverData', discoverData.data.profiles);
 
   const handleLogin = () => {
     return navigation.navigate('Login');
   };
 
-  const handleProfileCreation = () => {
-    return navigation.navigate('ProfileCreation');
-  };
-
-  const handlelivestream = () => {
-    return navigation.navigate('LiveStream');
-  };
-
-  const handleuploadscreenshot = () => {
-    return navigation.navigate('UploadScreenshot');
-  };
-
-  const handleFriendsList = () => {
-    return navigation.navigate('FriendsList');
-  };
+  function handlelocation() {
+    console.log('location update');
+    Geolocation.getCurrentPosition(
+      position => {
+        const {latitude, longitude} = position.coords;
+        console.log(latitude, longitude);
+        locationUpdate(
+          {
+            data: {
+              latitude: latitude,
+              longitude: longitude,
+            },
+          },
+          {
+            onSuccess: data => {
+              console.log('location updated Success', data);
+              setlocationupdated(true);
+            },
+          },
+        );
+      },
+      error => {
+        // console.error(error);
+      },
+      {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
+    );
+  }
 
   const handleFilter = () => {
     setshowfilter(!showfilter);
@@ -337,7 +378,7 @@ const Discover = () => {
       style={styles.screen}>
       <View style={styles.screen}>
         <View style={styles.screencontainer}>
-          <Header />
+          <DiscoverHeader />
 
           <View style={[styles.optioncontainer]}>
             <TouchableOpacity onPress={() => setpageOption('Discover')}>
@@ -369,16 +410,9 @@ const Discover = () => {
               <Text>LO</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={handleProfileCreation}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('ProfileCreation')}>
               <Text>PC</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={handleFriendsList}>
-              <Text>FL</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={handleuploadscreenshot}>
-              <Text>US</Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => navigation.navigate('Recharge')}>
@@ -392,6 +426,8 @@ const Discover = () => {
             <View
               style={{
                 position: 'relative',
+                marginLeft: 'auto',
+                marginRight: 10,
               }}>
               {pageoption === 'Nearby' && (
                 <TouchableOpacity onPress={handleFilter}>
@@ -410,8 +446,17 @@ const Discover = () => {
                   <View style={styles.dropcontainer}>
                     {filterdata.items.map((item, index) => (
                       <View key={index} style={styles.singleitem}>
-                        <TouchableOpacity>
-                          <Text style={styles.itemtext}>{item.value}</Text>
+                        <TouchableOpacity
+                          onPress={() => {
+                            setfilterdata(prev => {
+                              return {
+                                ...prev,
+                                applied: item.value,
+                              };
+                            });
+                            setshowfilter(false);
+                          }}>
+                          <Text style={styles.itemtext}>{item.item}</Text>
                         </TouchableOpacity>
                       </View>
                     ))}
@@ -454,7 +499,7 @@ const Discover = () => {
                 width: 74,
                 height: 74,
               }}
-              onPress={handlelivestream}>
+              onPress={() => navigation.navigate('LiveStream')}>
               <Entypo
                 name="video-camera"
                 size={40}

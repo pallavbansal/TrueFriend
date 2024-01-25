@@ -2,8 +2,19 @@ import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import React from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import {useNavigation} from '@react-navigation/native';
 
 const SingleFriend = ({data}) => {
+  const navigation = useNavigation();
+
+  const handleChat = () => {
+    navigation.navigate('Chat', {
+      userid: data.id,
+      name: data.name,
+      imageUrl: data.imageUrl,
+    });
+  };
+
   return (
     <View>
       <View style={styles.fricontainer}>
@@ -35,7 +46,7 @@ const SingleFriend = ({data}) => {
           <Text style={styles.text1}>{data.name}</Text>
 
           <View style={{flexDirection: 'row', gap: 10, marginTop: 10}}>
-            <TouchableOpacity style={styles.chatbutton}>
+            <TouchableOpacity style={styles.chatbutton} onPress={handleChat}>
               <Text
                 style={{
                   color: 'white',

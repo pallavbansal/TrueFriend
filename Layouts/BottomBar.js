@@ -46,8 +46,8 @@ const routes = [
     },
   },
   {
-    name: 'Chat',
-    label: 'Chat',
+    name: 'FriendsList',
+    label: 'Friends',
     icon: focused => {
       return focused ? (
         <MaterialCommunityIcons

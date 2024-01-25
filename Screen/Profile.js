@@ -1,4 +1,11 @@
-import {View, Text, StyleSheet, TouchableOpacity, FlatList} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  ScrollView,
+} from 'react-native';
 import React, {useState} from 'react';
 import BottomBar from '../Layouts/BottomBar';
 import GradientScreen from '../Layouts/GradientScreen';
@@ -8,6 +15,7 @@ import SingleMedia from '../Components/Profile/SingleMedia';
 import {useFetchProfile} from '../Hooks/Query/ProfileQuery';
 import ProfileTop from '../Components/Profile/ProfileTop';
 import EditProfile from '../Components/Profile/EditProfile';
+import DetailMedia from '../Components/Profile/DetailMedia';
 import Loading from './Loading';
 const picturesdata = [
   {
@@ -148,12 +156,21 @@ const videosdata = [
 
 const Profile = () => {
   const {isPending, error, data: profiledata, isError} = useFetchProfile();
-
   const [selectedmediatype, setselectedmediatype] = useState('pictures');
   const [showeditmodel, setshoweditmodel] = useState(false);
+  const [showdetailmodel, setshowdetailmodel] = useState({
+    show: false,
+    data: null,
+  });
 
   function handleeditprofile() {
     setshoweditmodel(true);
+  }
+  function closedetailmodel() {
+    setshowdetailmodel({
+      show: false,
+      data: null,
+    });
   }
 
   if (isPending) {
@@ -164,6 +181,29 @@ const Profile = () => {
   //   return <Text>Error: {error.message}</Text>;
   // }
   const finaldata = profiledata.data.profile;
+  const Biodata = [
+    {
+      Sex: finaldata.sex.toUpperCase(),
+    },
+    {
+      Religion: finaldata.religion.toUpperCase(),
+    },
+    {
+      Drinking: finaldata.drinking.toUpperCase(),
+    },
+    {
+      Smoking: finaldata.smoking.toUpperCase(),
+    },
+    {
+      Followers: finaldata.followers_count,
+    },
+    {
+      Looking_For: finaldata.looking_for.toUpperCase(),
+    },
+    {
+      Marital_Status: finaldata.marital_status.toUpperCase(),
+    },
+  ];
   if (showeditmodel) {
     return (
       <EditProfile
@@ -213,6 +253,20 @@ const Profile = () => {
         </View>
         <View style={styles.mediacontainer}>
           <View style={styles.optionscontainer}>
+            <TouchableOpacity onPress={() => setselectedmediatype('bio')}>
+              <Text
+                style={[
+                  styles.optiontext,
+                  {
+                    color:
+                      selectedmediatype === 'bio'
+                        ? colors.arrow.tertiary
+                        : colors.arrow.primary,
+                  },
+                ]}>
+                Bio
+              </Text>
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => setselectedmediatype('pictures')}>
               <Text
                 style={[
@@ -243,24 +297,75 @@ const Profile = () => {
             </TouchableOpacity>
           </View>
           <View style={styles.medialistcontainer}>
-            {selectedmediatype === 'pictures' ? (
+            {selectedmediatype === 'bio' && (
+              <View
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  padding: 15,
+                }}>
+                <ScrollView>
+                  {Biodata.map((item, index) => {
+                    const keys = Object.keys(item);
+                    const values = Object.values(item);
+                    return (
+                      <View
+                        key={index}
+                        style={{
+                          marginBottom: 10,
+                          marginHorizontal: 10,
+                        }}>
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                          }}>
+                          <Text style={styles.headingtext3}>{keys[0]}</Text>
+                          <Text style={styles.headingtext3}>{values[0]}</Text>
+                        </View>
+                      </View>
+                    );
+                  })}
+                </ScrollView>
+              </View>
+            )}
+
+            {selectedmediatype === 'pictures' && (
               <FlatList
                 data={picturesdata}
                 keyExtractor={item => item.id.toString()}
                 renderItem={({item, index}) => (
-                  <SingleMedia item={item} index={index} />
+                  <TouchableOpacity
+                    onPress={() =>
+                      setshowdetailmodel({
+                        show: true,
+                        data: item,
+                      })
+                    }>
+                    <SingleMedia item={item} index={index} />
+                  </TouchableOpacity>
                 )}
                 onEndReachedThreshold={0.1}
                 showsVerticalScrollIndicator={false}
                 numColumns={4}
                 contentContainerStyle={{paddingBottom: 80}}
               />
-            ) : (
+            )}
+            {selectedmediatype === 'videos' && (
               <FlatList
                 data={videosdata}
                 keyExtractor={item => item.id.toString()}
                 renderItem={({item, index}) => (
-                  <SingleMedia item={item} index={index} />
+                  <TouchableOpacity
+                    onPress={() =>
+                      setshowdetailmodel({
+                        show: true,
+                        data: item,
+                      })
+                    }>
+                    <SingleMedia item={item} index={index} />
+                  </TouchableOpacity>
                 )}
                 onEndReachedThreshold={0.1}
                 showsVerticalScrollIndicator={false}
@@ -270,6 +375,9 @@ const Profile = () => {
             )}
           </View>
         </View>
+        {showdetailmodel.show && (
+          <DetailMedia data={showdetailmodel.data} close={closedetailmodel} />
+        )}
         <BottomBar />
       </View>
     </GradientScreen>
