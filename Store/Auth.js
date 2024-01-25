@@ -28,10 +28,10 @@ const AuthSlice = createSlice({
       state.verify.otp = action.payload.otp;
     },
     LogoutRed(state) {
-      state.user = null;
+      // state.user = null;
       state.token = null;
-      state.userid = null;
-      state.userinitaldata = null;
+      // state.userid = null;
+      // state.userinitaldata = null;
     },
   },
 });

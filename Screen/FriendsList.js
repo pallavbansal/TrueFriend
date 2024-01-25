@@ -18,7 +18,7 @@ import SingleFriend from '../Components/FriendList/SingleFriend';
 const data = [
   {
     id: 1,
-    name: 'John Doe',
+    name: 'Vivek Bansal',
     imageUrl:
       'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     liked: true,
@@ -31,23 +31,27 @@ const data = [
   },
   {
     id: 3,
-    name: 'John Doe',
+    name: 'Ajay Singh',
     liked: true,
+    imageUrl:
+      'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
   {
     id: 4,
-    name: 'John Doe',
+    name: 'Rahul Kumar',
     imageUrl:
       'https://images.unsplash.com/photo-1613521140785-e85e427f8002?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
   {
     id: 5,
-    name: 'John Doe',
+    name: 'Vicky Agarwal',
     liked: true,
+    imageUrl:
+      'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
   {
     id: 6,
-    name: 'John Doe',
+    name: 'Mohit Sharma',
     imageUrl:
       'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },

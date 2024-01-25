@@ -8,21 +8,22 @@ import {
 } from 'react-native';
 import React, {useState} from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {colors} from '../Styles/ColorData';
-import GradientInput from '../Components/Common/GradientInput';
+import {colors} from '../../Styles/ColorData';
+import GradientInput from '../Common/GradientInput';
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch} from 'react-redux';
-import {LogoutRed} from '../Store/Auth';
+import {LogoutRed} from '../../Store/Auth';
+import {useFetchProfile} from '../../Hooks/Query/ProfileQuery';
+import Loading from '../../Screen/Loading';
 
-const Header = () => {
+const DiscoverHeader = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const {data: UserProfileData, isPending, error, isError} = useFetchProfile();
   const [showsearch, setshowsearch] = useState(false);
-
   const handlenotification = () => {
     return navigation.navigate('Notification');
   };
-
   const handleLogout = () => {
     dispatch(LogoutRed());
     return navigation.reset({
@@ -30,7 +31,9 @@ const Header = () => {
       routes: [{name: 'Login'}],
     });
   };
-
+  if (isPending) {
+    return <Loading />;
+  }
   return (
     <View style={styles.headercontainer}>
       <View style={styles.headertopcontainer}>
@@ -43,25 +46,27 @@ const Header = () => {
               borderWidth: 3,
               borderColor: 'white',
             }}
-            source={require('../assets/favicon.png')}
+            source={{
+              uri: UserProfileData.data.profile.profile_picture,
+            }}
           />
         </View>
         <View style={styles.headerdetailcontainer}>
           <Text style={{color: 'white', fontSize: 20, fontWeight: 900}}>
-            Geet Singhania
+            {UserProfileData.data.profile?.name}
           </Text>
-          <Text style={{color: 'white', fontSize: 16, fontWeight: 800}}>
-            User Id
-          </Text>
+          {/* <Text style={{color: 'white', fontSize: 16, fontWeight: 800}}>
+            {'UserId : ' + UserProfileData.data.profile?.id}
+          </Text> */}
         </View>
         <View style={styles.headericoncontainer}>
           <TouchableOpacity onPress={handleLogout}>
             <MaterialIcons name="logout" size={28} color="white" />
           </TouchableOpacity>
 
-          {/* <TouchableOpacity onPress={handlenotification}>
+          <TouchableOpacity onPress={handlenotification}>
             <MaterialIcons name="notifications" size={28} color="white" />
-          </TouchableOpacity> */}
+          </TouchableOpacity>
 
           <TouchableOpacity onPress={() => setshowsearch(!showsearch)}>
             <MaterialIcons name="search" size={28} color="white" />
@@ -92,7 +97,7 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default DiscoverHeader;
 
 const styles = StyleSheet.create({
   headercontainer: {

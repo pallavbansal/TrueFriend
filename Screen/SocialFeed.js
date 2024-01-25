@@ -1,9 +1,11 @@
-import {View, Text, StyleSheet, FlatList} from 'react-native';
+import {View, Text, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
 import React from 'react';
 import BottomBar from '../Layouts/BottomBar';
 import GradientScreen from '../Layouts/GradientScreen';
 import FeedHeader from '../Components/SocialFeed/FeedHeader';
+import Feather from 'react-native-vector-icons/Feather';
 import SingleFeedProfile from '../Components/SocialFeed/SingleFeedProfile';
+import {colors} from '../Styles/ColorData';
 
 const feeds = [
   {
@@ -273,6 +275,10 @@ const feeds = [
 ];
 
 const SocialFeed = () => {
+  const handlelivestream = () => {
+    console.log('live stream');
+  };
+
   return (
     <GradientScreen>
       <View style={styles.container}>
@@ -289,6 +295,29 @@ const SocialFeed = () => {
             numColumns={1}
             contentContainerStyle={{paddingBottom: 120}}
           />
+        </View>
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 75,
+            right: 20,
+            padding: 6,
+            borderRadius: 48,
+            backgroundColor: colors.text.primarylight,
+            elevation: 10,
+          }}>
+          <TouchableOpacity
+            style={{
+              backgroundColor: colors.text.primary,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 40,
+              width: 50,
+              height: 50,
+            }}
+            onPress={handlelivestream}>
+            <Feather name="upload" size={28} color={colors.arrow.secondary} />
+          </TouchableOpacity>
         </View>
         <BottomBar />
       </View>

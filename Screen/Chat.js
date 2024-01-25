@@ -18,13 +18,6 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import ReportUser from '../Components/Chat/ReportUser';
 import Message from '../Components/Chat/Message';
 
-const profile = {
-  id: '1',
-  name: 'smartphones',
-  status: 'online',
-  imageUrl:
-    'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-};
 const MessageData = [
   {
     id: '1',
@@ -133,9 +126,9 @@ const MessageData = [
   },
 ];
 
-const Chat = () => {
+const Chat = ({route}) => {
+  const {userid, name, imageUrl} = route.params;
   const [reportdialog, setreportdialog] = useState(false);
-
   const handlerreportdialog = () => {
     setreportdialog(!reportdialog);
   };
@@ -148,7 +141,7 @@ const Chat = () => {
           style={styles.headercontainer}>
           <View>
             <Image
-              source={{uri: profile.imageUrl}}
+              source={{uri: imageUrl}}
               style={{
                 width: 40,
                 height: 40,
@@ -159,7 +152,7 @@ const Chat = () => {
             />
           </View>
           <View>
-            <Text style={styles.headingtext2}>{profile.name}</Text>
+            <Text style={styles.headingtext2}>{name}</Text>
           </View>
           <View style={{flexDirection: 'row', gap: 10, marginLeft: 'auto'}}>
             <TouchableOpacity>
