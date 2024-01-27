@@ -2,6 +2,7 @@ const url = 'https://wooing.boxinallsoftech.com/public/api/v1';
 
 // Login service
 export async function login(data) {
+  console.log('data', data);
   const response = await fetch(`${url}/auth/login`, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -10,6 +11,7 @@ export async function login(data) {
   if (!response.ok) {
     throw new Error('Invalid Credentials');
   }
+  console.log('response', response);
   return response.json();
 }
 // Verify service
@@ -23,6 +25,7 @@ export async function verify(data) {
   if (!response.ok) {
     throw new Error('Network response was not ok');
   }
+
   return response.json();
 }
 // Forgot Password service

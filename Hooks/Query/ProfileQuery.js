@@ -18,7 +18,7 @@ export const useFetchProfile = () => {
   const token = useSelector(state => state.Auth.token);
   const {isPending, error, data, isError} = useQuery({
     queryFn: () => fetchProfile(token),
-    queryKey: ['fetchProfile'],
+    queryKey: ['fetchProfile', token],
   });
   return {isPending, error, data, isError};
 };

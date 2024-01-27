@@ -34,6 +34,8 @@ const DiscoverHeader = () => {
   if (isPending) {
     return <Loading />;
   }
+  console.log('UserProfileData', UserProfileData);
+
   return (
     <View style={styles.headercontainer}>
       <View style={styles.headertopcontainer}>

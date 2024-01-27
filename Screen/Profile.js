@@ -248,7 +248,11 @@ const Profile = () => {
             <Text style={styles.headingtext2}>Short Bio</Text>
           </View>
           <View>
-            <Text style={styles.headingtext3}>{finaldata.bio}</Text>
+            {finaldata.bio ? (
+              <Text style={styles.headingtext3}>{finaldata.bio}</Text>
+            ) : (
+              <Text style={styles.headingtext3}>No Bio</Text>
+            )}
           </View>
         </View>
         <View style={styles.mediacontainer}>

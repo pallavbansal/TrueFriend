@@ -387,7 +387,7 @@ const Discover = () => {
                   styles.optiontext,
                   {
                     color:
-                      pageoption === 'Discover' ? colors.text.primary : null,
+                      pageoption === 'Discover' ? colors.text.primary : 'gray',
                   },
                 ]}>
                 Discover
@@ -399,29 +399,30 @@ const Discover = () => {
                 style={[
                   styles.optiontext,
                   {
-                    color: pageoption === 'Nearby' ? colors.text.primary : null,
+                    color:
+                      pageoption === 'Nearby' ? colors.text.primary : 'gray',
                   },
                 ]}>
                 Nearby
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={handleLogin}>
+            {/* <TouchableOpacity onPress={handleLogin}>
               <Text>LO</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={() => navigation.navigate('ProfileCreation')}>
               <Text>PC</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
-            <TouchableOpacity onPress={() => navigation.navigate('Recharge')}>
+            {/* <TouchableOpacity onPress={() => navigation.navigate('Recharge')}>
               <Text>RE</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
-            <TouchableOpacity onPress={() => navigation.navigate('Payment')}>
+            {/* <TouchableOpacity onPress={() => navigation.navigate('Payment')}>
               <Text>PY</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <View
               style={{
