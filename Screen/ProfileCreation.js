@@ -29,12 +29,12 @@ const ProfileCreation = () => {
         value: 'male',
       },
       {
-        label: 'Female',
-        value: 'Female',
+        label: 'female',
+        value: 'female',
       },
       {
-        label: 'Other',
-        value: 'Other',
+        label: 'other',
+        value: 'other',
       },
     ],
   });
@@ -48,16 +48,12 @@ const ProfileCreation = () => {
         value: 'married',
       },
       {
-        label: 'Single',
-        value: 'Single',
+        label: 'single',
+        value: 'single',
       },
       {
-        label: 'Divorced',
-        value: 'Divorced',
-      },
-      {
-        label: 'Widowed',
-        value: 'Widowed',
+        label: 'divorced',
+        value: 'divorced',
       },
     ],
   });
@@ -71,24 +67,24 @@ const ProfileCreation = () => {
         value: 'dating',
       },
       {
-        label: 'Friendship',
-        value: 'Friendship',
+        label: 'friendship',
+        value: 'friendship',
       },
       {
-        label: 'Chat Buddy',
-        value: 'Chat Buddy',
+        label: 'chat Buddy',
+        value: 'chat Buddy',
       },
       {
-        label: 'Sugar Daddy',
-        value: 'Sugar Daddy',
+        label: 'sugar Daddy',
+        value: 'sugar Daddy',
       },
       {
-        label: 'Sugar Mommy',
-        value: 'Sugar Mommy',
+        label: 'sugar Mommy',
+        value: 'sugar Mommy',
       },
       {
-        label: 'Hookups',
-        value: 'Hookups',
+        label: 'hookups',
+        value: 'hookups',
       },
     ],
   });
@@ -102,29 +98,29 @@ const ProfileCreation = () => {
         value: 'hindu',
       },
       {
-        label: 'Christianity',
-        value: 'Christianity',
+        label: 'christianity',
+        value: 'christianity',
       },
       {
-        label: 'Islam',
-        value: 'Islam',
+        label: 'islam',
+        value: 'islam',
       },
 
       {
-        label: 'Buddhism',
-        value: 'Buddhism',
+        label: 'buddhism',
+        value: 'buddhism',
       },
       {
-        label: 'Judaism',
-        value: 'Judaism',
+        label: 'judaism',
+        value: 'judaism',
       },
       {
-        label: 'Atheist',
-        value: 'Atheist',
+        label: 'atheist',
+        value: 'atheist',
       },
       {
-        label: 'Other',
-        value: 'Other',
+        label: 'other',
+        value: 'other',
       },
     ],
   });
@@ -138,16 +134,16 @@ const ProfileCreation = () => {
         value: 'no',
       },
       {
-        label: 'Socially',
-        value: 'Socially',
+        label: 'socially',
+        value: 'socially',
       },
       {
-        label: 'Often',
-        value: 'Often',
+        label: 'often',
+        value: 'often',
       },
       {
-        label: 'Regularly',
-        value: 'Regularly',
+        label: 'regularly',
+        value: 'regularly',
       },
     ],
   });
@@ -161,16 +157,16 @@ const ProfileCreation = () => {
         value: 'no',
       },
       {
-        label: 'Socially',
-        value: 'Socially',
+        label: 'socially',
+        value: 'socially',
       },
       {
-        label: 'Often',
-        value: 'Often',
+        label: 'often',
+        value: 'often',
       },
       {
-        label: 'Regularly',
-        value: 'Regularly',
+        label: 'regularly',
+        value: 'regularly',
       },
     ],
   });

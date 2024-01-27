@@ -36,6 +36,12 @@ export async function updateProfile(data, token) {
   const formData = new FormData();
   formData.append('mobile_number', data.mobile_number);
   formData.append('bio', data.bio);
+  formData.append('sex', data.sex);
+  formData.append('marital_status', data.marital_status);
+  formData.append('looking_for', data.looking_for);
+  formData.append('religion', data.religion);
+  formData.append('drinking', data.drinking);
+  formData.append('smoking', data.smoking);
   if (data.profile_picture.path) {
     formData.append('profile_picture', {
       uri: data.profile_picture.path,

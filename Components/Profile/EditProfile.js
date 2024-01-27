@@ -18,12 +18,164 @@ import React, {useState, useEffect} from 'react';
 import MultipleImagePicker from '@baronha/react-native-multiple-image-picker';
 import {useUpdateProfile} from '../../Hooks/Query/ProfileQuery';
 import {useQueryClient} from '@tanstack/react-query';
+import ProfileCreationDropdown from '../ProfileCreation/ProfileCreationDropdown';
 
 const EditProfile = ({setshoweditmodel, initialdata}) => {
   const queryClient = useQueryClient();
   const {isPending, error, mutate, reset} = useUpdateProfile();
   const [showerrors, setshowerrors] = useState(false);
   const [image, setImage] = useState('');
+  const [sexdata, setsexData] = useState({
+    open: false,
+    value: null,
+    placeholder: 'Sex',
+    items: [
+      {
+        label: 'male',
+        value: 'male',
+      },
+      {
+        label: 'female',
+        value: 'female',
+      },
+      {
+        label: 'other',
+        value: 'other',
+      },
+    ],
+  });
+  const [martialstatusdata, setmartialstatusData] = useState({
+    open: false,
+    value: null,
+    placeholder: 'Martial Status',
+    items: [
+      {
+        label: 'married',
+        value: 'married',
+      },
+      {
+        label: 'single',
+        value: 'single',
+      },
+      {
+        label: 'divorced',
+        value: 'divorced',
+      },
+    ],
+  });
+  const [searchingfordata, setsearchingforData] = useState({
+    open: false,
+    value: null,
+    placeholder: "I'm looking for",
+    items: [
+      {
+        label: 'dating',
+        value: 'dating',
+      },
+      {
+        label: 'friendship',
+        value: 'friendship',
+      },
+      {
+        label: 'chat Buddy',
+        value: 'chat Buddy',
+      },
+      {
+        label: 'sugar Daddy',
+        value: 'sugar Daddy',
+      },
+      {
+        label: 'sugar Mommy',
+        value: 'sugar Mommy',
+      },
+      {
+        label: 'hookups',
+        value: 'hookups',
+      },
+    ],
+  });
+  const [religiondata, setreligionData] = useState({
+    open: false,
+    value: null,
+    placeholder: 'Religion',
+    items: [
+      {
+        label: 'hindu',
+        value: 'hindu',
+      },
+      {
+        label: 'christianity',
+        value: 'christianity',
+      },
+      {
+        label: 'islam',
+        value: 'islam',
+      },
+
+      {
+        label: 'buddhism',
+        value: 'buddhism',
+      },
+      {
+        label: 'judaism',
+        value: 'judaism',
+      },
+      {
+        label: 'atheist',
+        value: 'atheist',
+      },
+      {
+        label: 'other',
+        value: 'other',
+      },
+    ],
+  });
+  const [drinkingdata, setdrinkingData] = useState({
+    open: false,
+    value: null,
+    placeholder: 'Drinking',
+    items: [
+      {
+        label: 'no',
+        value: 'no',
+      },
+      {
+        label: 'socially',
+        value: 'socially',
+      },
+      {
+        label: 'often',
+        value: 'often',
+      },
+      {
+        label: 'regularly',
+        value: 'regularly',
+      },
+    ],
+  });
+  const [smokingdata, setsmokingData] = useState({
+    open: false,
+    value: null,
+    placeholder: 'Smoking',
+    items: [
+      {
+        label: 'no',
+        value: 'no',
+      },
+      {
+        label: 'socially',
+        value: 'socially',
+      },
+      {
+        label: 'often',
+        value: 'often',
+      },
+      {
+        label: 'regularly',
+        value: 'regularly',
+      },
+    ],
+  });
   const [registerdata, setRegisterData] = useState({
     name: '',
     email: '',
@@ -37,6 +189,8 @@ const EditProfile = ({setshoweditmodel, initialdata}) => {
   });
 
   useEffect(() => {
+    console.log('initialdata', initialdata);
+    setselecteddata(initialdata);
     setRegisterData({
       name: initialdata?.name ? initialdata.name : '',
       email: initialdata?.email ? initialdata.email : '',
@@ -52,6 +206,60 @@ const EditProfile = ({setshoweditmodel, initialdata}) => {
     });
     setImage('');
   }, [initialdata]);
+
+  function setselecteddata(data) {
+    setsexData({
+      ...sexdata,
+      value: data.sex,
+    });
+    setmartialstatusData({
+      ...martialstatusdata,
+      value: data.marital_status,
+    });
+    setsearchingforData({
+      ...searchingfordata,
+      value: data.looking_for,
+    });
+    setreligionData({
+      ...religiondata,
+      value: data.religion,
+    });
+    setdrinkingData({
+      ...drinkingdata,
+      value: data.drinking,
+    });
+    setsmokingData({
+      ...smokingdata,
+      value: data.smoking,
+    });
+  }
+
+  function closeall() {
+    setsexData({
+      ...sexdata,
+      open: false,
+    });
+    setmartialstatusData({
+      ...martialstatusdata,
+      open: false,
+    });
+    setsearchingforData({
+      ...searchingfordata,
+      open: false,
+    });
+    setreligionData({
+      ...religiondata,
+      open: false,
+    });
+    setdrinkingData({
+      ...drinkingdata,
+      open: false,
+    });
+    setsmokingData({
+      ...smokingdata,
+      open: false,
+    });
+  }
 
   const handleImageUpload = async () => {
     try {
@@ -85,14 +293,24 @@ const EditProfile = ({setshoweditmodel, initialdata}) => {
       mobile_number: registerdata.phone,
       bio: registerdata.bio,
       profile_picture: registerdata.image,
+      sex: sexdata.value,
+      marital_status: martialstatusdata.value,
+      looking_for: searchingfordata.value,
+      religion: religiondata.value,
+      drinking: drinkingdata.value,
+      smoking: smokingdata.value,
     };
-    console.log('data', formdata);
+    console.log('xxxxxxxxxxxxxx data', formdata);
     mutate(
       {data: formdata},
       {
         onSuccess: data => {
+          console.log('yyyyyyyyyyyyyyyyyy data', data);
           queryClient.invalidateQueries({queryKey: ['fetchProfile']});
           setshoweditmodel(false);
+        },
+        onError: error => {
+          console.log('error', error);
         },
       },
     );
@@ -181,6 +399,36 @@ const EditProfile = ({setshoweditmodel, initialdata}) => {
                 />
               </View>
             </GradientInput>
+            <ProfileCreationDropdown
+              data={sexdata}
+              setData={setsexData}
+              closeall={closeall}
+            />
+            <ProfileCreationDropdown
+              data={martialstatusdata}
+              setData={setmartialstatusData}
+              closeall={closeall}
+            />
+            <ProfileCreationDropdown
+              data={searchingfordata}
+              setData={setsearchingforData}
+              closeall={closeall}
+            />
+            <ProfileCreationDropdown
+              data={religiondata}
+              setData={setreligionData}
+              closeall={closeall}
+            />
+            <ProfileCreationDropdown
+              data={drinkingdata}
+              setData={setdrinkingData}
+              closeall={closeall}
+            />
+            <ProfileCreationDropdown
+              data={smokingdata}
+              setData={setsmokingData}
+              closeall={closeall}
+            />
 
             {showerrors &&
               (registerdata.phone.length < 10 ||
