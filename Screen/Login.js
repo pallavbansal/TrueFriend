@@ -66,10 +66,12 @@ const Login = () => {
       email: logininputs.email,
       password: logininputs.password,
     };
+    console.log('login data', data);
     mutate(
       {data},
       {
         onSuccess: data => {
+          console.log('login success', data);
           if (data.status_code == 1) {
             console.log('login success', data);
             dispatch(
@@ -80,6 +82,9 @@ const Login = () => {
               }),
             );
             setLoginInputs({email: '', password: ''});
+            if (data.data.profile_filled == 0) {
+              return navigation.navigate('ProfileCreation');
+            }
             return navigation.reset({
               index: 0,
               routes: [{name: 'Discover'}],

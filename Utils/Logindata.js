@@ -5,13 +5,13 @@ export const logindata = [
     password: '2040324',
   },
   {
-    name: 'test21',
-    email: 'test21@gamil.com',
+    name: 'vivek',
+    email: 'Testboxinall@gmail.com',
     password: '1234567',
   },
   {
-    name: 'test20',
-    email: 'test20@gamil.com',
+    name: 'vivek2',
+    email: 'Testboxinall2@gmail.com',
     password: '1234567',
   },
 ];

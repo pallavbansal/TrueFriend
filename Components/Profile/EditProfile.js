@@ -47,10 +47,10 @@ const EditProfile = ({setshoweditmodel, initialdata}) => {
       phone: initialdata?.phone_number ? initialdata.phone_number : '',
       dob: initialdata?.dob ? initialdata.dob : '',
       address: initialdata?.address ? initialdata.address : '',
-      image: initialdata?.profile_picture ? initialdata.profile_picture : '',
+      image: '',
       bio: initialdata?.bio ? initialdata.bio : '',
     });
-    setImage(initialdata?.profile_picture ? initialdata.profile_picture : '');
+    setImage('');
   }, [initialdata]);
 
   const handleImageUpload = async () => {
@@ -86,6 +86,7 @@ const EditProfile = ({setshoweditmodel, initialdata}) => {
       bio: registerdata.bio,
       profile_picture: registerdata.image,
     };
+    console.log('data', formdata);
     mutate(
       {data: formdata},
       {
