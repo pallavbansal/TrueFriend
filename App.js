@@ -1,11 +1,14 @@
-import React from 'react';
-import {SafeAreaView, StatusBar, StyleSheet} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {SafeAreaView, StatusBar, StyleSheet, Text} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Toast from 'react-native-toast-message';
 import {Provider} from 'react-redux';
 import {store} from './Store/store';
+import NetInfo from '@react-native-community/netinfo';
+import {useNetInfoInstance} from '@react-native-community/netinfo';
+import NoInterent from './Components/Common/NoInterent';
 import {
   Discover,
   Notification,
@@ -122,6 +125,19 @@ const MainNavigator = () => {
 const queryClient = new QueryClient();
 
 function App() {
+  const {
+    netInfo: {type, isConnected},
+    refresh,
+  } = useNetInfoInstance();
+
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(state => {});
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
   return (
     <>
       <QueryClientProvider client={queryClient}>
@@ -129,7 +145,7 @@ function App() {
           <SafeAreaView style={styles.container}>
             <StatusBar />
             <NavigationContainer>
-              <MainNavigator />
+              {isConnected ? <MainNavigator /> : <NoInterent />}
             </NavigationContainer>
             <Toast autoHide visibilityTime={1000} swipeable />
           </SafeAreaView>
