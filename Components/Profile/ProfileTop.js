@@ -103,7 +103,7 @@ const ProfileTop = ({finaldata, handleeditprofile}) => {
           }}
         />
       </View>
-      {/* <View
+      <View
         style={{
           position: 'absolute',
           right: 10,
@@ -122,7 +122,7 @@ const ProfileTop = ({finaldata, handleeditprofile}) => {
             <AntDesign name="edit" size={28} color="white" />
           </TouchableOpacity>
         </View>
-      </View> */}
+      </View>
     </>
   );
 };

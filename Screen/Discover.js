@@ -6,10 +6,12 @@ import DiscoverHeader from '../Components/Discover/DiscoverHeader';
 import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../Styles/ColorData';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Loading from './Loading';
 import Entypo from 'react-native-vector-icons/Entypo';
 import GradientInput from '../Components/Common/GradientInput';
 import SingleUser from '../Components/Discover/SingleUser';
 import Geolocation from '@react-native-community/geolocation';
+import NoData from '../Components/Common/NoData';
 import {
   useLocationUpdate,
   useFetchDiscoverProfile,
@@ -297,23 +299,23 @@ const Discover = () => {
   const [filterdata, setfilterdata] = useState({
     items: [
       {
-        item: '1 Km',
-        value: '1',
+        item: '10 Km',
+        value: '10',
       },
       {
-        item: '3 Km',
-        value: '3',
+        item: '50 Km',
+        value: '50',
       },
       {
-        item: '5 Km',
-        value: '5 ',
+        item: '100 Km',
+        value: '100',
       },
-      {
-        item: 'All',
-        value: 'All',
-      },
+      // {
+      //   item: 'All',
+      //   value: '50',
+      // },
     ],
-    applied: '1',
+    applied: '50',
   });
   const {
     isPending: isDiscoverPending,
@@ -326,20 +328,20 @@ const Discover = () => {
     if (!locationupdated) {
       handlelocation();
     }
-  }, []);
+  }, [locationupdated]);
 
   if (isDiscoverPending) {
-    return <Text>Loading...</Text>;
+    return <Loading />;
   }
 
-  console.log('discoverData', discoverData.data.profiles);
+  console.log('discoverData', discoverData?.data?.profile);
 
   const handleLogin = () => {
     return navigation.navigate('Login');
   };
 
   function handlelocation() {
-    console.log('location update');
+    console.log('location update start');
     Geolocation.getCurrentPosition(
       position => {
         const {latitude, longitude} = position.coords;
@@ -387,7 +389,9 @@ const Discover = () => {
                   styles.optiontext,
                   {
                     color:
-                      pageoption === 'Discover' ? colors.text.primary : 'gray',
+                      pageoption === 'Discover'
+                        ? colors.arrow.tertiary
+                        : colors.text.primary,
                   },
                 ]}>
                 Discover
@@ -400,7 +404,9 @@ const Discover = () => {
                   styles.optiontext,
                   {
                     color:
-                      pageoption === 'Nearby' ? colors.text.primary : 'gray',
+                      pageoption === 'Nearby'
+                        ? colors.arrow.tertiary
+                        : colors.text.primary,
                   },
                 ]}>
                 Nearby
@@ -457,7 +463,18 @@ const Discover = () => {
                             });
                             setshowfilter(false);
                           }}>
-                          <Text style={styles.itemtext}>{item.item}</Text>
+                          <Text
+                            style={[
+                              styles.itemtext,
+                              {
+                                color:
+                                  filterdata.applied === item.value
+                                    ? colors.arrow.tertiary
+                                    : colors.login.headingtext2,
+                              },
+                            ]}>
+                            {item.item}
+                          </Text>
                         </TouchableOpacity>
                       </View>
                     ))}
@@ -468,17 +485,21 @@ const Discover = () => {
           </View>
 
           <View style={{marginBottom: 120, alignItems: 'center'}}>
-            <FlatList
-              data={categories}
-              keyExtractor={item => item.id.toString()}
-              renderItem={({item, index}) => (
-                <SingleUser item={item} index={index} />
-              )}
-              onEndReachedThreshold={0.1}
-              showsVerticalScrollIndicator={false}
-              numColumns={3}
-              contentContainerStyle={{paddingBottom: 80}}
-            />
+            {discoverData?.data?.profile ? (
+              <FlatList
+                data={discoverData?.data?.profile}
+                keyExtractor={item => item.id.toString()}
+                renderItem={({item, index}) => (
+                  <SingleUser item={item} index={index} />
+                )}
+                onEndReachedThreshold={0.1}
+                showsVerticalScrollIndicator={false}
+                numColumns={3}
+                contentContainerStyle={{paddingBottom: 80}}
+              />
+            ) : (
+              <NoData />
+            )}
           </View>
 
           <View
@@ -560,5 +581,6 @@ const styles = StyleSheet.create({
   itemtext: {
     color: colors.login.headingtext2,
     fontSize: 14,
+    fontWeight: 'bold',
   },
 });
