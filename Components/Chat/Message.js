@@ -1,26 +1,110 @@
-import {View, Text, StyleSheet} from 'react-native';
-import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Modal,
+  TouchableOpacity,
+} from 'react-native';
+import React, {useState} from 'react';
 import {colors} from '../../Styles/ColorData';
+import Video from 'react-native-video';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-const myid = '1';
+const Message = ({MessageData, myid}) => {
+  const [modalVisible, setModalVisible] = useState(false);
 
-const Message = ({MessageData}) => {
+  const onBuffer = ({isBuffering}) => {
+    console.log(isBuffering ? 'Video is buffering' : 'Video buffering ended');
+  };
+
+  const videoError = error => {
+    console.error('Video error', error);
+  };
+
   return (
     <View
       style={[
         styles.container,
-        MessageData.sender === myid ? styles.right : styles.left,
+        MessageData.senderid == myid ? styles.right : styles.left,
       ]}>
       <View style={styles.messageheader}>
         <Text
           style={[
-            MessageData.sender === myid ? styles.nametext1 : styles.nametext2,
+            MessageData.senderid == myid ? styles.nametext1 : styles.nametext2,
           ]}>
-          {MessageData.senderName}
+          {MessageData.senderid == myid ? 'You' : MessageData.senderName}
         </Text>
+        {MessageData.type == 'image' && (
+          <MaterialIcons
+            name="image"
+            size={18}
+            color={colors.arrow.primary}
+            style={{
+              marginRight: 'auto',
+            }}
+          />
+        )}
+        {MessageData.type == 'video' && (
+          <MaterialIcons
+            name="video-camera-back"
+            size={18}
+            color={colors.arrow.primary}
+            style={{
+              marginRight: 'auto',
+            }}
+          />
+        )}
+        {MessageData.type == 'doc' && (
+          <MaterialIcons
+            name="edit-document"
+            size={18}
+            color={colors.arrow.primary}
+            style={{
+              marginRight: 'auto',
+            }}
+          />
+        )}
+
         <Text style={styles.timetext}>{MessageData.time}</Text>
       </View>
-      <Text style={styles.messagetext}>{MessageData.message}</Text>
+      {MessageData.type == 'text' && (
+        <Text style={styles.messagetext}>{MessageData.message}</Text>
+      )}
+      {MessageData.type == 'image' && (
+        <Image
+          source={{uri: MessageData.media}}
+          style={{width: 150, height: 150}}
+        />
+      )}
+      {MessageData.type == 'video' && (
+        <TouchableOpacity onPress={() => setModalVisible(true)}>
+          <Image
+            source={{uri: MessageData.media}}
+            style={{width: 150, height: 150}}
+          />
+          <Modal
+            animationType="slide"
+            transparent={false}
+            visible={modalVisible}
+            onRequestClose={() => {
+              setModalVisible(!modalVisible);
+            }}>
+            <View style={styles.videoModal}>
+              <Video
+                source={{uri: MessageData.media}}
+                style={{width: '100%', height: '100%'}}
+                resizeMode="cover"
+                controls={true}
+                paused={false}
+                repeat={false}
+                onBuffer={onBuffer}
+                onError={videoError}
+              />
+            </View>
+          </Modal>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -82,5 +166,11 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     fontSize: 14,
     lineHeight: 20,
+  },
+  videoModal: {
+    // backgroundColor: 'black',
+    flex: 1,
+    // padding: 10,
+    // margin: 10,
   },
 });

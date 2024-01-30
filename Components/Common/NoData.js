@@ -8,13 +8,13 @@ const NoData = () => {
     <View style={styles.container}>
       <Image
         source={require('../../assets/images/no_data.png')}
-        style={{height: 250, width: 250}}
+        style={{height: 200, width: 200}}
       />
       <Text
         style={{
           fontSize: 28,
           fontWeight: 'bold',
-          marginTop: 10,
+          marginTop: 0,
           color: colors.arrow.primary,
         }}>
         No Data Available
@@ -22,7 +22,7 @@ const NoData = () => {
       <Text
         style={{
           fontSize: 15,
-          marginTop: 10,
+          marginTop: 5,
           textAlign: 'center',
           fontWeight: 'bold',
           color: colors.socialfeed.actionicons,
@@ -37,10 +37,12 @@ export default NoData;
 
 const styles = StyleSheet.create({
   container: {
-    height: '100%',
+    height: '90%',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -50,
-    // backgroundColor: 'white',
+    backgroundColor: 'white',
+    padding: 50,
+    margin: 10,
+    borderRadius: 20,
   },
 });

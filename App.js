@@ -146,6 +146,7 @@ function App() {
             <StatusBar />
             <NavigationContainer>
               {isConnected ? <MainNavigator /> : <NoInterent />}
+              {/* <NoInterent /> */}
             </NavigationContainer>
             <Toast autoHide visibilityTime={1000} swipeable />
           </SafeAreaView>

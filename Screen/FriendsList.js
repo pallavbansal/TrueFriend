@@ -5,33 +5,41 @@ import {
   StyleSheet,
   TextInput,
   FlatList,
+  Modal,
+  Pressable,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import {colors} from '../Styles/ColorData';
 import GradientScreen from '../Layouts/GradientScreen';
 import GradientInput from '../Components/Common/GradientInput';
+import GradientButton from '../Components/Common/GradientButton';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
 import SingleFriend from '../Components/FriendList/SingleFriend';
+import SelectFriend from '../Components/FriendList/SelectFriend';
 
 const data = [
   {
     id: 1,
     name: 'Vivek Bansal',
+    type: 'single',
     imageUrl:
       'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     liked: true,
   },
   {
     id: 2,
-    name: 'John Doe',
+    name: 'Friends Group',
+    type: 'group',
+    grouproomid: '123',
     imageUrl:
       'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
   {
     id: 3,
     name: 'Ajay Singh',
+    type: 'single',
     liked: true,
     imageUrl:
       'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
@@ -39,12 +47,14 @@ const data = [
   {
     id: 4,
     name: 'Rahul Kumar',
+    type: 'single',
     imageUrl:
       'https://images.unsplash.com/photo-1613521140785-e85e427f8002?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
   {
     id: 5,
     name: 'Vicky Agarwal',
+    type: 'single',
     liked: true,
     imageUrl:
       'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
@@ -52,6 +62,14 @@ const data = [
   {
     id: 6,
     name: 'Mohit Sharma',
+    type: 'single',
+    imageUrl:
+      'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+  },
+  {
+    id: 7,
+    name: 'XYZ',
+    type: 'single',
     imageUrl:
       'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
@@ -59,6 +77,13 @@ const data = [
 
 const FriendsList = () => {
   const navigation = useNavigation();
+  const [showgroupmodal, setshowgroupmodal] = useState(false);
+  const [grouplist, setgrouplist] = useState([]);
+
+  const handlecreategroup = () => {
+    console.log('grouplist', grouplist);
+    setshowgroupmodal(false);
+  };
   return (
     <GradientScreen>
       <View style={styles.container}>
@@ -81,7 +106,8 @@ const FriendsList = () => {
               alignItems: 'center',
               marginRight: 20,
               gap: 3,
-            }}>
+            }}
+            onPress={() => setshowgroupmodal(true)}>
             <View
               style={{
                 backgroundColor: '#FF5A90',
@@ -137,6 +163,61 @@ const FriendsList = () => {
             contentContainerStyle={{paddingBottom: 250}}
           />
         </View>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={showgroupmodal}
+          onRequestClose={() => {
+            setshowgroupmodal(!showgroupmodal);
+          }}>
+          <Pressable
+            onPress={() => setshowgroupmodal(false)}
+            style={{
+              flex: 1,
+            }}>
+            <Pressable
+              onPress={event => event.stopPropagation()}
+              style={styles.GroupModal}>
+              <View
+                style={{
+                  flex: 1,
+                }}>
+                <FlatList
+                  data={data.filter(item => item.type === 'single')}
+                  keyExtractor={item => item.id.toString()}
+                  renderItem={({item, index}) => (
+                    <SelectFriend
+                      data={item}
+                      index={index}
+                      grouplist={grouplist}
+                      setgrouplist={setgrouplist}
+                    />
+                  )}
+                  onEndReachedThreshold={0.1}
+                  showsVerticalScrollIndicator={false}
+                  numColumns={1}
+                  contentContainerStyle={{paddingBottom: 20, paddingTop: 20}}
+                />
+              </View>
+
+              <View
+                style={{
+                  width: '100%',
+                  justifyContent: 'center',
+                  flexDirection: 'row',
+                  marginBottom: 20,
+                }}>
+                <TouchableOpacity
+                  style={{marginTop: 20}}
+                  onPress={handlecreategroup}>
+                  <GradientButton style={styles.submitbutton}>
+                    <Text style={styles.submittext}>Create Group</Text>
+                  </GradientButton>
+                </TouchableOpacity>
+              </View>
+            </Pressable>
+          </Pressable>
+        </Modal>
       </View>
     </GradientScreen>
   );
@@ -145,6 +226,14 @@ const FriendsList = () => {
 export default FriendsList;
 
 const styles = StyleSheet.create({
+  GroupModal: {
+    flex: 1,
+    backgroundColor: colors.arrow.secondary,
+    marginTop: 100,
+    marginHorizontal: 10,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+  },
   container: {
     flex: 1,
   },
@@ -200,5 +289,20 @@ const styles = StyleSheet.create({
   },
   friendlistcontainer: {
     marginTop: 10,
+  },
+  submitbutton: {
+    width: 170,
+    height: 55,
+    borderRadius: 80,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  submittext: {
+    fontFamily: 'Lexend',
+    color: colors.text.primary,
+    fontWeight: '600',
+    fontSize: 18,
+    lineHeight: 22.5,
   },
 });

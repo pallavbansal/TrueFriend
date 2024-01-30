@@ -1,179 +1,176 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  TextInput,
-  FlatList,
-} from 'react-native';
-import React, {useState} from 'react';
+import {View, StyleSheet, FlatList} from 'react-native';
+import React, {useState, useEffect} from 'react';
 import GradientScreen from '../Layouts/GradientScreen';
-import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../Styles/ColorData';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Entypo from 'react-native-vector-icons/Entypo';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import ReportUser from '../Components/Chat/ReportUser';
 import Message from '../Components/Chat/Message';
+import ChatHeader from '../Components/Chat/ChatHeader';
+import ChatBottom from '../Components/Chat/ChatBottom';
+import {useSelector} from 'react-redux';
+import io from 'socket.io-client';
+const socket = io('http://192.168.117.181:3000');
 
-const MessageData = [
-  {
-    id: '1',
-    message:
-      'Hello dndi knoe kdmld omsld ddd dm odd modm w dkfed fmde dfle djfode demdoedd  dled e dfmew kdmfe mfel dfmled lfe flm',
-    sender: '1',
-    senderName: 'You',
-    receiver: '2',
-    time: '10:00 AM',
-  },
-  {
-    id: '2',
-    message: 'Hi',
-    sender: '2',
-    senderName: 'Rahul Singh',
-    receiver: '1',
-    time: '10:00 PM',
-  },
-  {
-    id: '3',
-    message: 'How are you?',
-    sender: '1',
-    senderName: 'You',
-    receiver: '2',
-    time: '10:00 AM',
-  },
-  {
-    id: '4',
-    message: 'I am fine',
-    sender: '2',
-    senderName: 'Rahul Singh',
-    receiver: '1',
-    time: '10:00 PM',
-  },
-  {
-    id: '5',
-    message: 'What about you?',
-    sender: '2',
-    senderName: 'Rahul Singh',
-    receiver: '1',
-    time: '10:00 AM',
-  },
-  {
-    id: '6',
-    message: 'I am fine',
-    sender: '1',
-    senderName: 'You',
-    receiver: '2',
-    time: '10:00 PM',
-  },
-  {
-    id: '7',
-    message: 'What about you?',
-    sender: '1',
-    senderName: 'You',
-    receiver: '2',
-    time: '10:00 AM',
-  },
-  {
-    id: '8',
-    message: 'I am fine',
-    sender: '2',
-    senderName: 'Rahul Singh',
-    receiver: '1',
-    time: '10:00 PM',
-  },
-  {
-    id: '9',
-    message: 'What about you?',
-    sender: '2',
-    senderName: 'Rahul Singh',
-    receiver: '1',
-    time: '10:00 AM',
-  },
-  {
-    id: '10',
-    message: 'I am fine',
-    sender: '1',
-    senderName: 'You',
-    receiver: '2',
-    time: '10:00 PM',
-  },
-  {
-    id: '11',
-    message: 'What about you?',
-    sender: '1',
-    senderName: 'You',
-    receiver: '2',
-    time: '10:00 AM',
-  },
-  {
-    id: '12',
-    message: 'I am fine',
-    sender: '2',
-    senderName: 'Rahul Singh',
-    receiver: '1',
-    time: '10:00 PM',
-  },
-  {
-    id: '13',
-    message: 'What about you?',
-    sender: '2',
-    senderName: 'Rahul Singh',
-    receiver: '1',
-    time: '10:00 AM',
-  },
-];
+// const MessageDatatemp = [
+//   {
+//     id: '1',
+//     type: 'text',
+//     message:
+//       'Hello dndi knoe kdmld omsld ddd dm odd modm w dkfed fmde dfle djfode demdoedd  dled e dfmew kdmfe mfel dfmled lfe flm',
+//     senderid: '7',
+//     senderName: 'You',
+//     receiverid: '2',
+//     time: '10:00 AM',
+//   },
+//   {
+//     id: '2',
+//     type: 'text',
+//     message: 'Hi',
+//     senderid: '2',
+//     senderName: 'Rahul Singh',
+//     receiverid: '1',
+//     time: '10:00 PM',
+//   },
+//   {
+//     id: '3',
+//     type: 'text',
+//     message: 'How are you?',
+//     senderid: '7',
+//     senderName: 'You',
+//     receiverid: '2',
+//     time: '10:00 AM',
+//   },
+//   {
+//     id: '4',
+//     type: 'text',
+//     message: 'I am fine',
+//     senderid: '2',
+//     senderName: 'Rahul Singh',
+//     receiverid: '7',
+//     time: '10:00 PM',
+//   },
+//   {
+//     id: '5',
+//     type: 'text',
+//     message: 'What about you?',
+//     senderid: '2',
+//     senderName: 'Rahul Singh',
+//     receiverid: '7',
+//     time: '10:00 AM',
+//   },
+//   {
+//     id: '6',
+//     type: 'text',
+//     message: 'I am fine',
+//     senderid: '7',
+//     senderName: 'You',
+//     receiverid: '2',
+//     time: '10:00 PM',
+//   },
+//   {
+//     id: '7',
+//     type: 'text',
+//     message: 'What about you?',
+//     senderid: '7',
+//     senderName: 'You',
+//     receiverid: '2',
+//     time: '10:00 AM',
+//   },
+//   {
+//     id: '8',
+//     type: 'text',
+//     message: 'I am fine',
+//     senderid: '2',
+//     senderName: 'Rahul Singh',
+//     receiverid: '7',
+//     time: '10:00 PM',
+//   },
+//   {
+//     id: '9',
+//     type: 'text',
+//     message: 'What about you?',
+//     senderid: '2',
+//     senderName: 'Rahul Singh',
+//     receiverid: '7',
+//     time: '10:00 AM',
+//   },
+//   {
+//     id: '10',
+//     type: 'text',
+//     message: 'I am fine',
+//     senderid: '7',
+//     senderName: 'You',
+//     receiverid: '2',
+//     time: '10:00 PM',
+//   },
+//   {
+//     id: '11',
+//     type: 'text',
+//     message: 'What about you?',
+//     senderid: '7',
+//     senderName: 'You',
+//     receiverid: '2',
+//     time: '10:00 AM',
+//   },
+//   {
+//     id: '12',
+//     type: 'text',
+//     message: 'I am fine',
+//     senderid: '2',
+//     senderName: 'Rahul Singh',
+//     receiverid: '7',
+//     time: '10:00 PM',
+//   },
+//   {
+//     id: '13',
+//     type: 'text',
+//     message: 'What about you?',
+//     senderid: '2',
+//     senderName: 'Rahul Singh',
+//     receiverid: '7',
+//     time: '10:00 AM',
+//   },
+// ];
 
 const Chat = ({route}) => {
-  const {userid, name, imageUrl} = route.params;
-  const [reportdialog, setreportdialog] = useState(false);
-  const handlerreportdialog = () => {
-    setreportdialog(!reportdialog);
-  };
+  const [MessageData, setMessageData] = useState([]);
+  const {userid, name, imageUrl, type: chattype, grouproomid} = route.params;
+  const myuserid = useSelector(state => state.Auth.userid);
+  const {name: myname} = useSelector(state => state.Auth.userinitaldata);
+
+  useEffect(() => {
+    const socket = io('http://192.168.117.181:3000');
+    socket.on('connect', () => {
+      const roomid = [myuserid, userid].sort().join('_');
+      if (chattype == 'group') {
+        socket.emit('join room', grouproomid);
+      } else {
+        socket.emit('join room', roomid);
+      }
+    });
+
+    socket.on('chat message', msg => {
+      console.log(msg);
+      setMessageData(prev => {
+        const lastMessageId = prev.length > 0 ? prev[prev.length - 1].id : 0;
+        msg.id = lastMessageId + 1;
+        return [...prev, msg];
+      });
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   return (
     <GradientScreen>
       <View style={styles.container}>
-        <LinearGradient
-          colors={colors.gradients.buttongradient}
-          style={styles.headercontainer}>
-          <View>
-            <Image
-              source={{uri: imageUrl}}
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                borderWidth: 1,
-                borderColor: 'white',
-              }}
-            />
-          </View>
-          <View>
-            <Text style={styles.headingtext2}>{name}</Text>
-          </View>
-          <View style={{flexDirection: 'row', gap: 10, marginLeft: 'auto'}}>
-            <TouchableOpacity>
-              <Ionicons name="call" size={24} color="white" />
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <FontAwesome5 name="video" size={24} color="white" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handlerreportdialog}>
-              <Entypo name="dots-three-vertical" size={24} color="white" />
-            </TouchableOpacity>
-          </View>
-        </LinearGradient>
-        {reportdialog && <ReportUser close={handlerreportdialog} />}
-
+        <ChatHeader name={name} imageUrl={imageUrl} userid={userid} />
         <View style={styles.chatcontainer}>
           <FlatList
             data={MessageData}
             keyExtractor={item => item.id.toString()}
             renderItem={({item, index}) => (
-              <Message MessageData={item} index={index} />
+              <Message MessageData={item} index={index} myid={myuserid} />
             )}
             onEndReachedThreshold={0.1}
             showsVerticalScrollIndicator={false}
@@ -181,43 +178,12 @@ const Chat = ({route}) => {
             contentContainerStyle={{paddingBottom: 80}}
           />
         </View>
-        <View style={styles.bottomcontainer}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              backgroundColor: colors.text.primary,
-              gap: 10,
-            }}>
-            <TextInput
-              placeholder="Type a message"
-              placeholderTextColor={colors.login.headingtext2}
-              cursorColor={colors.login.headingtext2}
-              style={{
-                color: colors.login.headingtext2,
-                fontWeight: '900',
-                flex: 1,
-                borderRadius: 20,
-                paddingHorizontal: 20,
-                margin: 5,
-              }}
-            />
-            <TouchableOpacity>
-              <Entypo
-                name="attachment"
-                size={24}
-                color={colors.arrow.secondary}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity style={{marginRight: 10}}>
-              <MaterialIcons
-                name="send"
-                size={24}
-                color={colors.arrow.secondary}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
+        <ChatBottom
+          socket={socket}
+          senderid={myuserid}
+          receiverid={userid}
+          myname={myname}
+        />
       </View>
     </GradientScreen>
   );
@@ -229,18 +195,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  headercontainer: {
-    padding: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    width: '100%',
-  },
-  bottomcontainer: {
-    backgroundColor: 'red',
-    position: 'fixed',
-    bottom: 0,
-  },
   headingtext2: {
     fontFamily: 'Lexend',
     color: colors.text.primary,
@@ -250,6 +204,5 @@ const styles = StyleSheet.create({
   },
   chatcontainer: {
     flex: 1,
-    // backgroundColor: 'blue',
   },
 });
