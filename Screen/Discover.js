@@ -510,7 +510,9 @@ const Discover = () => {
               padding: 6,
               borderRadius: 48,
               backgroundColor: colors.text.primarylight,
-              elevation: 10,
+              // backgroundColor: 'black',
+              // backgroundColor: colors.arrow.primary,
+              elevation: 50,
             }}>
             <TouchableOpacity
               style={{
@@ -520,6 +522,7 @@ const Discover = () => {
                 borderRadius: 40,
                 width: 74,
                 height: 74,
+                elevation: 50,
               }}
               onPress={() => navigation.navigate('LiveStream')}>
               <Entypo

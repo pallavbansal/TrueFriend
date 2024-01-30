@@ -20,7 +20,7 @@ const NoInterent = () => {
         />
         <Text
           style={{
-            fontSize: 28,
+            fontSize: 30,
             fontWeight: 'bold',
             marginTop: 10,
             color: colors.arrow.primary,
@@ -38,7 +38,7 @@ const NoInterent = () => {
           No internet connection is found. Check your connection or try again.
         </Text>
 
-        <TouchableOpacity onPress={refresh} style={{marginTop: 30}}>
+        <TouchableOpacity onPress={refresh} style={{marginTop: 150}}>
           <GradientButton style={styles.submitbutton}>
             <Text style={styles.submittext}>Refresh</Text>
           </GradientButton>
@@ -56,6 +56,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'white',
+    paddingHorizontal: 50,
   },
   submitbutton: {
     backgroundColor: colors.arrow.primary,
@@ -64,6 +65,7 @@ const styles = StyleSheet.create({
     borderRadius: 80,
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 'auto',
   },
 
   submittext: {

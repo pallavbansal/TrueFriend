@@ -12,6 +12,8 @@ const SingleFriend = ({data}) => {
       userid: data.id,
       name: data.name,
       imageUrl: data.imageUrl,
+      type: data.type,
+      grouproomid: data.grouproomid,
     });
   };
 
@@ -56,15 +58,17 @@ const SingleFriend = ({data}) => {
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.callbutton}>
-              <Text
-                style={{
-                  color: 'white',
-                  fontWeight: '500',
-                }}>
-                Call
-              </Text>
-            </TouchableOpacity>
+            {data.type == 'single' && (
+              <TouchableOpacity style={styles.callbutton}>
+                <Text
+                  style={{
+                    color: 'white',
+                    fontWeight: '500',
+                  }}>
+                  Call
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </View>
