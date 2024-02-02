@@ -15,6 +15,7 @@ import Recharge from './Recharge';
 import Splash from './Splash';
 import Chat from './Chat';
 import Temp from './Temp';
+import CreatePost from './CreatePost';
 
 export {
   Discover,
@@ -34,4 +35,5 @@ export {
   Splash,
   Chat,
   Temp,
+  CreatePost,
 };

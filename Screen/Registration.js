@@ -142,7 +142,7 @@ const Registration = () => {
         onSuccess: data => {
           if (data.status_code == 1) {
             console.log('register success', data);
-            dispatch(VerifyRed({id: data.data.id, otp: data.test_otp}));
+            dispatch(VerifyRed({id: data.data.id}));
             resetalldata();
             return navigation.navigate('Verify');
           } else {

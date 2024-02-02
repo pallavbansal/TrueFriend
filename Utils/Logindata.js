@@ -1,5 +1,10 @@
 export const logindata = [
   {
+    name: 'Jhon',
+    email: 'synyru@closetab.email',
+    password: '1234567',
+  },
+  {
     name: 'Jhon Doe',
     email: 'test2@gmail.com',
     password: '2040324',

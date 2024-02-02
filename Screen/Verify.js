@@ -22,7 +22,7 @@ import Toast from 'react-native-toast-message';
 const Verify = () => {
   const navigation = useNavigation();
   const verifydata = useSelector(state => state.Auth.verify);
-  const {mutate, isPending, error} = useVerify();
+  const {mutate, isPending, error, reset} = useVerify();
 
   const inputRefs = React.useMemo(
     () =>
@@ -39,36 +39,54 @@ const Verify = () => {
   };
   const focusPreviousInput = index => {
     if (index > 0) {
+      inputRefs[index].current.value = '';
       inputRefs[index - 1].current.focus();
     }
   };
 
   function handletextChange(text, index) {
     if (text) {
-      console.log('text', text);
+      inputRefs[index].current.value = text;
       focusNextInput(index);
     }
   }
 
   function handleSubmit() {
+    const otp = inputRefs.map(ref => ref.current.value).join('');
+    if (otp.length < 4) {
+      return Toast.show({
+        type: 'error',
+        text1: 'Invalid OTP',
+        text2: 'Please enter a valid 4 digit OTP',
+      });
+    }
     const data = {
       id: verifydata.id.toString(),
-      otp: verifydata.otp.toString(),
+      otp: otp,
     };
+
+    console.log('data', data);
     mutate(
       {data},
       {
         onSuccess: data => {
           console.log('Verify success', data);
-          Toast.show({
-            type: 'success',
-            text1: 'Verify Success',
-            text2: 'Redirecting to Login Page',
-          });
-          return navigation.reset({
-            index: 0,
-            routes: [{name: 'Login'}],
-          });
+          if (data.status_code == 1) {
+            Toast.show({
+              type: 'success',
+              text1: 'Verify Success',
+              text2: 'Redirecting to Login Page',
+            });
+            return navigation.reset({
+              index: 0,
+              routes: [{name: 'Login'}],
+            });
+          } else {
+            setTimeout(() => {
+              reset();
+            }, 4000);
+            throw new Error(data.message);
+          }
         },
       },
     );
@@ -116,7 +134,6 @@ const Verify = () => {
                       maxLength={1}
                       ref={inputRefs[i]}
                       onKeyPress={({nativeEvent}) => {
-                        console.log('hello', nativeEvent.key);
                         if (nativeEvent.key === 'Backspace') {
                           focusPreviousInput(i);
                         }
@@ -134,20 +151,24 @@ const Verify = () => {
               ))}
             </View>
 
-            <View>
-              <Text style={styles.headingtext2}>{'id: ' + verifydata.id}</Text>
-              <Text style={styles.headingtext2}>
-                {'otp: ' + verifydata.otp}
-              </Text>
-            </View>
+            {error && (
+              <GradientText
+                style={[
+                  styles.headingtext2,
+                  {
+                    textAlign: 'center',
+                    paddingHorizontal: 20,
+                  },
+                ]}>
+                {error.message}
+              </GradientText>
+            )}
 
             <TouchableOpacity onPress={handleSubmit} style={{marginTop: 20}}>
               <GradientButton style={styles.submitbutton}>
                 <Text style={styles.submittext}>Submit</Text>
               </GradientButton>
             </TouchableOpacity>
-
-            {error && <Text style={styles.headingtext2}>{error.message}</Text>}
 
             <TouchableOpacity>
               <GradientText style={[styles.headingtext2, {fontSize: 16}]}>

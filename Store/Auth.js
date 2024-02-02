@@ -7,7 +7,7 @@ const initialState = {
   userprofiledata: null,
   verify: {
     id: null,
-    otp: null,
+    // otp: null,
   },
 };
 
@@ -25,7 +25,7 @@ const AuthSlice = createSlice({
     },
     VerifyRed(state, action) {
       state.verify.id = action.payload.id;
-      state.verify.otp = action.payload.otp;
+      // state.verify.otp = action.payload.otp;
     },
     LogoutRed(state) {
       // state.user = null;
