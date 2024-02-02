@@ -1,6 +1,5 @@
 import {View, Text, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
-import React, {useState, useRef, useEffect} from 'react';
-import GradientText from '../Components/Common/GradientText';
+import React, {useState, useRef} from 'react';
 import BottomBar from '../Layouts/BottomBar';
 import GradientScreen from '../Layouts/GradientScreen';
 import FeedHeader from '../Components/SocialFeed/FeedHeader';
@@ -15,16 +14,7 @@ const SocialFeed = () => {
   const navigation = useNavigation();
   const [isMuted, setIsMuted] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
-  const [allPosts, setAllPosts] = useState([]);
-  const {
-    data,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isPending,
-    isFetching,
-  } = useFetchSocialFeedPosts();
+  const {isPending, error, data, isError} = useFetchSocialFeedPosts();
   const [viewableItems, setViewableItems] = useState([]);
   const viewabilityConfig = useRef({viewAreaCoveragePercentThreshold: 50});
   const onViewableItemsChanged = useRef(({viewableItems}) => {
@@ -44,25 +34,9 @@ const SocialFeed = () => {
     setIsPaused(prev => !prev);
   };
 
-  useEffect(() => {
-    if (data) {
-      // data.pages.forEach(page => {
-      //   console.log(
-      //     'IDs in page',
-      //     page.data.posts.data.map(item => item.id),
-      //   );
-      // });
-      const posts = data.pages.flatMap(page => page.data.posts.data);
-      setAllPosts(posts);
-    }
-  }, [data]);
-
   if (isPending) {
     return <Loading />;
   }
-
-  // console.log('data', data.pages);
-  // console.log('allPosts', allPosts);
 
   return (
     <GradientScreen>
@@ -70,7 +44,7 @@ const SocialFeed = () => {
         <FeedHeader />
         <View style={styles.feedscontainer}>
           <FlatList
-            data={allPosts}
+            data={data.data.posts.data}
             keyExtractor={item => item.id.toString()}
             viewabilityConfig={viewabilityConfig.current}
             onViewableItemsChanged={onViewableItemsChanged.current}
@@ -86,38 +60,12 @@ const SocialFeed = () => {
               />
             )}
             onEndReachedThreshold={0.5}
-            onEndReached={fetchNextPage}
+            onEndReached={() => console.log('end')}
             showsVerticalScrollIndicator={false}
             numColumns={1}
-            removeClippedSubviews={true}
-            initialNumToRender={10}
-            maxToRenderPerBatch={10}
             contentContainerStyle={{paddingBottom: 120}}
           />
         </View>
-        {isFetching || isFetchingNextPage ? (
-          <View
-            style={{
-              position: 'absolute',
-              bottom: 60,
-              width: '100%',
-              backgroundColor: 'transparent',
-              alignItems: 'center',
-            }}>
-            <View
-              style={{
-                paddingHorizontal: 20,
-                paddingVertical: 5,
-                borderRadius: 20,
-                backgroundColor: colors.text.primary,
-              }}>
-              <GradientText style={styles.headingtext2}>
-                Fetching...
-              </GradientText>
-            </View>
-          </View>
-        ) : null}
-
         <View
           style={{
             position: 'absolute',
@@ -154,26 +102,4 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   feedscontainer: {},
-  submitbutton: {
-    width: 170,
-    height: 55,
-    borderRadius: 80,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  submittext: {
-    fontFamily: 'Lexend',
-    color: colors.text.primary,
-    fontWeight: '600',
-    fontSize: 18,
-    lineHeight: 22.5,
-  },
-  headingtext2: {
-    fontFamily: 'Lexend',
-    color: colors.login.headingtext2,
-    fontWeight: '900',
-    fontSize: 14,
-    lineHeight: 22.4,
-  },
 });

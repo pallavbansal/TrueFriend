@@ -50,6 +50,7 @@ export async function updateProfile(data, token) {
     });
   }
   try {
+    console.log('formData', formData);
     const response = await fetch(`${url}/profile/update`, {
       method: 'POST',
       headers: {

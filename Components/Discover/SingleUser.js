@@ -4,22 +4,23 @@ import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../../Styles/ColorData';
 
 const SingleUser = ({item}) => {
+  const {profile_picture: imageUrl, online_status, id, name} = item.user;
   return (
     <LinearGradient
       colors={colors.gradients.buttongradient}
       style={styles.gradientcontainer}>
       <View style={styles.container}>
         <Image
-          source={{uri: item.imageUrl}}
+          source={{uri: imageUrl}}
           style={{height: '100%', width: '100%', borderRadius: 10}}
         />
-        {item.status && (
+        {online_status && (
           <View
             style={[
               styles.dotcontainer,
               {
                 backgroundColor:
-                  item.status === 'online'
+                  online_status === 'online'
                     ? colors.dotcolors.online
                     : colors.dotcolors.offline,
               },

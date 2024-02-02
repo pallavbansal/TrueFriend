@@ -27,6 +27,7 @@ import {
   Splash,
   Chat,
   Temp,
+  CreatePost,
 } from './Screen/index';
 import Protect from './Auth/Protect';
 
@@ -76,6 +77,11 @@ const MainNavigator = () => {
       <Stack.Screen
         name="SocialFeed"
         component={SocialFeed}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="CreatePost"
+        component={CreatePost}
         options={{headerShown: false}}
       />
       <Stack.Screen

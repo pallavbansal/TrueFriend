@@ -1,0 +1,41 @@
+const url = 'https://wooing.boxinallsoftech.com/public/api/v1';
+
+export async function CreatePost(data, token) {
+  const formData = new FormData();
+  formData.append('caption', data.caption);
+  formData.append('media_type', data.media_type);
+  formData.append('media', {
+    uri: data.media.path,
+    type: data.media.mime,
+    name: data.media.fileName,
+  });
+  const response = await fetch(`${url}/post/create`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+  if (!response.ok) {
+    console.log('Create Post Error 1', response);
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
+}
+
+export async function getSocialFeedPosts(token, page) {
+  // console.log('token in api', page);
+  const response = await fetch(`${url}/post/fetch?page=${page}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    console.log('Error g', response);
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
+}
