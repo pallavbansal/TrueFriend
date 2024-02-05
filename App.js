@@ -28,6 +28,8 @@ import {
   Chat,
   Temp,
   CreatePost,
+  StartStream,
+  WatchStream,
 } from './Screen/index';
 import Protect from './Auth/Protect';
 
@@ -85,8 +87,18 @@ const MainNavigator = () => {
         options={{headerShown: false}}
       />
       <Stack.Screen
+        name="StartStream"
+        component={StartStream}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
         name="LiveStream"
         component={LiveStream}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="WatchStream"
+        component={WatchStream}
         options={{headerShown: false}}
       />
       <Stack.Screen

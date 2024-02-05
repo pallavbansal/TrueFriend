@@ -9,6 +9,7 @@ const initialState = {
     id: null,
     // otp: null,
   },
+  meetingid: '5nev-vyqz-gweq',
 };
 
 const AuthSlice = createSlice({
@@ -33,9 +34,18 @@ const AuthSlice = createSlice({
       // state.userid = null;
       // state.userinitaldata = null;
     },
+    MeetingIdRed(state, action) {
+      // console.log('action.payload.meetingid', action.payload);
+      // state.meetingid = action.payload;
+    },
   },
 });
 
-export const {LoginRed, LogoutRed, UserProfileDataRed, VerifyRed} =
-  AuthSlice.actions;
+export const {
+  LoginRed,
+  LogoutRed,
+  UserProfileDataRed,
+  VerifyRed,
+  MeetingIdRed,
+} = AuthSlice.actions;
 export default AuthSlice.reducer;

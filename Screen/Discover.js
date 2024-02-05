@@ -16,7 +16,7 @@ import {
   useLocationUpdate,
   useFetchDiscoverProfile,
 } from '../Hooks/Query/HomeQuery';
-
+import {useDispatch, useSelector} from 'react-redux';
 const categories = [
   {
     user: {
@@ -58,6 +58,8 @@ const categories = [
 
 const Discover = () => {
   const navigation = useNavigation();
+  const meetingid = useSelector(state => state.Auth.meetingid);
+  console.log('meetingid', meetingid);
   const {
     mutate: locationUpdate,
     isPending: isLocationPending,
@@ -263,7 +265,7 @@ const Discover = () => {
                 data={discoverData?.data?.profiles}
                 keyExtractor={item => item.user.id.toString()}
                 renderItem={({item, index}) => (
-                  <SingleUser item={item} index={index} />
+                  <SingleUser item={item} index={index} meetingid={meetingid} />
                 )}
                 onEndReachedThreshold={0.1}
                 showsVerticalScrollIndicator={false}
@@ -297,7 +299,11 @@ const Discover = () => {
                 height: 74,
                 elevation: 50,
               }}
-              onPress={() => navigation.navigate('LiveStream')}>
+              onPress={() =>
+                navigation.navigate('StartStream', {
+                  isCreator: true,
+                })
+              }>
               <Entypo
                 name="video-camera"
                 size={40}
