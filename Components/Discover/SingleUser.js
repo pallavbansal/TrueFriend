@@ -1,19 +1,47 @@
-import {View, Text, StyleSheet, Image} from 'react-native';
-import React from 'react';
+import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
+import React, {useEffect, useState} from 'react';
 import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../../Styles/ColorData';
+import {useNavigation} from '@react-navigation/native';
+import {getToken} from '../LiveStreaming/api';
 
-const SingleUser = ({item}) => {
+const SingleUser = ({item, meetingid}) => {
+  const navigation = useNavigation();
+  const [token, setToken] = useState('');
   const {profile_picture: imageUrl, online_status, id, name} = item.user;
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      const token = await getToken();
+      setToken(token);
+    };
+
+    fetchToken();
+  }, [navigation]);
+
+  const handlewatchstream = () => {
+    if (meetingid) {
+      navigation.navigate('WatchStream', {
+        token: token,
+        meetingId: meetingid,
+        name: name,
+        mode: 'VIEWER',
+      });
+    }
+  };
+
   return (
     <LinearGradient
       colors={colors.gradients.buttongradient}
       style={styles.gradientcontainer}>
       <View style={styles.container}>
-        <Image
-          source={{uri: imageUrl}}
-          style={{height: '100%', width: '100%', borderRadius: 10}}
-        />
+        <TouchableOpacity onPress={handlewatchstream}>
+          <Image
+            source={{uri: imageUrl}}
+            style={{height: '100%', width: '100%', borderRadius: 10}}
+          />
+        </TouchableOpacity>
+
         {online_status && (
           <View
             style={[

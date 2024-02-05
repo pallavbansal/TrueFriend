@@ -9,6 +9,20 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH"
+        android:maxSdkVersion="30" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_ADMIN"
+        android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    
 
     <application
       android:name=".MainApplication"
@@ -36,5 +50,22 @@
        <meta-data
       android:name="com.google.android.geo.API_KEY"
       android:value="AIzaSyB2rtoExWWydu6QR6rtg6ebOlHKfjZL9io"/>
+
+
+
+       <meta-data
+      android:name="live.videosdk.rnfgservice.notification_channel_name"
+      android:value="Meeting Notification"
+     />
+    <meta-data
+    android:name="live.videosdk.rnfgservice.notification_channel_description"
+    android:value="Whenever meeting started notification will appear."
+    />
+    <meta-data
+    android:name="live.videosdk.rnfgservice.notification_color"
+    android:resource="@color/red"
+    />
+    <service android:name="live.videosdk.rnfgservice.ForegroundService" android:foregroundServiceType="mediaProjection"></service>
+    <service android:name="live.videosdk.rnfgservice.ForegroundServiceTask"></service>
     </application>
 </manifest>
