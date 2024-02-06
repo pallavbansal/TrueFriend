@@ -7,7 +7,7 @@ import ChatHeader from '../Components/Chat/ChatHeader';
 import ChatBottom from '../Components/Chat/ChatBottom';
 import {useSelector} from 'react-redux';
 import io from 'socket.io-client';
-const socket = io('http://192.168.117.181:3000');
+const socket = io('http://192.168.205.98:3000');
 
 // const MessageDatatemp = [
 //   {
@@ -137,9 +137,10 @@ const Chat = ({route}) => {
   const {name: myname} = useSelector(state => state.Auth.userinitaldata);
 
   useEffect(() => {
-    const socket = io('http://192.168.117.181:3000');
+    const socket = io('http://192.168.205.98:3000');
     socket.on('connect', () => {
       const roomid = [myuserid, userid].sort().join('_');
+      console.log('roomid', roomid);
       if (chattype == 'group') {
         socket.emit('join room', grouproomid);
       } else {
@@ -148,7 +149,7 @@ const Chat = ({route}) => {
     });
 
     socket.on('chat message', msg => {
-      console.log(msg);
+      console.log('message recieved', msg);
       setMessageData(prev => {
         const lastMessageId = prev.length > 0 ? prev[prev.length - 1].id : 0;
         msg.id = lastMessageId + 1;
@@ -164,7 +165,12 @@ const Chat = ({route}) => {
   return (
     <GradientScreen>
       <View style={styles.container}>
-        <ChatHeader name={name} imageUrl={imageUrl} userid={userid} />
+        <ChatHeader
+          name={name}
+          imageUrl={imageUrl}
+          userid={userid}
+          chattype={chattype}
+        />
         <View style={styles.chatcontainer}>
           <FlatList
             data={MessageData}
@@ -183,6 +189,9 @@ const Chat = ({route}) => {
           senderid={myuserid}
           receiverid={userid}
           myname={myname}
+          chattype={chattype}
+          grouproomid={grouproomid}
+          MessageData={MessageData}
         />
       </View>
     </GradientScreen>

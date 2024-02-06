@@ -9,32 +9,101 @@ import React, {useState, useEffect} from 'react';
 import {colors} from '../../Styles/ColorData';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {getTime} from '../../Utils/HelperFunctions';
+import {getTime, getFormattedDate} from '../../Utils/HelperFunctions';
 import LinearGradient from 'react-native-linear-gradient';
 import MultipleImagePicker from '@baronha/react-native-multiple-image-picker';
+import {useSelector} from 'react-redux';
 
 // types => text,image,video,emoji,docs,divider
 
-const ChatBottom = ({socket, senderid, receiverid, myname}) => {
+const ChatBottom = ({
+  socket,
+  senderid,
+  receiverid,
+  myname,
+  chattype,
+  grouproomid,
+  MessageData,
+}) => {
+  const token = useSelector(state => state.Auth.token);
   const [typetext, settypetext] = useState('');
   const [showattachmentoptions, setshowattachmentoptions] = useState(false);
 
   const handleinput = text => {
-    // console.log('dddddddddddd', event);
     settypetext(text);
   };
 
-  const sendMessage = () => {
+  const ifdividerneeded = () => {
+    if (MessageData.length === 0) {
+      return true;
+    }
+
+    const lastMessageDate = new Date(MessageData[MessageData.length - 1].date);
+    const today = new Date();
+
+    // console.log('length', MessageData.length, new Date());
+    // console.log('Day', lastMessageDate.getDate(), today.getDate());
+    // console.log('Month', lastMessageDate.getMonth(), today.getMonth());
+    // console.log('Year', lastMessageDate.getFullYear(), today.getFullYear());
+
+    if (
+      lastMessageDate.getDate() !== today.getDate() ||
+      lastMessageDate.getMonth() !== today.getMonth() ||
+      lastMessageDate.getFullYear() !== today.getFullYear()
+    ) {
+      return true;
+    }
+
+    return false;
+  };
+
+  const sendMessage = messagedata => {
+    const messagedatafinal = {
+      ...messagedata,
+      senderid: senderid,
+      receiverid: chattype == 'group' ? grouproomid : receiverid,
+      receiver_id: chattype == 'group' ? grouproomid : receiverid,
+      senderName: myname,
+      token: token,
+      room:
+        chattype == 'group'
+          ? grouproomid
+          : [senderid, receiverid].sort().join('_'),
+      time: getTime(),
+      date: new Date(),
+    };
+    // if (chattype == 'single') {
+    //   messagedatafinal.receiverid = receiverid;
+    // }
+    // if (chattype == 'group') {
+    //   messagedatafinal.receiverid = grouproomid;
+    // }
+    if (ifdividerneeded()) {
+      const divider = {
+        type: 'divider',
+        senderid: senderid,
+        senderName: myname,
+        receiverid: chattype == 'group' ? grouproomid : receiverid,
+        receiver_id: chattype == 'group' ? grouproomid : receiverid,
+        token: token,
+        room:
+          chattype == 'group'
+            ? grouproomid
+            : [senderid, receiverid].sort().join('_'),
+        time: getTime(),
+        date: new Date(),
+      };
+      socket.emit('chat message', divider);
+    }
+    socket.emit('chat message', messagedatafinal);
+  };
+
+  const sendTextMessage = () => {
     const messagedata = {
       type: 'text',
       message: typetext,
-      senderid: senderid,
-      senderName: myname,
-      receiverid: receiverid,
-      room: [senderid, receiverid].sort().join('_'),
-      time: getTime(),
     };
-    socket.emit('chat message', messagedata);
+    sendMessage(messagedata);
     settypetext('');
   };
 
@@ -45,19 +114,13 @@ const ChatBottom = ({socket, senderid, receiverid, myname}) => {
         mediaType: type,
         maxSelectedAssets: 1,
       });
-      console.log('response', response);
       if (response && response.length > 0) {
         const messagedata = {
           type: type,
           message: '',
           media: response[0].path,
-          senderid: senderid,
-          senderName: myname,
-          receiverid: receiverid,
-          room: [senderid, receiverid].sort().join('_'),
-          time: getTime(),
         };
-        socket.emit('chat message', messagedata);
+        sendMessage(messagedata);
       }
     } catch (e) {
       console.log(e);
@@ -122,7 +185,7 @@ const ChatBottom = ({socket, senderid, receiverid, myname}) => {
           onPress={() => setshowattachmentoptions(prev => !prev)}>
           <Entypo name="attachment" size={24} color={colors.arrow.secondary} />
         </TouchableOpacity>
-        <TouchableOpacity style={{marginRight: 10}} onPress={sendMessage}>
+        <TouchableOpacity style={{marginRight: 10}} onPress={sendTextMessage}>
           <MaterialIcons name="send" size={24} color={colors.arrow.secondary} />
         </TouchableOpacity>
       </View>

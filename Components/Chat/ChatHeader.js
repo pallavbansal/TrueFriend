@@ -1,37 +1,50 @@
 import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../../Styles/ColorData';
-import React, {useState} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-} from 'react-native';
-import OutsidePress from '../Common/OutsidePress';
+import React, {useState, useEffect} from 'react';
+import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import GradientInput from '../Common/GradientInput';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import ReportUser from './ReportUser';
 
-const ChatHeader = ({name, imageUrl, userid}) => {
+const ChatHeader = ({name, imageUrl, userid, chattype}) => {
   const [optionsdialog, setoptionsdialog] = useState(false);
   const [reportdialog, setreportdialog] = useState(false);
   const [filterdata, setfilterdata] = useState({
-    items: [
-      {
-        item: 'Block User',
-      },
-      {
-        item: 'Report User',
-      },
-      {
-        item: 'Settings',
-      },
-    ],
+    items: [],
   });
+
+  useEffect(() => {
+    if (chattype == 'group') {
+      setfilterdata({
+        items: [
+          {
+            item: 'Leave Group',
+          },
+          {
+            item: 'Report Group',
+          },
+          {
+            item: 'Settings',
+          },
+        ],
+      });
+    }
+    if (chattype == 'single') {
+      setfilterdata({
+        items: [
+          {
+            item: 'Report User',
+          },
+          {
+            item: 'Settings',
+          },
+        ],
+      });
+    }
+  }, [chattype]);
+
   const handlerreportdialog = () => {
     setreportdialog(!reportdialog);
   };
@@ -40,11 +53,12 @@ const ChatHeader = ({name, imageUrl, userid}) => {
   };
   const handleoptionpress = item => {
     setoptionsdialog(false);
-    if (item.item == 'Report User') {
+    if (item.item == 'Report User' || item.item == 'Report Group') {
       handlerreportdialog();
     }
     console.log(item);
   };
+
   return (
     <>
       <LinearGradient
@@ -71,12 +85,17 @@ const ChatHeader = ({name, imageUrl, userid}) => {
             gap: 10,
             marginLeft: 'auto',
           }}>
-          <TouchableOpacity>
-            <Ionicons name="call" size={24} color="white" />
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <FontAwesome5 name="video" size={24} color="white" />
-          </TouchableOpacity>
+          {chattype == 'single' && (
+            <TouchableOpacity>
+              <Ionicons name="call" size={24} color="white" />
+            </TouchableOpacity>
+          )}
+          {chattype == 'single' && (
+            <TouchableOpacity>
+              <FontAwesome5 name="video" size={24} color="white" />
+            </TouchableOpacity>
+          )}
+
           <TouchableOpacity onPress={handleroptionsdialog}>
             <Entypo name="dots-three-vertical" size={24} color="white" />
           </TouchableOpacity>

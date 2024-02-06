@@ -6,7 +6,7 @@ import {
   FlatList,
   ScrollView,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import BottomBar from '../Layouts/BottomBar';
 import GradientScreen from '../Layouts/GradientScreen';
 import {colors} from '../Styles/ColorData';
@@ -17,6 +17,16 @@ import ProfileTop from '../Components/Profile/ProfileTop';
 import EditProfile from '../Components/Profile/EditProfile';
 import DetailMedia from '../Components/Profile/DetailMedia';
 import Loading from './Loading';
+// "id": 2,
+//                 "user_id": "7",
+//                 "caption": "test 2",
+//                 "media_path": "https://wooing.boxinallsoftech.com/public/uploads/posts/86886_1706858722_stable-diffusion-xl.jpg",
+//                 "media_type": "1",
+//                 "like_count": "0",
+//                 "dislike_count": "0",
+//                 "status": "1",
+//                 "created_at": "2024-02-02T07:25:22.000000Z",
+//                 "updated_at": "2024-02-02T07:25:22.000000Z"
 const picturesdata = [
   {
     id: '1',
@@ -162,6 +172,22 @@ const Profile = () => {
     show: false,
     data: null,
   });
+  const [picturedata2, setpicturedata2] = useState([]);
+  const [videodata2, setvideodata2] = useState([]);
+
+  useEffect(() => {
+    if (profiledata) {
+      setpicturedata2([]);
+      setvideodata2([]);
+      profiledata.data.profile.media.map(item => {
+        if (item.media_type === '1') {
+          setpicturedata2(prev => [...prev, item]);
+        } else {
+          setvideodata2(prev => [...prev, item]);
+        }
+      });
+    }
+  }, [profiledata]);
 
   function handleeditprofile() {
     setshoweditmodel(true);
@@ -300,7 +326,16 @@ const Profile = () => {
               </Text>
             </TouchableOpacity>
           </View>
-          <View style={styles.medialistcontainer}>
+          <View
+            style={[
+              styles.medialistcontainer,
+              selectedmediatype === 'pictures' && picturedata2.length > 3
+                ? {alignItems: 'center'}
+                : {},
+              selectedmediatype === 'videos' && videodata2.length > 3
+                ? {alignItems: 'center'}
+                : {},
+            ]}>
             {selectedmediatype === 'bio' && (
               <View
                 style={{
@@ -335,48 +370,73 @@ const Profile = () => {
               </View>
             )}
 
-            {selectedmediatype === 'pictures' && (
-              <FlatList
-                data={picturesdata}
-                keyExtractor={item => item.id.toString()}
-                renderItem={({item, index}) => (
-                  <TouchableOpacity
-                    onPress={() =>
-                      setshowdetailmodel({
-                        show: true,
-                        data: item,
-                      })
-                    }>
-                    <SingleMedia item={item} index={index} />
-                  </TouchableOpacity>
-                )}
-                onEndReachedThreshold={0.1}
-                showsVerticalScrollIndicator={false}
-                numColumns={4}
-                contentContainerStyle={{paddingBottom: 80}}
-              />
-            )}
-            {selectedmediatype === 'videos' && (
-              <FlatList
-                data={videosdata}
-                keyExtractor={item => item.id.toString()}
-                renderItem={({item, index}) => (
-                  <TouchableOpacity
-                    onPress={() =>
-                      setshowdetailmodel({
-                        show: true,
-                        data: item,
-                      })
-                    }>
-                    <SingleMedia item={item} index={index} />
-                  </TouchableOpacity>
-                )}
-                onEndReachedThreshold={0.1}
-                showsVerticalScrollIndicator={false}
-                numColumns={4}
-                contentContainerStyle={{paddingBottom: 80}}
-              />
-            )}
+            {selectedmediatype === 'pictures' &&
+              (picturedata2.length > 0 ? (
+                <FlatList
+                  data={picturedata2}
+                  keyExtractor={item => item.id.toString()}
+                  renderItem={({item, index}) => (
+                    <TouchableOpacity
+                      onPress={() =>
+                        setshowdetailmodel({
+                          show: true,
+                          data: item,
+                        })
+                      }>
+                      <SingleMedia item={item} index={index} />
+                    </TouchableOpacity>
+                  )}
+                  onEndReachedThreshold={0.1}
+                  showsVerticalScrollIndicator={false}
+                  numColumns={4}
+                  contentContainerStyle={{paddingBottom: 80}}
+                />
+              ) : (
+                <Text
+                  style={{
+                    color: colors.login.headingtext2,
+                    marginTop: 50,
+                    fontSize: 20,
+                    fontWeight: '900',
+                    textAlign: 'center',
+                  }}>
+                  No Pictures
+                </Text>
+              ))}
+
+            {selectedmediatype === 'videos' &&
+              (videodata2.length > 0 ? (
+                <FlatList
+                  data={videodata2}
+                  keyExtractor={item => item.id.toString()}
+                  renderItem={({item, index}) => (
+                    <TouchableOpacity
+                      onPress={() =>
+                        setshowdetailmodel({
+                          show: true,
+                          data: item,
+                        })
+                      }>
+                      <SingleMedia item={item} index={index} />
+                    </TouchableOpacity>
+                  )}
+                  onEndReachedThreshold={0.1}
+                  showsVerticalScrollIndicator={false}
+                  numColumns={4}
+                  contentContainerStyle={{paddingBottom: 80}}
+                />
+              ) : (
+                <Text
+                  style={{
+                    color: colors.login.headingtext2,
+                    marginTop: 50,
+                    fontSize: 20,
+                    fontWeight: '900',
+                    textAlign: 'center',
+                  }}>
+                  No Videos
+                </Text>
+              ))}
           </View>
         </View>
         {showdetailmodel.show && (
@@ -451,6 +511,6 @@ const styles = StyleSheet.create({
   medialistcontainer: {
     flex: 1,
     width: '100%',
-    alignItems: 'center',
+    // alignItems: 'center',
   },
 });

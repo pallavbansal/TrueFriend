@@ -22,6 +22,59 @@ const Message = ({MessageData, myid}) => {
     console.error('Video error', error);
   };
 
+  const dividertext = date => {
+    const inputDate = new Date(date);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+
+    if (
+      inputDate.getDate() === today.getDate() &&
+      inputDate.getMonth() === today.getMonth() &&
+      inputDate.getFullYear() === today.getFullYear()
+    ) {
+      return 'Today';
+    } else if (
+      inputDate.getDate() === yesterday.getDate() &&
+      inputDate.getMonth() === yesterday.getMonth() &&
+      inputDate.getFullYear() === yesterday.getFullYear()
+    ) {
+      return 'Yesterday';
+    } else {
+      return `${inputDate.getDate()}/${
+        inputDate.getMonth() + 1
+      }/${inputDate.getFullYear()}`;
+    }
+  };
+
+  if (MessageData.type == 'divider') {
+    return (
+      <View
+        style={{
+          width: '100%',
+          marginVertical: 10,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <View
+          style={{
+            width: '90%',
+            height: 2,
+            backgroundColor: colors.login.headingtext2,
+            borderRadius: 10,
+          }}></View>
+        <Text
+          style={{
+            color: colors.arrow.primary,
+            fontSize: 12,
+            fontWeight: '900',
+          }}>
+          {dividertext(MessageData.date)}
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <View
       style={[

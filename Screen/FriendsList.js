@@ -21,15 +21,38 @@ import SelectFriend from '../Components/FriendList/SelectFriend';
 
 const data = [
   {
-    id: 1,
-    name: 'Vivek Bansal',
+    id: 7,
+    name: 'Jhon Doe',
+    type: 'single',
+    liked: true,
+    imageUrl:
+      'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+  },
+  {
+    id: 44,
+    name: 'Vivek',
+    type: 'single',
+    imageUrl:
+      'https://images.unsplash.com/photo-1613521140785-e85e427f8002?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+  },
+  {
+    id: 45,
+    name: 'Vivek 2',
+    type: 'single',
+    liked: true,
+    imageUrl:
+      'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+  },
+  {
+    id: 56,
+    name: 'Jhon',
     type: 'single',
     imageUrl:
       'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     liked: true,
   },
   {
-    id: 2,
+    id: 200,
     name: 'Friends Group',
     type: 'group',
     grouproomid: '123',
@@ -37,37 +60,14 @@ const data = [
       'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
   {
-    id: 3,
-    name: 'Ajay Singh',
-    type: 'single',
-    liked: true,
-    imageUrl:
-      'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  },
-  {
-    id: 4,
-    name: 'Rahul Kumar',
-    type: 'single',
-    imageUrl:
-      'https://images.unsplash.com/photo-1613521140785-e85e427f8002?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  },
-  {
-    id: 5,
-    name: 'Vicky Agarwal',
-    type: 'single',
-    liked: true,
-    imageUrl:
-      'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  },
-  {
-    id: 6,
+    id: 201,
     name: 'Mohit Sharma',
     type: 'single',
     imageUrl:
       'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
   {
-    id: 7,
+    id: 202,
     name: 'XYZ',
     type: 'single',
     imageUrl:
