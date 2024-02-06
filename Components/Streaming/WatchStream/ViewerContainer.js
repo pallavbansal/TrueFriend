@@ -15,11 +15,12 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import LinearGradient from 'react-native-linear-gradient';
 import {usePubSub, useMeeting} from '@videosdk.live/react-native-sdk';
 import ControlsOverlay from './ControlsOverlay';
-import BottomSheet from '../LiveStream/BottomSheet2';
-import ChatViewer from '../LiveStream/ChatViewer';
+import BottomSheet from '../common/BottomSheet';
+import ChatViewer from '../common/ChatViewer';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {colors} from '../../Styles/ColorData';
+import {colors} from '../../../Styles/ColorData';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import StreamLoading from './StreamLoading';
 
 const {height} = Dimensions.get('window');
 
@@ -82,21 +83,7 @@ const ViewerContainer = () => {
           />
         </View>
       ) : (
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: 'white',
-          }}>
-          <Text
-            style={{
-              fontSize: 20,
-              textAlign: 'center',
-              marginTop: 20,
-              color: 'black',
-            }}>
-            Loading...
-          </Text>
-        </View>
+        <StreamLoading />
       )}
 
       <View

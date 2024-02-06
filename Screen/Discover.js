@@ -23,6 +23,7 @@ const categories = [
       id: '1',
       name: 'smartphones',
       online_status: 'online',
+      meedingid: null,
       profile_picture:
         'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },

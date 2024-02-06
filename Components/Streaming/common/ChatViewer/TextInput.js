@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, TextInput, TouchableOpacity} from 'react-native';
-import {Send} from '../../../assets/icons2';
+import {Send} from '../../../../assets/icons2';
 import colors from './colors';
 import {useStandardHeight} from './spacing';
 
