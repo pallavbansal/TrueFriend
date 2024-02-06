@@ -8,3 +8,12 @@ export const getTime = () => {
   const currentTime = `${formattedHours}:${formattedMinutes} ${ampm}`;
   return currentTime;
 };
+
+export const getFormattedDate = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const date = now.getDate();
+  const formattedDate = `${date}/${month}/${year}`;
+  return formattedDate;
+};

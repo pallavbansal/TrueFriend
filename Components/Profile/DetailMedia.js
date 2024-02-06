@@ -5,12 +5,15 @@ import {
   Image,
   Pressable,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../../Styles/ColorData';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Video from 'react-native-video';
 
 const DetailMedia = ({close, data}) => {
+  const [isPaused, setIsPaused] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
   const handleclose = event => {
     event.stopPropagation();
     close();
@@ -24,6 +27,13 @@ const DetailMedia = ({close, data}) => {
     console.log('Delete', data);
   };
 
+  const handlePause = () => {
+    setIsPaused(prev => !prev);
+  };
+  const handleMuteUnmute = () => {
+    setIsMuted(prev => !prev);
+  };
+
   return (
     <Pressable style={styles.container} onPress={handleclose}>
       <LinearGradient
@@ -31,16 +41,31 @@ const DetailMedia = ({close, data}) => {
         style={styles.reportcontainer}>
         <Pressable style={styles.reportinsidecontainer} onPress={handlePress}>
           <View style={styles.headercontainer}>
-            <Image
-              source={{
-                uri: data.imageUrl,
-              }}
-              style={{
-                width: '100%',
-                height: '100%',
-                borderRadius: 25,
-              }}
-            />
+            {data.media_type === '1' ? (
+              <Image
+                source={{
+                  uri: data.media_path,
+                }}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: 25,
+                }}
+                resizeMode="contain"
+              />
+            ) : (
+              <Video
+                source={{uri: data.media_path}}
+                style={{height: '100%', width: '100%', borderRadius: 25}}
+                paused={isPaused}
+                muted={isMuted}
+                resizeMode="contain"
+                repeat={true}
+                posterResizeMode="cover"
+                poster="https://www.w3schools.com/w3images/lights.jpg"
+              />
+            )}
+
             <TouchableOpacity
               onPress={handleDelete}
               style={styles.deletebutton}>
@@ -50,6 +75,28 @@ const DetailMedia = ({close, data}) => {
                 color={colors.profile.edit}
               />
             </TouchableOpacity>
+            {data.media_type === '2' && (
+              <TouchableOpacity
+                onPress={handlePause}
+                style={styles.pausebutton}>
+                <MaterialIcons
+                  name={isPaused ? 'play-arrow' : 'pause'}
+                  size={28}
+                  color={colors.profile.edit}
+                />
+              </TouchableOpacity>
+            )}
+            {data.media_type === '2' && (
+              <TouchableOpacity
+                onPress={handleMuteUnmute}
+                style={styles.mutebutton}>
+                <MaterialIcons
+                  name={isMuted ? 'volume-off' : 'volume-up'}
+                  size={28}
+                  color={colors.profile.edit}
+                />
+              </TouchableOpacity>
+            )}
           </View>
         </Pressable>
       </LinearGradient>
@@ -101,6 +148,22 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     right: 10,
+  },
+  pausebutton: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 5,
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
+  },
+  mutebutton: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 5,
+    position: 'absolute',
+    bottom: 10,
+    left: 10,
   },
   headingtext: {
     fontFamily: 'Lexend',

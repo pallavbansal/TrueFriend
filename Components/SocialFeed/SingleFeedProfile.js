@@ -72,19 +72,29 @@ const SingleFeedProfile = ({
       </View>
       <View style={styles.profilecontainer}>
         {media_type == '1' ? (
+          // <Image
+          //   source={{uri: media_path}}
+          //   style={{height: 250, width: '100%'}}
+          //   resizeMode="contain"
+          // />
           <Image
             source={{uri: media_path}}
-            style={{height: 250, width: '100%'}}
+            style={{
+              width: '100%',
+              aspectRatio: 1,
+            }}
+            resizeMode="contain"
           />
         ) : (
           <Pressable onPress={handlePlayPausein}>
             <Video
               source={{uri: media_path}}
               style={{
-                height: 250,
+                // height: 250,
+                aspectRatio: 16 / 9,
                 width: '100%',
               }}
-              resizeMode="cover"
+              resizeMode="contain"
               // poster="https://www.w3schools.com/w3images/lights.jpg"
               // posterResizeMode="cover"
               muted={isMuted}

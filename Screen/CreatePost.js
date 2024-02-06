@@ -19,6 +19,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation} from '@react-navigation/native';
 import MultipleImagePicker from '@baronha/react-native-multiple-image-picker';
 import {useCreatePost} from '../Hooks/Query/FeedQuery';
+// import ImageResizer from 'react-native-image-resizer';s
 
 const CreatePost = () => {
   const navigation = useNavigation();
@@ -78,6 +79,37 @@ const CreatePost = () => {
       console.log(e);
     }
   };
+
+  // const handleImageUpload = async () => {
+  //   try {
+  //     const response = await MultipleImagePicker.openPicker({
+  //       mediaType: 'all',
+  //       maxSelectedAssets: 1,
+  //     });
+  //     if (response && response.length > 0) {
+  //       console.log('response', response[0]);
+
+  //       // Resize the image
+  //       const resizedImage = await ImageResizer.createResizedImage(
+  //         response[0].path, // path to the image
+  //         1024, // new width
+  //         1024, // new height
+  //         'JPEG', // format
+  //         80, // quality
+  //       );
+
+  //       // Create a new object with the new URI
+  //       const newResponse = {
+  //         ...response[0],
+  //         uri: resizedImage.uri,
+  //       };
+
+  //       setPostInputs({...postinputs, Image: newResponse});
+  //     }
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // };
 
   return (
     <GradientScreen>
