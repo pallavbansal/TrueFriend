@@ -6,7 +6,7 @@ import {
   MeetingProvider,
   MeetingConsumer,
 } from '@videosdk.live/react-native-sdk';
-import ILSContainer from '../Components/LiveStream/ILSContainer';
+import ILSContainer from '../Components/Streaming/LiveStream/ILSContainer';
 import {useNavigation} from '@react-navigation/native';
 
 const LiveStream = ({route}) => {

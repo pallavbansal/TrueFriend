@@ -1,16 +1,13 @@
 import React, {useEffect, useRef, useState, useMemo} from 'react';
 import {View, Platform, Dimensions, Text, TouchableOpacity} from 'react-native';
 import {useMeeting, usePubSub} from '@videosdk.live/react-native-sdk';
-// import VideosdkRPK from '../../../../VideosdkRPK';
 import Toast from 'react-native-toast-message';
-import SpeakerHeader from './SpeakerHeader';
 import SpeakerFooter from './SpeakerFooter';
-// import {MemoizedParticipantGrid} from './ParticipantGrid';
 import {useOrientation} from './useOrientation';
 import ParticipantView from './ParticipantView';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import BottomSheet from './BottomSheet2';
-import ChatViewer from './ChatViewer';
+import BottomSheet from '../common/BottomSheet';
+import ChatViewer from '../common/ChatViewer';
 export default function MeetingViewer({setlocalParticipantMode}) {
   const {
     localParticipant,

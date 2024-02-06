@@ -16,7 +16,7 @@ const WaitingToJoinView = () => {
           fontWeight: 'bold',
           color: 'black',
         }}>
-        WaitingToJoinView
+        Wait...
       </Text>
     </View>
   );

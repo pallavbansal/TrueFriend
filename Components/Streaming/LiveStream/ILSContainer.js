@@ -3,9 +3,9 @@ import {
   ReactNativeForegroundService,
 } from '@videosdk.live/react-native-sdk';
 import {useEffect, useRef, useState} from 'react';
-import WaitingToJoinView from './WaitingToJoinView';
+import WaitingToJoinView from '../common/WaitingToJoinView';
 import React from 'react';
-import ViewerContainer from './ViewerContainer';
+import MeetingViewer from './MeetingViewer';
 
 export default function ILSContainer({webcamEnabled}) {
   const [isJoined, setJoined] = useState(false);
@@ -37,5 +37,5 @@ export default function ILSContainer({webcamEnabled}) {
     };
   }, []);
 
-  return isJoined ? <ViewerContainer /> : <WaitingToJoinView />;
+  return isJoined ? <MeetingViewer /> : <WaitingToJoinView />;
 }

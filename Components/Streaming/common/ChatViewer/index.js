@@ -14,7 +14,7 @@ import moment from 'moment';
 import {usePubSub} from '@videosdk.live/react-native-sdk';
 import colors from './colors';
 import {convertRFValue, useStandardHeight} from './spacing';
-import {RaiseHand} from '../../../assets/icons2';
+import {RaiseHand} from '../../../../assets/icons2';
 
 const ChatViewer = ({raiseHandVisible}) => {
   const mpubsubRef = useRef();

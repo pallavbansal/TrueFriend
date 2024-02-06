@@ -2,7 +2,7 @@ import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import React from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import LinearGradient from 'react-native-linear-gradient';
-import {colors} from '../../Styles/ColorData';
+import {colors} from '../../../Styles/ColorData';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const IconContainer = ({backgroundColor, onPress, iconName, iconColor}) => {

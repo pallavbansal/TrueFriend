@@ -6,7 +6,7 @@ import {
   MeetingProvider,
   MeetingConsumer,
 } from '@videosdk.live/react-native-sdk';
-import WatchContainer from '../Components/WatchStream/WatchContainer';
+import WatchContainer from '../Components/Streaming/WatchStream/WatchContainer';
 import {useNavigation} from '@react-navigation/native';
 
 const WatchStream = ({route}) => {
