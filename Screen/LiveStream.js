@@ -48,6 +48,9 @@ const LiveStream = ({route}) => {
           <MeetingConsumer
             {...{
               onMeetingLeft: () => {
+                console.log(
+                  '-------------------------------------Meeting Left-------------------------------------',
+                );
                 navigation.navigate('Discover');
               },
             }}>

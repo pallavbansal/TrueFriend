@@ -10,15 +10,6 @@ export const useCreatePost = () => {
   return {isPending, error, mutate, reset};
 };
 
-// export const useFetchSocialFeedPosts = () => {
-//   const token = useSelector(state => state.Auth.token);
-//   const {isPending, error, data, isError} = useQuery({
-//     queryFn: () => getSocialFeedPosts(token),
-//     queryKey: ['socialfeedposts'],
-//   });
-//   return {isPending, error, data, isError};
-// };
-
 export const useFetchSocialFeedPosts = () => {
   const token = useSelector(state => state.Auth.token);
   const {

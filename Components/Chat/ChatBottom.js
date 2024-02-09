@@ -4,15 +4,18 @@ import {
   TextInput,
   StyleSheet,
   Text,
+  Image,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import {colors} from '../../Styles/ColorData';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import {getTime, getFormattedDate} from '../../Utils/HelperFunctions';
 import LinearGradient from 'react-native-linear-gradient';
 import MultipleImagePicker from '@baronha/react-native-multiple-image-picker';
 import {useSelector} from 'react-redux';
+import {useCreateChat} from '../../Hooks/Query/ChatQuery';
 
 // types => text,image,video,emoji,docs,divider
 
@@ -25,10 +28,22 @@ const ChatBottom = ({
   grouproomid,
   MessageData,
 }) => {
-  const token = useSelector(state => state.Auth.token);
   const [typetext, settypetext] = useState('');
+  const [media, setmedia] = useState([]);
   const [showattachmentoptions, setshowattachmentoptions] = useState(false);
-
+  const {mutate, isPending, error, reset} = useCreateChat();
+  const tempdata = {
+    sender_id: senderid,
+    receiver_id: chattype == 'group' ? grouproomid : receiverid,
+    sender: {
+      name: myname,
+    },
+    room:
+      chattype == 'group'
+        ? grouproomid
+        : [senderid, receiverid].sort().join('_'),
+    created_at: new Date(),
+  };
   const handleinput = text => {
     settypetext(text);
   };
@@ -38,7 +53,9 @@ const ChatBottom = ({
       return true;
     }
 
-    const lastMessageDate = new Date(MessageData[MessageData.length - 1].date);
+    const lastMessageDate = new Date(
+      MessageData[MessageData.length - 1].created_at,
+    );
     const today = new Date();
 
     // console.log('length', MessageData.length, new Date());
@@ -57,54 +74,106 @@ const ChatBottom = ({
     return false;
   };
 
-  const sendMessage = messagedata => {
+  const senddivider = () => {
+    return new Promise((resolve, reject) => {
+      const messagedatafinal = {
+        type: 'DIVIDER',
+        content: 'divider',
+        ...tempdata,
+      };
+      const backenddata = {
+        receiver_id: messagedatafinal.receiver_id,
+        type: messagedatafinal.type,
+        content: messagedatafinal.content,
+      };
+      mutate(
+        {
+          data: backenddata,
+        },
+        {
+          onSuccess: data => {
+            messagedatafinal.id = data.data.message.id;
+            messagedatafinal.created_at = data.data.message.created_at;
+            socket.emit('chat message', messagedatafinal);
+            resolve();
+          },
+          onError: error => {
+            console.log('error msg from backend', error);
+            reject(error);
+          },
+        },
+      );
+    });
+  };
+
+  const sendMessage = async messagedata => {
+    if (ifdividerneeded()) {
+      try {
+        await senddivider();
+      } catch (error) {
+        console.log('Error sending divider', error);
+        return;
+      }
+    }
     const messagedatafinal = {
       ...messagedata,
-      senderid: senderid,
-      receiverid: chattype == 'group' ? grouproomid : receiverid,
-      receiver_id: chattype == 'group' ? grouproomid : receiverid,
-      senderName: myname,
-      token: token,
-      room:
-        chattype == 'group'
-          ? grouproomid
-          : [senderid, receiverid].sort().join('_'),
-      time: getTime(),
-      date: new Date(),
+      ...tempdata,
     };
-    // if (chattype == 'single') {
-    //   messagedatafinal.receiverid = receiverid;
-    // }
-    // if (chattype == 'group') {
-    //   messagedatafinal.receiverid = grouproomid;
-    // }
-    if (ifdividerneeded()) {
-      const divider = {
-        type: 'divider',
-        senderid: senderid,
-        senderName: myname,
-        receiverid: chattype == 'group' ? grouproomid : receiverid,
-        receiver_id: chattype == 'group' ? grouproomid : receiverid,
-        token: token,
-        room:
-          chattype == 'group'
-            ? grouproomid
-            : [senderid, receiverid].sort().join('_'),
-        time: getTime(),
-        date: new Date(),
-      };
-      socket.emit('chat message', divider);
+    const backenddata = {
+      receiver_id: messagedatafinal.receiver_id,
+      type: messagedatafinal.type,
+      content: messagedatafinal.content,
+    };
+    if (messagedatafinal.type == 'PHOTO' || messagedatafinal.type == 'VIDEO') {
+      backenddata.media = messagedatafinal.media;
     }
-    socket.emit('chat message', messagedatafinal);
+
+    mutate(
+      {
+        data: backenddata,
+      },
+      {
+        onSuccess: data => {
+          messagedatafinal.id = data.data.message.id;
+          messagedatafinal.created_at = data.data.message.created_at;
+          if (
+            messagedatafinal.type == 'PHOTO' ||
+            messagedatafinal.type == 'VIDEO'
+          ) {
+            messagedatafinal.media_path = data.data.message.media_path;
+            delete messagedatafinal.media;
+          }
+          socket.emit('chat message', messagedatafinal);
+        },
+        onError: error => {
+          console.log('error msg from backend', error);
+        },
+      },
+    );
   };
 
   const sendTextMessage = () => {
-    const messagedata = {
-      type: 'text',
-      message: typetext,
-    };
-    sendMessage(messagedata);
-    settypetext('');
+    if (typetext.length == 0) {
+      return;
+    }
+    if (media.length == 0) {
+      const messagedata = {
+        type: 'TEXT',
+        content: typetext,
+      };
+      sendMessage(messagedata);
+      settypetext('');
+      setmedia([]);
+    } else {
+      const messagedata = {
+        type: media.type == 'image' ? 'PHOTO' : 'VIDEO',
+        content: typetext,
+        media: media,
+      };
+      sendMessage(messagedata);
+      settypetext('');
+      setmedia([]);
+    }
   };
 
   const handleImageUpload = async type => {
@@ -115,12 +184,7 @@ const ChatBottom = ({
         maxSelectedAssets: 1,
       });
       if (response && response.length > 0) {
-        const messagedata = {
-          type: type,
-          message: '',
-          media: response[0].path,
-        };
-        sendMessage(messagedata);
+        setmedia(response[0]);
       }
     } catch (e) {
       console.log(e);
@@ -130,25 +194,63 @@ const ChatBottom = ({
   return (
     <View style={styles.bottomcontainer}>
       {showattachmentoptions && (
-        <LinearGradient
-          colors={colors.gradients.buttongradient}
+        <View style={styles.attachmentcontainer}>
+          <TouchableOpacity onPress={() => handleImageUpload('image')}>
+            <MaterialIcons name="image" size={40} color="white" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleImageUpload('video')}>
+            <MaterialIcons name="video-camera-back" size={40} color="white" />
+          </TouchableOpacity>
+        </View>
+      )}
+      {media.length != 0 && (
+        <View
           style={{
-            margin: 10,
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: colors.text.primary,
+            gap: 15,
+            alignSelf: 'center',
+            padding: 10,
             borderRadius: 20,
+            position: 'absolute',
+            bottom: 65,
+            left: 10,
           }}>
-          <View style={styles.attachmentcontainer}>
-            <TouchableOpacity onPress={() => handleImageUpload('image')}>
-              <MaterialIcons name="image" size={40} color="white" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleImageUpload('video')}>
-              <MaterialIcons name="video-camera-back" size={40} color="white" />
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <MaterialIcons name="edit-document" size={40} color="white" />
+          <Image
+            source={{
+              uri: media.path,
+            }}
+            style={{width: 50, height: 50, borderRadius: 10}}></Image>
+          <View style={{gap: 10}}>
+            {media.type == 'image' ? (
+              <MaterialIcons
+                name="image"
+                size={20}
+                color={colors.arrow.secondary}
+              />
+            ) : (
+              <MaterialIcons
+                name="video-camera-back"
+                size={20}
+                color={colors.arrow.secondary}
+              />
+            )}
+
+            <TouchableOpacity
+              onPress={() => {
+                setmedia([]);
+              }}>
+              <AntDesign
+                name="closecircle"
+                size={20}
+                color={colors.arrow.secondary}
+              />
             </TouchableOpacity>
           </View>
-        </LinearGradient>
+        </View>
       )}
+
       <View
         style={{
           flexDirection: 'row',
@@ -182,7 +284,9 @@ const ChatBottom = ({
         />
 
         <TouchableOpacity
-          onPress={() => setshowattachmentoptions(prev => !prev)}>
+          onPress={() => {
+            setmedia([]), setshowattachmentoptions(prev => !prev);
+          }}>
           <Entypo name="attachment" size={24} color={colors.arrow.secondary} />
         </TouchableOpacity>
         <TouchableOpacity style={{marginRight: 10}} onPress={sendTextMessage}>
@@ -209,10 +313,14 @@ const styles = StyleSheet.create({
     lineHeight: 26,
   },
   attachmentcontainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 50,
-    paddingVertical: 15,
+    position: 'absolute',
+    bottom: 70,
+    left: 10,
+    borderRadius: 20,
+    flexDirection: 'column',
+    gap: 20,
+    padding: 15,
+    backgroundColor: colors.arrow.secondary,
+    width: 70,
   },
 });
