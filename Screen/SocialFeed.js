@@ -1,5 +1,5 @@
 import {View, Text, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useRef, useEffect, useCallback, useMemo} from 'react';
 import GradientText from '../Components/Common/GradientText';
 import BottomBar from '../Layouts/BottomBar';
 import GradientScreen from '../Layouts/GradientScreen';
@@ -16,6 +16,7 @@ const SocialFeed = () => {
   const [isMuted, setIsMuted] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [allPosts, setAllPosts] = useState([]);
+  // const [initalpage, setInitalPage] = useState(1);
   const {
     data,
     error,
@@ -36,33 +37,27 @@ const SocialFeed = () => {
     return navigation.navigate('CreatePost');
   };
 
-  const handleMuteUnmute = () => {
+  const handleMuteUnmute = useCallback(() => {
     setIsMuted(prev => !prev);
-  };
+  }, []);
 
-  const handlePlayPause = () => {
+  const handlePlayPause = useCallback(() => {
     setIsPaused(prev => !prev);
-  };
+  }, []);
 
   useEffect(() => {
     if (data) {
-      // data.pages.forEach(page => {
-      //   console.log(
-      //     'IDs in page',
-      //     page.data.posts.data.map(item => item.id),
-      //   );
-      // });
+      console.log('Data in feed', data.pageParams);
       const posts = data.pages.flatMap(page => page.data.posts.data);
       setAllPosts(posts);
     }
   }, [data]);
 
+  const memoizedViewableItems = useMemo(() => viewableItems, [viewableItems]);
+
   if (isPending) {
     return <Loading />;
   }
-
-  // console.log('data', data.pages);
-  // console.log('allPosts', allPosts);
 
   return (
     <GradientScreen>
@@ -77,10 +72,11 @@ const SocialFeed = () => {
             renderItem={({item, index}) => (
               <SingleFeedProfile
                 item={item}
+                setAllPosts={setAllPosts}
                 index={index}
                 isMuted={isMuted}
                 isPaused={isPaused}
-                viewableItems={viewableItems}
+                viewableItems={memoizedViewableItems}
                 handleMuteUnmute={handleMuteUnmute}
                 handlePlayPause={handlePlayPause}
               />
@@ -89,9 +85,10 @@ const SocialFeed = () => {
             onEndReached={fetchNextPage}
             showsVerticalScrollIndicator={false}
             numColumns={1}
-            removeClippedSubviews={true}
+            removeClippedSubviews={true} // Unloads offscreen items
             initialNumToRender={10}
-            maxToRenderPerBatch={10}
+            updateCellsBatchingPeriod={50} // Increase this number to reduce rendering times
+            maxToRenderPerBatch={10} // Increase this number if you have a high-end device
             contentContainerStyle={{paddingBottom: 120}}
           />
         </View>

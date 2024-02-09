@@ -8,7 +8,7 @@ import {
   Modal,
   Pressable,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {colors} from '../Styles/ColorData';
 import GradientScreen from '../Layouts/GradientScreen';
 import GradientInput from '../Components/Common/GradientInput';
@@ -17,14 +17,62 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
 import SingleFriend from '../Components/FriendList/SingleFriend';
+import SingleRequest from '../Components/FriendList/SingleRequest';
 import SelectFriend from '../Components/FriendList/SelectFriend';
+import socket from '../Socket/Socket';
+import {useSelector} from 'react-redux';
 
-const data = [
+const friendsdata = [
   {
     id: 7,
     name: 'Jhon Doe',
     type: 'single',
     liked: true,
+    imageUrl:
+      'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    unseenmsg: 2,
+  },
+  {
+    id: 44,
+    name: 'Vivek',
+    type: 'single',
+    imageUrl:
+      'https://images.unsplash.com/photo-1613521140785-e85e427f8002?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    unseenmsg: 2,
+  },
+  {
+    id: 45,
+    name: 'Vivek 2',
+    type: 'single',
+    liked: true,
+    imageUrl:
+      'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    unseenmsg: 2,
+  },
+  {
+    id: 56,
+    name: 'Jhon',
+    type: 'single',
+    imageUrl:
+      'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    liked: true,
+    unseenmsg: 0,
+  },
+  {
+    id: 200,
+    name: 'Friends Group',
+    type: 'group',
+    grouproomid: '123',
+    imageUrl:
+      'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    unseenmsg: 2,
+  },
+];
+const requestdata = [
+  {
+    id: 7,
+    name: 'Jhon Doe',
+    type: 'single',
     imageUrl:
       'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
@@ -37,53 +85,76 @@ const data = [
   },
   {
     id: 45,
-    name: 'Vivek 2',
-    type: 'single',
-    liked: true,
-    imageUrl:
-      'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  },
-  {
-    id: 56,
-    name: 'Jhon',
-    type: 'single',
-    imageUrl:
-      'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    liked: true,
-  },
-  {
-    id: 200,
-    name: 'Friends Group',
+    name: 'Collage Friends',
     type: 'group',
-    grouproomid: '123',
     imageUrl:
-      'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  },
-  {
-    id: 201,
-    name: 'Mohit Sharma',
-    type: 'single',
-    imageUrl:
-      'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  },
-  {
-    id: 202,
-    name: 'XYZ',
-    type: 'single',
-    imageUrl:
-      'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+      'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D',
   },
 ];
 
 const FriendsList = () => {
   const navigation = useNavigation();
+  const myuserid = useSelector(state => state.Auth.userid);
+  const [selectedoptiontype, setselectedoptiontype] = useState('friends');
   const [showgroupmodal, setshowgroupmodal] = useState(false);
   const [grouplist, setgrouplist] = useState([]);
+  const [filteredfriendsdata, setfilteredfriendsdata] = useState(friendsdata);
+  const [filteredrequestdata, setfilteredrequestdata] = useState(requestdata);
+  const [searchfilter, setsearchfilter] = useState('');
+
+  useEffect(() => {
+    if (selectedoptiontype === 'friends') {
+      if (searchfilter) {
+        setfilteredfriendsdata(
+          friendsdata.filter(item =>
+            item.name.toLowerCase().includes(searchfilter.toLowerCase()),
+          ),
+        );
+      } else {
+        setfilteredfriendsdata(friendsdata);
+      }
+    }
+    if (selectedoptiontype === 'requests') {
+      if (searchfilter) {
+        setfilteredrequestdata(
+          requestdata.filter(item =>
+            item.name.toLowerCase().includes(searchfilter.toLowerCase()),
+          ),
+        );
+      } else {
+        setfilteredrequestdata(requestdata);
+      }
+    }
+  }, [searchfilter, selectedoptiontype]);
 
   const handlecreategroup = () => {
     console.log('grouplist', grouplist);
     setshowgroupmodal(false);
   };
+
+  useEffect(() => {
+    if (socket.connected) {
+      friendsdata.map(item => {
+        if (item.type === 'single') {
+          const roomid = [myuserid, item.id].sort().join('_');
+          socket.emit('join room', roomid);
+        } else {
+          socket.emit('join room', item.grouproomid);
+        }
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleMessage = msg => {
+      console.log('msg in friend list', msg);
+    };
+    socket.on('chat message', handleMessage);
+    return () => {
+      socket.off('chat message', handleMessage);
+    };
+  }, []);
+
   return (
     <GradientScreen>
       <View style={styles.container}>
@@ -100,29 +171,31 @@ const FriendsList = () => {
             />
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginRight: 20,
-              gap: 3,
-            }}
-            onPress={() => setshowgroupmodal(true)}>
-            <View
+          {selectedoptiontype === 'friends' && (
+            <TouchableOpacity
               style={{
-                backgroundColor: '#FF5A90',
-                padding: 5,
-                borderRadius: 50,
-              }}>
-              <AntDesign
-                name="plus"
-                size={24}
-                color="white"
-                style={{fontWeight: '900'}}
-              />
-            </View>
-            <Text style={styles.headingtext2}> Create Group</Text>
-          </TouchableOpacity>
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginRight: 20,
+                gap: 3,
+              }}
+              onPress={() => setshowgroupmodal(true)}>
+              <View
+                style={{
+                  backgroundColor: '#FF5A90',
+                  padding: 5,
+                  borderRadius: 50,
+                }}>
+                <AntDesign
+                  name="plus"
+                  size={24}
+                  color="white"
+                  style={{fontWeight: '900'}}
+                />
+              </View>
+              <Text style={styles.headingtext2}> Create Group</Text>
+            </TouchableOpacity>
+          )}
         </View>
         <View style={styles.headingsearchcontainer}>
           <GradientInput style={styles.gradientborder}>
@@ -133,35 +206,95 @@ const FriendsList = () => {
                 color={colors.text.secondary}
               />
               <TextInput
-                placeholder="Search Message, Match"
+                placeholder={
+                  selectedoptiontype === 'friends'
+                    ? 'Search Friends & Groups'
+                    : 'Search Requests'
+                }
                 keyboardType="email-address"
                 placeholderTextColor={colors.login.headingtext2}
+                onChangeText={text => setsearchfilter(text)}
+                value={searchfilter}
                 cursorColor={colors.login.headingtext2}
                 style={{color: colors.login.headingtext2, flex: 1}}
               />
             </View>
           </GradientInput>
         </View>
+        <View style={styles.optionscontainer}>
+          <TouchableOpacity onPress={() => setselectedoptiontype('friends')}>
+            <Text
+              style={[
+                styles.optiontext,
+                {
+                  color:
+                    selectedoptiontype === 'friends'
+                      ? colors.arrow.tertiary
+                      : colors.arrow.primary,
+                },
+              ]}>
+              Friends
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setselectedoptiontype('requests')}>
+            <Text
+              style={[
+                styles.optiontext,
+                {
+                  color:
+                    selectedoptiontype === 'requests'
+                      ? colors.arrow.tertiary
+                      : colors.arrow.primary,
+                },
+              ]}>
+              Requests
+            </Text>
+          </TouchableOpacity>
+        </View>
         <View style={styles.headingContainer}>
-          <Text style={[styles.headingtext, {marginBottom: 5, marginTop: 20}]}>
+          {/* <Text style={[styles.headingtext, {marginBottom: 5, marginTop: 20}]}>
             Friend List
-          </Text>
-          <Text style={styles.headingtext2}>
-            Check out friends list & keep enjoying
-          </Text>
+          </Text> */}
+          {/* {selectedoptiontype === 'friends' ? (
+            <Text style={styles.headingtext2}>
+              Check out friends list & keep enjoying
+            </Text>
+          ) : (
+            <Text style={styles.headingtext2}>
+              Check out friend requests & keep enjoying
+            </Text>
+          )} */}
         </View>
         <View style={styles.friendlistcontainer}>
-          <FlatList
-            data={data}
-            keyExtractor={item => item.id.toString()}
-            renderItem={({item, index}) => (
-              <SingleFriend data={item} index={index} />
-            )}
-            onEndReachedThreshold={0.1}
-            showsVerticalScrollIndicator={false}
-            numColumns={1}
-            contentContainerStyle={{paddingBottom: 250}}
-          />
+          {selectedoptiontype === 'friends' ? (
+            <FlatList
+              data={filteredfriendsdata}
+              keyExtractor={item => item.id.toString()}
+              renderItem={({item, index}) => (
+                <SingleFriend
+                  data={item}
+                  index={index}
+                  setfilteredfriendsdata={setfilteredfriendsdata}
+                />
+              )}
+              onEndReachedThreshold={0.1}
+              showsVerticalScrollIndicator={false}
+              numColumns={1}
+              contentContainerStyle={{paddingBottom: 250}}
+            />
+          ) : (
+            <FlatList
+              data={filteredrequestdata}
+              keyExtractor={item => item.id.toString()}
+              renderItem={({item, index}) => (
+                <SingleRequest data={item} index={index} />
+              )}
+              onEndReachedThreshold={0.1}
+              showsVerticalScrollIndicator={false}
+              numColumns={1}
+              contentContainerStyle={{paddingBottom: 250}}
+            />
+          )}
         </View>
         <Modal
           animationType="slide"
@@ -183,7 +316,7 @@ const FriendsList = () => {
                   flex: 1,
                 }}>
                 <FlatList
-                  data={data.filter(item => item.type === 'single')}
+                  data={friendsdata.filter(item => item.type === 'single')}
                   keyExtractor={item => item.id.toString()}
                   renderItem={({item, index}) => (
                     <SelectFriend
@@ -246,7 +379,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   headingsearchcontainer: {
-    marginTop: 80,
+    marginTop: 60,
     marginHorizontal: 30,
   },
   gradientborder: {
@@ -268,9 +401,22 @@ const styles = StyleSheet.create({
   },
   headingContainer: {
     width: '100%',
-    marginTop: 10,
+    marginTop: 0,
     marginLeft: 20,
-    // marginBottom: 20,
+  },
+  optionscontainer: {
+    marginLeft: 20,
+    width: '100%',
+    flexDirection: 'row',
+    gap: 20,
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  optiontext: {
+    fontFamily: 'Lexend',
+    fontWeight: '900',
+    fontSize: 18,
+    lineHeight: 26,
   },
   headingtext: {
     fontFamily: 'Lexend',

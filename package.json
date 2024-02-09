@@ -35,7 +35,7 @@
     "react-native-create-thumbnail": "^2.0.0",
     "react-native-dropdown-picker": "^5.4.6",
     "react-native-elements": "^3.4.3",
-    "react-native-gesture-handler": "^2.14.0",
+    "react-native-gesture-handler": "^2.15.0",
     "react-native-hyperlink": "^0.0.22",
     "react-native-image-resizer": "^1.4.5",
     "react-native-linear-gradient": "^2.8.3",
@@ -52,6 +52,7 @@
     "react-redux": "^8.0.5",
     "redux": "^4.2.0",
     "redux-logger": "^3.0.6",
+    "redux-persist": "^6.0.0",
     "redux-thunk": "^2.4.2",
     "socket.io-client": "^4.7.4"
   },

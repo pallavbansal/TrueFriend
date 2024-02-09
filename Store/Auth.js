@@ -1,13 +1,12 @@
 import {createSlice} from '@reduxjs/toolkit';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const initialState = {
   userid: null,
   userinitaldata: null, // userinitaldata is the data that is fetched from the api when the user logs in
   token: null,
-  userprofiledata: null,
   verify: {
     id: null,
-    // otp: null,
   },
   meetingid: 'hvvb-v4bi-zm04',
 };
@@ -20,32 +19,35 @@ const AuthSlice = createSlice({
       state.token = action.payload.token;
       state.userid = action.payload.userid;
       state.userinitaldata = action.payload.userinitaldata;
+
+      // Store data in AsyncStorage
+      console.log(
+        'action.payload',
+        action.payload.userid,
+        action.payload.token,
+        action.payload.userinitaldata,
+      );
+      AsyncStorage.setItem('userid', JSON.stringify(action.payload.userid));
+      AsyncStorage.setItem(
+        'userinitaldata',
+        JSON.stringify(action.payload.userinitaldata),
+      );
+      AsyncStorage.setItem('token', action.payload.token);
     },
-    UserProfileDataRed(state, action) {
-      state.userprofiledata = action.payload.userprofiledata;
-    },
+
     VerifyRed(state, action) {
       state.verify.id = action.payload.id;
-      // state.verify.otp = action.payload.otp;
     },
     LogoutRed(state) {
-      // state.user = null;
       state.token = null;
-      // state.userid = null;
-      // state.userinitaldata = null;
-    },
-    MeetingIdRed(state, action) {
-      // console.log('action.payload.meetingid', action.payload);
-      // state.meetingid = action.payload;
+      state.userid = null;
+      state.userinitaldata = null;
+      AsyncStorage.removeItem('userid');
+      AsyncStorage.removeItem('userinitaldata');
+      AsyncStorage.removeItem('token');
     },
   },
 });
 
-export const {
-  LoginRed,
-  LogoutRed,
-  UserProfileDataRed,
-  VerifyRed,
-  MeetingIdRed,
-} = AuthSlice.actions;
+export const {LoginRed, LogoutRed, VerifyRed} = AuthSlice.actions;
 export default AuthSlice.reducer;

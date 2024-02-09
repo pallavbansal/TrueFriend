@@ -2,33 +2,10 @@ import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import React from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import {useNavigation} from '@react-navigation/native';
+import Entypo from 'react-native-vector-icons/Entypo';
 import {colors} from '../../Styles/ColorData';
 
-const SingleFriend = ({data, setfilteredfriendsdata}) => {
-  const navigation = useNavigation();
-
-  const handleChat = () => {
-    // setfilteredfriendsdata(prev => {
-    //   return prev.map(item => {
-    //     if (item.id == data.id) {
-    //       return {
-    //         ...item,
-    //         unseenmsg: 0,
-    //       };
-    //     }
-    //     return item;
-    //   });
-    // });
-    navigation.navigate('Chat', {
-      userid: data.id,
-      name: data.name,
-      imageUrl: data.imageUrl,
-      type: data.type,
-      grouproomid: data.grouproomid,
-    });
-  };
-
+const SingleRequest = ({data}) => {
   return (
     <View>
       <View style={styles.fricontainer}>
@@ -59,64 +36,39 @@ const SingleFriend = ({data, setfilteredfriendsdata}) => {
         <View style={{flex: 1}}>
           <Text style={styles.text1}>{data.name}</Text>
 
-          <View
-            style={{
-              flexDirection: 'row',
-              gap: 10,
-              marginTop: 10,
-              alignItems: 'center',
-            }}>
-            <TouchableOpacity style={styles.chatbutton} onPress={handleChat}>
+          <View style={{flexDirection: 'row', gap: 10, marginTop: 10}}>
+            <TouchableOpacity style={styles.acceptbutton}>
               <Text
                 style={{
                   color: 'white',
                   fontWeight: '500',
                 }}>
-                Chat
+                Accept
               </Text>
             </TouchableOpacity>
 
-            {data.type == 'single' && (
-              <TouchableOpacity style={styles.callbutton}>
-                <Text
-                  style={{
-                    color: 'white',
-                    fontWeight: '500',
-                  }}>
-                  Call
-                </Text>
-              </TouchableOpacity>
-            )}
-
-            {data.unseenmsg > 0 && (
-              <View
+            <TouchableOpacity style={styles.deletebutton}>
+              <Text
                 style={{
-                  marginLeft: 'auto',
-                  marginRight: 10,
-                  backgroundColor: colors.arrow.tertiary,
-                  padding: 5,
-                  borderRadius: 100,
-                  width: 25,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  height: 25,
+                  color: 'black',
+                  fontWeight: '500',
                 }}>
-                <Text
-                  style={{
-                    color: 'white',
-                    fontSize: 12,
-                  }}>
-                  {data.unseenmsg}
-                </Text>
-              </View>
-            )}
+                Delete
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
-      {data.liked && (
+      {data.type == 'single' ? (
         <View style={styles.likecontainer}>
           <TouchableOpacity>
-            <AntDesign name="like2" size={24} color="black" />
+            <Entypo name="user" size={18} color={colors.arrow.secondary} />
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <View style={styles.likecontainer}>
+          <TouchableOpacity>
+            <Entypo name="users" size={18} color={colors.arrow.secondary} />
           </TouchableOpacity>
         </View>
       )}
@@ -125,7 +77,7 @@ const SingleFriend = ({data, setfilteredfriendsdata}) => {
   );
 };
 
-export default SingleFriend;
+export default SingleRequest;
 
 const styles = StyleSheet.create({
   fricontainer: {
@@ -158,22 +110,22 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     marginBottom: 15,
   },
-  chatbutton: {
+  acceptbutton: {
     height: 30,
-    width: 90,
+    width: 106,
     borderRadius: 5,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#8D49EE',
     paddingHorizontal: 10,
   },
-  callbutton: {
+  deletebutton: {
     height: 30,
-    width: 90,
+    width: 106,
     borderRadius: 5,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#00B528',
+    backgroundColor: '#DDDDDD',
     paddingHorizontal: 10,
   },
   likecontainer: {

@@ -5,37 +5,69 @@ import {
   Image,
   TouchableOpacity,
   Pressable,
+  PanResponder,
 } from 'react-native';
 import React, {useState} from 'react';
 import {colors} from '../../Styles/ColorData';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Video from 'react-native-video';
 import {ActivityIndicator} from 'react-native';
+import {
+  PinchGestureHandler,
+  PanGestureHandler,
+  State,
+} from 'react-native-gesture-handler';
 
 const SingleFeedProfile = ({
   item,
+  setAllPosts,
   isMuted,
   isPaused,
   handleMuteUnmute,
   handlePlayPause,
   viewableItems,
 }) => {
-  const {name, media_path, id, caption, media_type} = item;
+  const {name, media_path, id, caption, media_type, like_count, dislike_count} =
+    item;
+  const [scale, setScale] = useState(1);
+  const [translateX, setTranslateX] = useState(0);
+  const [translateY, setTranslateY] = useState(0);
 
   const [isLoading, setIsLoading] = useState(true);
-
   const handleBuffer = ({isBuffering}) => {
     setIsLoading(isBuffering);
   };
-
   const handleLoadStart = () => {
     setIsLoading(true);
   };
-
   const handleLoad = () => {
     setIsLoading(false);
+  };
+
+  const handlelike = () => {
+    setAllPosts(prev => {
+      return prev.map(post => {
+        if (post.id === id) {
+          if (post.liked) {
+            return {
+              ...post,
+              like_count: parseInt(post.like_count, 10) - 1,
+              liked: false,
+            };
+          } else {
+            return {
+              ...post,
+              like_count: parseInt(post.like_count, 10) + 1,
+              liked: true,
+            };
+          }
+        }
+        return post;
+      });
+    });
   };
 
   const handlePlayPausein = () => {
@@ -49,6 +81,30 @@ const SingleFeedProfile = ({
       }
     }
   };
+
+  const onPinchGestureEvent = event => {
+    setScale(event.nativeEvent.scale);
+  };
+
+  const onPinchHandlerStateChange = event => {
+    if (event.nativeEvent.oldState === State.ACTIVE) {
+      setScale(1);
+    }
+  };
+
+  // const onGestureEvent = event => {
+  //   if (scale > 1) {
+  //     setTranslateX(event.nativeEvent.translationX);
+  //     setTranslateY(event.nativeEvent.translationY);
+  //   }
+  // };
+
+  // const onHandlerStateChange = event => {
+  //   if (event.nativeEvent.oldState === State.ACTIVE) {
+  //     setTranslateX(0);
+  //     setTranslateY(0);
+  //   }
+  // };
 
   return (
     <View style={styles.container}>
@@ -70,104 +126,88 @@ const SingleFeedProfile = ({
           <Text style={styles.headingtext3}>{caption}</Text>
         </View>
       </View>
-      <View style={styles.profilecontainer}>
-        {media_type == '1' ? (
-          // <Image
-          //   source={{uri: media_path}}
-          //   style={{height: 250, width: '100%'}}
-          //   resizeMode="contain"
-          // />
-          <Image
-            source={{uri: media_path}}
-            style={{
-              width: '100%',
-              aspectRatio: 1,
-            }}
-            resizeMode="contain"
-          />
-        ) : (
-          <Pressable onPress={handlePlayPausein}>
-            <Video
+
+      <PinchGestureHandler
+        onGestureEvent={onPinchGestureEvent}
+        onHandlerStateChange={onPinchHandlerStateChange}>
+        <View style={[styles.profilecontainer]}>
+          {media_type == '1' ? (
+            <Image
               source={{uri: media_path}}
               style={{
-                // height: 250,
-                aspectRatio: 16 / 9,
                 width: '100%',
+                aspectRatio: 1,
+                transform: [{scale}, {translateX}, {translateY}],
               }}
               resizeMode="contain"
-              // poster="https://www.w3schools.com/w3images/lights.jpg"
-              // posterResizeMode="cover"
-              muted={isMuted}
-              paused={!(!isPaused && viewableItems.includes(id.toString()))}
-              repeat={true}
-              onBuffer={handleBuffer}
-              onLoadStart={handleLoadStart}
-              onLoad={handleLoad}
             />
-
-            {isLoading && (
-              <ActivityIndicator
-                size="large"
-                color="black"
+          ) : (
+            <Pressable onPress={handlePlayPausein}>
+              <Video
+                source={{uri: media_path}}
                 style={{
-                  position: 'absolute',
-                  top: '45%',
-                  left: '45%',
-                }}
-              />
-            )}
-
-            {/* {isLoading && (
-              <Image
-                source={{uri: 'https://www.w3schools.com/w3images/lights.jpg'}}
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  height: 250,
+                  // height: 250,
+                  aspectRatio: 16 / 9,
                   width: '100%',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor: 'black',
-                  zIndex: 1,
+                  transform: [{scale}],
                 }}
+                resizeMode="contain"
+                // poster="https://www.w3schools.com/w3images/lights.jpg"
+                // posterResizeMode="cover"
+                muted={isMuted}
+                paused={!(!isPaused && viewableItems.includes(id.toString()))}
+                repeat={true}
+                onBuffer={handleBuffer}
+                onLoadStart={handleLoadStart}
+                onLoad={handleLoad}
               />
-            )} */}
 
-            {/* <TouchableOpacity
-              onPress={handlePlayPause}
-              style={{
-                position: 'absolute',
-                top: '45%',
-                left: '46%',
-              }}>
-              {isPaused ? (
-                <Feather name="pause" size={40} color="black" />
-              ) : (
-                <Feather name="play" size={40} color="black" />
+              {isLoading && (
+                <ActivityIndicator
+                  size="large"
+                  color={colors.profile.edit}
+                  style={{
+                    position: 'absolute',
+                    top: '40%',
+                    left: '45%',
+                    backgroundColor: 'white',
+                    padding: 2,
+                    borderRadius: 20,
+                  }}
+                />
               )}
-            </TouchableOpacity> */}
-            <TouchableOpacity
-              onPress={handleMuteUnmute}
-              style={{
-                position: 'absolute',
-                bottom: 5,
-                right: 5,
-                elevation: 5,
-              }}>
-              {isMuted ? (
-                <Feather name="volume-x" size={24} color="black" />
-              ) : (
-                <Feather name="volume-2" size={24} color="black" />
-              )}
-            </TouchableOpacity>
-          </Pressable>
-        )}
-      </View>
+
+              {!isLoading &&
+                isPaused &&
+                viewableItems.includes(id.toString()) && (
+                  <TouchableOpacity
+                    onPress={handlePlayPausein}
+                    style={styles.pausebutton}>
+                    <MaterialIcons
+                      name={'play-arrow'}
+                      size={28}
+                      color={colors.profile.edit}
+                    />
+                  </TouchableOpacity>
+                )}
+
+              <TouchableOpacity
+                onPress={handleMuteUnmute}
+                style={styles.mutebutton}>
+                <MaterialIcons
+                  name={isMuted ? 'volume-off' : 'volume-up'}
+                  size={24}
+                  color={colors.profile.edit}
+                />
+              </TouchableOpacity>
+            </Pressable>
+          )}
+        </View>
+      </PinchGestureHandler>
       <View style={styles.actioncontainer}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handlelike}>
           <AntDesign
-            name="like2"
+            name={item.liked ? 'like1' : 'like2'}
             size={24}
             color={colors.socialfeed.actionicons}
           />
@@ -197,6 +237,9 @@ const SingleFeedProfile = ({
           />
         </TouchableOpacity>
       </View>
+      <View style={styles.statscontainer}>
+        <Text style={styles.headingtext4}>{item.like_count} Likes</Text>
+      </View>
     </View>
   );
 };
@@ -216,10 +259,20 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   profilecontainer: {
-    elevation: 5,
-    backgroundColor: 'white',
+    // elevation: 5,
+    // backgroundColor: 'white',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    borderRadius: 20,
+    overflow: 'hidden',
+    margin: 5,
   },
   actioncontainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    gap: 10,
+  },
+  statscontainer: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 10,
@@ -239,4 +292,32 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 22.4,
   },
+  headingtext4: {
+    color: colors.login.headingtext2,
+    fontWeight: 'bold',
+    fontSize: 14,
+    lineHeight: 22.4,
+  },
+  mutebutton: {
+    backgroundColor: 'white',
+    borderRadius: 13,
+    padding: 2,
+    position: 'absolute',
+    bottom: 7,
+    right: 7,
+  },
+  pausebutton: {
+    backgroundColor: 'white',
+    borderRadius: 13,
+    padding: 2,
+    position: 'absolute',
+    top: '40%',
+    left: '45%',
+  },
 });
+
+// <Image
+//   source={{uri: media_path}}
+//   style={{height: 250, width: '100%'}}
+//   resizeMode="contain"
+// />

@@ -21,6 +21,14 @@ const Message = ({MessageData, myid}) => {
   const videoError = error => {
     console.error('Video error', error);
   };
+  const formatTime = dateString => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('en-IN', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+  };
 
   const dividertext = date => {
     const inputDate = new Date(date);
@@ -47,7 +55,7 @@ const Message = ({MessageData, myid}) => {
     }
   };
 
-  if (MessageData.type == 'divider') {
+  if (MessageData.type == 'DIVIDER') {
     return (
       <View
         style={{
@@ -69,7 +77,7 @@ const Message = ({MessageData, myid}) => {
             fontSize: 12,
             fontWeight: '900',
           }}>
-          {dividertext(MessageData.date)}
+          {dividertext(MessageData.created_at)}
         </Text>
       </View>
     );
@@ -79,14 +87,14 @@ const Message = ({MessageData, myid}) => {
     <View
       style={[
         styles.container,
-        MessageData.senderid == myid ? styles.right : styles.left,
+        MessageData.sender_id == myid ? styles.right : styles.left,
       ]}>
       <View style={styles.messageheader}>
         <Text
           style={[
-            MessageData.senderid == myid ? styles.nametext1 : styles.nametext2,
+            MessageData.sender_id == myid ? styles.nametext1 : styles.nametext2,
           ]}>
-          {MessageData.senderid == myid ? 'You' : MessageData.senderName}
+          {MessageData.sender_id == myid ? 'You' : MessageData.sender.name}
         </Text>
         {MessageData.type == 'image' && (
           <MaterialIcons
@@ -119,23 +127,35 @@ const Message = ({MessageData, myid}) => {
           />
         )}
 
-        <Text style={styles.timetext}>{MessageData.time}</Text>
+        <Text style={styles.timetext}>
+          {formatTime(MessageData.created_at)}
+        </Text>
       </View>
-      {MessageData.type == 'text' && (
-        <Text style={styles.messagetext}>{MessageData.message}</Text>
+      {MessageData.type == 'TEXT' && (
+        <Text style={styles.messagetext}>{MessageData.content}</Text>
       )}
-      {MessageData.type == 'image' && (
+      {MessageData.type == 'PHOTO' && (
         <Image
-          source={{uri: MessageData.media}}
+          source={{uri: MessageData.media_path}}
           style={{width: 150, height: 150}}
         />
       )}
-      {MessageData.type == 'video' && (
+      {MessageData.type == 'VIDEO' && (
         <TouchableOpacity onPress={() => setModalVisible(true)}>
-          <Image
-            source={{uri: MessageData.media}}
+          <Video
+            source={{uri: MessageData.media_path}}
             style={{width: 150, height: 150}}
+            resizeMode="cover"
+            muted={true}
+            paused={true}
+            repeat={false}
+            onBuffer={onBuffer}
+            onError={videoError}
           />
+          {/* <Image
+            source={{uri: MessageData.media_path}}
+            style={{width: 150, height: 150}}
+          /> */}
           <Modal
             animationType="slide"
             transparent={false}
@@ -145,7 +165,7 @@ const Message = ({MessageData, myid}) => {
             }}>
             <View style={styles.videoModal}>
               <Video
-                source={{uri: MessageData.media}}
+                source={{uri: MessageData.media_path}}
                 style={{width: '100%', height: '100%'}}
                 resizeMode="cover"
                 controls={true}

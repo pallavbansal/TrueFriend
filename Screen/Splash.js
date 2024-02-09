@@ -1,18 +1,52 @@
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import GradientScreen from '../Layouts/GradientScreen';
 import LinearGradient from 'react-native-linear-gradient';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
+import {useDispatch} from 'react-redux';
+import {LogoutRed, LoginRed} from '../Store/Auth';
 import GradientText from '../Components/Common/GradientText';
 import {useNavigation} from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Loading from './Loading';
 import {colors} from '../Styles/ColorData';
 
 const Splash = () => {
+  const dispatch = useDispatch();
   const navigation = useNavigation();
+  const [loading, setloading] = useState(true);
+
+  useEffect(() => {
+    setloading(true);
+    const fetchData = async () => {
+      const userid = JSON.parse(await AsyncStorage.getItem('userid'));
+      const userinitaldata = JSON.parse(
+        await AsyncStorage.getItem('userinitaldata'),
+      );
+      const token = await AsyncStorage.getItem('token');
+
+      if (token && userid && userinitaldata) {
+        dispatch(LoginRed({userid, token, userinitaldata}));
+        return navigation.reset({
+          index: 0,
+          routes: [{name: 'Discover'}],
+        });
+      } else {
+        dispatch(LogoutRed());
+      }
+      setloading(false);
+    };
+    fetchData();
+  }, []);
+
   const handlegetstarted = () => {
     return navigation.navigate('Login');
   };
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <GradientScreen>

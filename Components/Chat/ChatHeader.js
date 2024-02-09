@@ -59,6 +59,14 @@ const ChatHeader = ({name, imageUrl, userid, chattype}) => {
     console.log(item);
   };
 
+  const handleaudiocall = () => {
+    console.log('call');
+  };
+
+  const handlevideocall = () => {
+    console.log('video');
+  };
+
   return (
     <>
       <LinearGradient
@@ -86,16 +94,15 @@ const ChatHeader = ({name, imageUrl, userid, chattype}) => {
             marginLeft: 'auto',
           }}>
           {chattype == 'single' && (
-            <TouchableOpacity>
+            <TouchableOpacity onPress={handleaudiocall}>
               <Ionicons name="call" size={24} color="white" />
             </TouchableOpacity>
           )}
           {chattype == 'single' && (
-            <TouchableOpacity>
+            <TouchableOpacity onPress={handlevideocall}>
               <FontAwesome5 name="video" size={24} color="white" />
             </TouchableOpacity>
           )}
-
           <TouchableOpacity onPress={handleroptionsdialog}>
             <Entypo name="dots-three-vertical" size={24} color="white" />
           </TouchableOpacity>

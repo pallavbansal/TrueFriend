@@ -24,7 +24,6 @@ import {colors} from '../Styles/ColorData';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
 import {useSelector} from 'react-redux';
-import {MeetingIdRed} from '../Store/Auth';
 import {useDispatch} from 'react-redux';
 
 const StartStream = ({route}) => {
@@ -50,7 +49,6 @@ const StartStream = ({route}) => {
         const _meetingId = await createMeeting({token});
         console.log('_meetingId', _meetingId);
         setMeetingId(_meetingId);
-        dispatch(MeetingIdRed(_meetingId));
       }
     }
     fetchData();
