@@ -1,4 +1,4 @@
-import {View, StyleSheet, ScrollView} from 'react-native';
+import {View, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
 import React, {useState, useEffect, useRef} from 'react';
 import GradientScreen from '../Layouts/GradientScreen';
 import GradientText from '../Components/Common/GradientText';
@@ -13,11 +13,11 @@ import socket from '../Socket/Socket';
 
 const Chat = ({route}) => {
   const [MessageData, setMessageData] = useState([]);
+  const flatListRef = useRef();
   const {userid, name, imageUrl, type: chattype, grouproomid} = route.params;
+  const [pages, setPages] = useState([]);
   const myuserid = useSelector(state => state.Auth.userid);
   const {name: myname} = useSelector(state => state.Auth.userinitaldata);
-  const [scrollPosition, setScrollPosition] = useState(0);
-  const scrollViewRef = useRef(null);
   const {
     data,
     error,
@@ -46,21 +46,16 @@ const Chat = ({route}) => {
       const finaldata = data.pages.flatMap(page => {
         return page.data.chats.data;
       });
+      // reverse the array
       finaldata.reverse();
       setMessageData(finaldata);
+      // flatListRef.current?.scrollToIndex({index: 20, animated: true});
+      // flatListRef.current?.scrollToEnd({animated: true});
     }
   }, [data]);
 
   useEffect(() => {
-    if (MessageData.length > 20) {
-      console.log(
-        '-------------------------------------------',
-        MessageData.length,
-      );
-      if (scrollViewRef.current) {
-        scrollViewRef.current.scrollTo({y: scrollPosition, animated: false});
-      }
-    }
+    flatListRef.current?.scrollToEnd({animated: true});
   }, [MessageData]);
 
   if (isPending) {
@@ -76,28 +71,30 @@ const Chat = ({route}) => {
           userid={userid}
           chattype={chattype}
         />
-        <ScrollView
-          ref={scrollViewRef}
-          style={styles.chatcontainer}
-          onScroll={({nativeEvent}) => {
-            if (
-              nativeEvent.contentOffset.y === 0 &&
-              hasNextPage &&
-              !isFetchingNextPage
-            ) {
-              fetchNextPage();
-            }
-          }}
-          scrollEventThrottle={400}>
-          {MessageData.map((item, index) => (
-            <Message
-              MessageData={item}
-              index={index}
-              myid={myuserid}
-              key={item.id}
-            />
-          ))}
-        </ScrollView>
+        <View style={styles.chatcontainer}>
+          <FlatList
+            ref={flatListRef}
+            data={MessageData}
+            onContentSizeChange={() => {
+              // flatListRef.current.scrollToEnd({animated: false})
+              // if (MessageData.length < 20) {
+              //   flatListRef.current.scrollToEnd({animated: false});
+              // }
+              // if (MessageData.length > 20) {
+              //   flatListRef.current.scrollToIndex({index: 20, animated: false});
+              // }
+            }}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({item, index}) => (
+              <Message MessageData={item} index={index} myid={myuserid} />
+            )}
+            onStartReachedThreshold={0.1}
+            onStartReached={fetchNextPage}
+            showsVerticalScrollIndicator={false}
+            numColumns={1}
+            contentContainerStyle={{paddingBottom: 80}}
+          />
+        </View>
         {isFetching || isFetchingPreviousPage || isFetchingNextPage ? (
           <View
             style={{

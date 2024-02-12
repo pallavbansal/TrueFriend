@@ -22,13 +22,12 @@ export const useFetchSocialFeedPosts = () => {
     isFetching,
   } = useInfiniteQuery({
     queryKey: ['socialfeedposts'],
-    queryFn: ({pageParam = 1}) => getSocialFeedPosts(token, pageParam),
+    initialPageParam: 1,
+    queryFn: ({pageParam}) => getSocialFeedPosts(token, pageParam),
     getNextPageParam: lastPage => {
-      // console.log('lastPage in hook', lastPage.data.posts.next_page_url);
       if (!lastPage.data.posts.next_page_url) return undefined;
       const match = lastPage.data.posts.next_page_url.match(/page=(\d+)/);
       const page = match ? Number(match[1]) : undefined;
-      // console.log('page in hook', page);
       return page;
     },
   });

@@ -1,4 +1,8 @@
-import {createStream, endStream} from '../../Services/StreamServices';
+import {
+  createStream,
+  endStream,
+  getStreamMeetingId,
+} from '../../Services/StreamServices';
 import {useMutation, useQuery} from '@tanstack/react-query';
 import {useSelector} from 'react-redux';
 
@@ -9,6 +13,14 @@ export const useCreateStream = () => {
   const token = useSelector(state => state.Auth.token);
   const {isPending, error, mutate, reset} = useMutation({
     mutationFn: ({data}) => createStream(data, token),
+  });
+  return {isPending, error, mutate, reset};
+};
+
+export const useGetMeetingId = () => {
+  const token = useSelector(state => state.Auth.token);
+  const {isPending, error, mutate, reset} = useMutation({
+    mutationFn: ({data}) => getStreamMeetingId(data, token),
   });
   return {isPending, error, mutate, reset};
 };

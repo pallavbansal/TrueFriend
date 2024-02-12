@@ -7,15 +7,9 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  Platform,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-  Keyboard,
-  Clipboard,
   StyleSheet,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import {Copy, MicOff, MicOn, VideoOff, VideoOn} from '../assets/icons2';
 import React, {useState, useEffect, useCallback} from 'react';
 import {createMeeting, getToken} from '../Components/LiveStreaming/api';
 import {useNavigation} from '@react-navigation/native';
@@ -25,9 +19,10 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
 import {useSelector} from 'react-redux';
 import {useDispatch} from 'react-redux';
-
+import {useCreateStream} from '../Hooks/Query/StreamQuery';
 const StartStream = ({route}) => {
   const navigation = useNavigation();
+  const {isPending, error, mutate, reset} = useCreateStream();
   const dispatch = useDispatch();
   const {name} = useSelector(state => state.Auth.userinitaldata);
   const [tracks, setTrack] = useState('');
@@ -77,6 +72,32 @@ const StartStream = ({route}) => {
   };
 
   const naviagateToSpeaker = () => {
+    // disposeVideoTrack();
+    // if (meetingId) {
+    //   const formdata = {
+    //     meeting_id: meetingId,
+    //     type: 'STREAM',
+    //   };
+    //   console.log(meetingId, formdata);
+    //   mutate(
+    //     {
+    //       data: formdata,
+    //     },
+    //     {
+    //       onSuccess: data => {
+    //         console.log('start stream meetingid push success', data);
+    //         navigation.navigate('LiveStream', {
+    //           name: name.trim(),
+    //           token: token,
+    //           meetingId: meetingId,
+    //           micEnabled: micOn,
+    //           webcamEnabled: videoOn,
+    //           mode: 'CONFERENCE',
+    //         });
+    //       },
+    //     },
+    //   );
+    // }
     disposeVideoTrack();
     navigation.navigate('LiveStream', {
       name: name.trim(),

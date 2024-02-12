@@ -27,6 +27,7 @@ const SpeakerFooter = ({
   toggleMic,
   localWebcamOn,
   toggleWebcam,
+  changeWebcam,
   setBottomSheetView,
   bottomSheetRef,
   end,
@@ -44,7 +45,9 @@ const SpeakerFooter = ({
       />
       <IconContainer
         backgroundColor="transparent"
-        onPress={() => {}}
+        onPress={() => {
+          changeWebcam();
+        }}
         iconName="change-circle"
         iconColor="#FFF"
       />
@@ -111,108 +114,3 @@ const styles = StyleSheet.create({
     borderRadius: 40,
   },
 });
-
-{
-  /* <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-evenly',
-        }}>
-        <IconContainer
-          backgroundColor={'red'}
-          Icon={() => {
-            return <CallEnd height={26} width={26} fill="#FFF" />;
-          }}
-          onPress={() => {
-            leaveMenu.current.show();
-          }}
-        />
-        <IconContainer
-          style={{
-            borderWidth: 1.5,
-            borderColor: '#2B3034',
-          }}
-          backgroundColor={!localMicOn ? colors.primary[100] : 'transparent'}
-          onPress={() => {
-            toggleMic();
-          }}
-          Icon={() => {
-            return localMicOn ? (
-              <MicOn height={24} width={24} fill="#FFF" />
-            ) : (
-              <MicOff height={28} width={28} fill="#1D2939" />
-            );
-          }}
-        />
-        <IconContainer
-          style={{
-            borderWidth: 1.5,
-            borderColor: '#2B3034',
-          }}
-          backgroundColor={!localWebcamOn ? colors.primary[100] : 'transparent'}
-          onPress={() => {
-            toggleWebcam();
-          }}
-          Icon={() => {
-            return localWebcamOn ? (
-              <VideoOn height={24} width={24} fill="#FFF" />
-            ) : (
-              <VideoOff height={36} width={36} fill="#1D2939" />
-            );
-          }}
-        />
-        <IconContainer
-          onPress={() => {
-            setBottomSheetView('CHAT');
-            bottomSheetRef.current.show();
-          }}
-          style={{
-            borderWidth: 1.5,
-            borderColor: '#2B3034',
-          }}
-          Icon={() => {
-            return <Chat height={22} width={22} fill="#FFF" />;
-          }}
-        />
-        <IconContainer
-          style={{
-            borderWidth: 1.5,
-            borderColor: '#2B3034',
-          }}
-          onPress={() => {
-            if (presenterId == null || localScreenShareOn) {
-              Platform.OS === 'android'
-                ? toggleScreenShare()
-                : VideosdkRPK.startBroadcast();
-            }
-          }}
-          Icon={() => {
-            return <ScreenShare height={22} width={22} fill="#FFF" />;
-          }}
-        />
-      </View> */
-}
-
-{
-  /* <IconContainer
-        onPress={() => {
-          setBottomSheetView('CHAT');
-          bottomSheetRef.current.show();
-        }}
-        iconName="chat"
-        iconColor="#FFF"
-      /> */
-}
-{
-  /* <IconContainer
-        onPress={() => {
-          if (presenterId == null || localScreenShareOn) {
-            Platform.OS === 'android'
-              ? toggleScreenShare()
-              : VideosdkRPK.startBroadcast();
-          }
-        }}
-        iconName="screen-share"
-        iconColor="#FFF"
-      /> */
-}

@@ -11,16 +11,13 @@ import {colors} from '../../Styles/ColorData';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {getTime, getFormattedDate} from '../../Utils/HelperFunctions';
-import LinearGradient from 'react-native-linear-gradient';
 import MultipleImagePicker from '@baronha/react-native-multiple-image-picker';
-import {useSelector} from 'react-redux';
 import {useCreateChat} from '../../Hooks/Query/ChatQuery';
+import socket from '../../Socket/Socket';
 
 // types => text,image,video,emoji,docs,divider
 
 const ChatBottom = ({
-  socket,
   senderid,
   receiverid,
   myname,
@@ -86,6 +83,7 @@ const ChatBottom = ({
         type: messagedatafinal.type,
         content: messagedatafinal.content,
       };
+      console.log('divider', backenddata);
       mutate(
         {
           data: backenddata,

@@ -22,8 +22,9 @@ const SingleUser = ({item, meetingid}) => {
   const handlewatchstream = () => {
     if (meetingid) {
       navigation.navigate('WatchStream', {
+        id: id,
         token: token,
-        meetingId: meetingid,
+        // meetingId: meetingid,
         name: name,
         mode: 'VIEWER',
       });

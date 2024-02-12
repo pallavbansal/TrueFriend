@@ -34,7 +34,7 @@ export const useFetchChatting = receiver_id => {
     isFetching,
   } = useInfiniteQuery({
     queryKey: ['fetchChatting', token, receiver_id],
-    queryFn: ({pageParam = 2}) => fetchChatting(token, receiver_id, pageParam),
+    queryFn: ({pageParam = 1}) => fetchChatting(token, receiver_id, pageParam),
     getNextPageParam: lastPage => {
       if (!lastPage.data.chats.next_page_url) return undefined;
       const match = lastPage.data.chats.next_page_url.match(/page=(\d+)/);
@@ -52,9 +52,9 @@ export const useFetchChatting = receiver_id => {
   return {
     data,
     error,
-    // fetchNextPage,
-    // hasNextPage,
-    // isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
     fetchPreviousPage,
     hasPreviousPage,
     isFetchingPreviousPage,
