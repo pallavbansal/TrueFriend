@@ -7,7 +7,7 @@ import WaitingToJoinView from '../common/WaitingToJoinView';
 import React from 'react';
 import ViewerContainer from './ViewerContainer';
 
-export default function ILSContainer({webcamEnabled}) {
+export default function WatchContainer({webcamEnabled}) {
   const [isJoined, setJoined] = useState(false);
   const mMeeting = useMeeting({});
   const mMeetingRef = useRef();

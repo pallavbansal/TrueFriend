@@ -6,7 +6,7 @@ const StreamLoading = () => {
   return (
     <View style={styles.container}>
       <MaterialIcons name="play-circle-outline" size={50} color="#4F8EF7" />
-      <Text style={styles.text}>Loading...</Text>
+      <Text style={styles.text}>Wait</Text>
     </View>
   );
 };

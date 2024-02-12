@@ -8,7 +8,10 @@ import ParticipantView from './ParticipantView';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import BottomSheet from '../common/BottomSheet';
 import ChatViewer from '../common/ChatViewer';
+import {useCreateStream} from '../../../Hooks/Query/StreamQuery';
+
 export default function MeetingViewer({setlocalParticipantMode}) {
+  const {isPending, error, mutate, reset} = useCreateStream();
   const {
     localParticipant,
     participants,
@@ -18,6 +21,7 @@ export default function MeetingViewer({setlocalParticipantMode}) {
     end,
     toggleWebcam,
     toggleMic,
+    changeWebcam,
     presenterId,
     localScreenShareOn,
     toggleScreenShare,
@@ -63,6 +67,23 @@ export default function MeetingViewer({setlocalParticipantMode}) {
         theme: 'DARK',
         orientation: 'landscape',
       });
+      if (meetingId) {
+        const formdata = {
+          meeting_id: meetingId,
+          type: 'STREAM',
+        };
+        console.log(meetingId, formdata);
+        mutate(
+          {
+            data: formdata,
+          },
+          {
+            onSuccess: data => {
+              console.log('start stream meetingid push success', data);
+            },
+          },
+        );
+      }
     } else if (hlsState === 'HLS_PLAYABLE') {
       stopHls();
     }
@@ -83,7 +104,7 @@ export default function MeetingViewer({setlocalParticipantMode}) {
       style={{
         flex: 1,
       }}>
-      <View
+      {/* <View
         style={{
           flexDirection: 'row',
           alignItems: 'center',
@@ -105,7 +126,7 @@ export default function MeetingViewer({setlocalParticipantMode}) {
           }}>
           {meetingId ? meetingId : 'No Meeting ID'}
         </Text>
-      </View>
+      </View> */}
 
       <View
         style={{
@@ -161,7 +182,8 @@ export default function MeetingViewer({setlocalParticipantMode}) {
               <Text
                 style={{
                   fontSize: 12,
-                  color: 'white',
+                  color: '#FF5D5D',
+                  fontWeight: 'bold',
                 }}>
                 Go Live
               </Text>
@@ -215,6 +237,7 @@ export default function MeetingViewer({setlocalParticipantMode}) {
         toggleMic={toggleMic}
         localWebcamOn={localWebcamOn}
         toggleWebcam={toggleWebcam}
+        changeWebcam={changeWebcam}
         end={end}
         setBottomSheetView={setBottomSheetView}
         bottomSheetRef={bottomSheetRef}

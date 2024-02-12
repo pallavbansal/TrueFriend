@@ -19,48 +19,59 @@ import {
 import {useDispatch, useSelector} from 'react-redux';
 const categories = [
   {
+    user_id: '7',
     user: {
-      id: '1',
-      name: 'smartphones',
-      online_status: 'online',
-      meedingid: null,
+      id: 56,
+      name: 'John',
       profile_picture:
-        'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+        'https://wooing.boxinallsoftech.com/public/uploads/profile/82578_1706872877_stable-diffusion-xl.jpg',
+      online_status: 'online',
     },
   },
-  {
-    user: {
-      id: '2',
-      name: 'laptops',
-      online_status: 'online',
-      profile_picture:
-        'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    },
-  },
-  {
-    user: {
-      id: '3',
-      name: 'fragrances',
-      online_status: 'online',
-      profile_picture:
-        'https://images.unsplash.com/photo-1613521140785-e85e427f8002?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    },
-  },
-  {
-    user: {
-      id: '4',
-      name: 'skincare',
-      online_status: 'online',
-      profile_picture:
-        'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    },
-  },
+  // {
+  //   user: {
+  //     id: '1',
+  //     name: 'smartphones',
+  //     online_status: 'online',
+  //     meedingid: null,
+  //     profile_picture:
+  //       'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+  //   },
+  // },
+  // {
+  //   user: {
+  //     id: '2',
+  //     name: 'laptops',
+  //     online_status: 'online',
+  //     profile_picture:
+  //       'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+  //   },
+  // },
+  // {
+  //   user: {
+  //     id: '3',
+  //     name: 'fragrances',
+  //     online_status: 'online',
+  //     profile_picture:
+  //       'https://images.unsplash.com/photo-1613521140785-e85e427f8002?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+  //   },
+  // },
+  // {
+  //   user: {
+  //     id: '4',
+  //     name: 'skincare',
+  //     online_status: 'online',
+  //     profile_picture:
+  //       'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+  //   },
+  // },
 ];
 
 const Discover = () => {
   const navigation = useNavigation();
   const meetingid = useSelector(state => state.Auth.meetingid);
   console.log('meetingid', meetingid);
+
   const {
     mutate: locationUpdate,
     isPending: isLocationPending,
@@ -109,8 +120,7 @@ const Discover = () => {
     return <Loading />;
   }
 
-  console.log('discoverData', discoverData?.data?.profiles);
-  // discoverData?.data?.profiles.push(...categories);
+  // console.log('discoverData', discoverData?.data?.profiles);
 
   const handleLogin = () => {
     return navigation.navigate('Login');
