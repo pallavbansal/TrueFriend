@@ -1,4 +1,9 @@
-import {CreatePost, getSocialFeedPosts} from '../../Services/FeedServices';
+import {
+  CreatePost,
+  getSocialFeedPosts,
+  likePost,
+  dislikePost,
+} from '../../Services/FeedServices';
 import {useMutation, useQuery, useInfiniteQuery} from '@tanstack/react-query';
 import {useSelector} from 'react-redux';
 
@@ -41,4 +46,20 @@ export const useFetchSocialFeedPosts = () => {
     isPending,
     isFetching,
   };
+};
+
+export const useLikePost = () => {
+  const token = useSelector(state => state.Auth.token);
+  const {mutate, reset} = useMutation({
+    mutationFn: ({postid}) => likePost(token, postid),
+  });
+  return {mutate, reset};
+};
+
+export const useDislikePost = () => {
+  const token = useSelector(state => state.Auth.token);
+  const {mutate, reset} = useMutation({
+    mutationFn: ({postid}) => dislikePost(token, postid),
+  });
+  return {mutate, reset};
 };

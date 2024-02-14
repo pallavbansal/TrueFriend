@@ -1,4 +1,4 @@
 // socket.js
 import io from 'socket.io-client';
-const socket = io('http://192.168.189.181:3000');
+const socket = io('http://wooing-chat.onrender.com');
 export default socket;

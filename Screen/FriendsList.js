@@ -21,6 +21,8 @@ import SingleRequest from '../Components/FriendList/SingleRequest';
 import SelectFriend from '../Components/FriendList/SelectFriend';
 import socket from '../Socket/Socket';
 import {useSelector} from 'react-redux';
+import Toast from 'react-native-toast-message';
+import Loading from './Loading';
 
 const friendsdata = [
   {
@@ -30,7 +32,7 @@ const friendsdata = [
     liked: true,
     imageUrl:
       'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    unseenmsg: 2,
+    unseenmsg: 0,
   },
   {
     id: 44,
@@ -38,7 +40,7 @@ const friendsdata = [
     type: 'single',
     imageUrl:
       'https://images.unsplash.com/photo-1613521140785-e85e427f8002?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    unseenmsg: 2,
+    unseenmsg: 0,
   },
   {
     id: 45,
@@ -47,7 +49,7 @@ const friendsdata = [
     liked: true,
     imageUrl:
       'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    unseenmsg: 2,
+    unseenmsg: 0,
   },
   {
     id: 56,
@@ -65,7 +67,7 @@ const friendsdata = [
     grouproomid: '123',
     imageUrl:
       'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    unseenmsg: 2,
+    unseenmsg: 0,
   },
 ];
 const requestdata = [
@@ -101,6 +103,7 @@ const FriendsList = () => {
   const [filteredfriendsdata, setfilteredfriendsdata] = useState(friendsdata);
   const [filteredrequestdata, setfilteredrequestdata] = useState(requestdata);
   const [searchfilter, setsearchfilter] = useState('');
+  const [socketconnected, setsocketconnected] = useState(true);
 
   useEffect(() => {
     if (selectedoptiontype === 'friends') {
@@ -134,26 +137,59 @@ const FriendsList = () => {
 
   useEffect(() => {
     if (socket.connected) {
+      setsocketconnected(true);
       friendsdata.map(item => {
         if (item.type === 'single') {
           const roomid = [myuserid, item.id].sort().join('_');
+          item.roomid = roomid;
           socket.emit('join room', roomid);
         } else {
           socket.emit('join room', item.grouproomid);
         }
       });
+    } else {
+      console.log('Socket not connected');
+      setsocketconnected(false);
     }
   }, []);
 
   useEffect(() => {
     const handleMessage = msg => {
       console.log('msg in friend list', msg);
+      setfilteredfriendsdata(prevData =>
+        prevData.map(item => {
+          if (item.type === 'single' && msg.sender_id === item.id) {
+            return {...item, unseenmsg: item.unseenmsg + 1};
+          }
+          if (
+            item.type === 'group' &&
+            msg.receiver_id === item.grouproomid &&
+            msg.sender_id !== myuserid
+          ) {
+            return {...item, unseenmsg: item.unseenmsg + 1};
+          }
+          return item;
+        }),
+      );
     };
     socket.on('chat message', handleMessage);
     return () => {
       socket.off('chat message', handleMessage);
     };
   }, []);
+
+  if (!socketconnected) {
+    setTimeout(() => {
+      navigation.goBack();
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Network Error, Please try again later.',
+        visibilityTime: 2000,
+      });
+    }, 2000);
+    return <Loading />;
+  }
 
   return (
     <GradientScreen>
@@ -268,7 +304,7 @@ const FriendsList = () => {
         <View style={styles.friendlistcontainer}>
           {selectedoptiontype === 'friends' ? (
             <FlatList
-              data={filteredfriendsdata}
+              data={filteredfriendsdata.filter(item => item.id !== myuserid)}
               keyExtractor={item => item.id.toString()}
               renderItem={({item, index}) => (
                 <SingleFriend

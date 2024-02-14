@@ -16,7 +16,6 @@ import {
   useLocationUpdate,
   useFetchDiscoverProfile,
 } from '../Hooks/Query/HomeQuery';
-import {useDispatch, useSelector} from 'react-redux';
 const categories = [
   {
     user_id: '7',
@@ -69,9 +68,6 @@ const categories = [
 
 const Discover = () => {
   const navigation = useNavigation();
-  const meetingid = useSelector(state => state.Auth.meetingid);
-  console.log('meetingid', meetingid);
-
   const {
     mutate: locationUpdate,
     isPending: isLocationPending,
@@ -119,8 +115,6 @@ const Discover = () => {
   if (isDiscoverPending) {
     return <Loading />;
   }
-
-  // console.log('discoverData', discoverData?.data?.profiles);
 
   const handleLogin = () => {
     return navigation.navigate('Login');
@@ -276,7 +270,7 @@ const Discover = () => {
                 data={discoverData?.data?.profiles}
                 keyExtractor={item => item.user.id.toString()}
                 renderItem={({item, index}) => (
-                  <SingleUser item={item} index={index} meetingid={meetingid} />
+                  <SingleUser item={item} index={index} />
                 )}
                 onEndReachedThreshold={0.1}
                 showsVerticalScrollIndicator={false}

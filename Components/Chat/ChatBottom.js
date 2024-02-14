@@ -23,6 +23,7 @@ const ChatBottom = ({
   myname,
   chattype,
   grouproomid,
+  roomid,
   MessageData,
 }) => {
   const [typetext, settypetext] = useState('');
@@ -35,10 +36,11 @@ const ChatBottom = ({
     sender: {
       name: myname,
     },
-    room:
-      chattype == 'group'
-        ? grouproomid
-        : [senderid, receiverid].sort().join('_'),
+    // room:
+    //   chattype == 'group'
+    //     ? grouproomid
+    //     : [senderid, receiverid].sort().join('_'),
+    room: chattype == 'group' ? grouproomid : roomid,
     created_at: new Date(),
   };
   const handleinput = text => {

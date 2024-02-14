@@ -5,13 +5,11 @@ import {
   Image,
   TouchableOpacity,
   Pressable,
-  PanResponder,
 } from 'react-native';
 import React, {useState} from 'react';
 import {colors} from '../../Styles/ColorData';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import Feather from 'react-native-vector-icons/Feather';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Video from 'react-native-video';
 import {ActivityIndicator} from 'react-native';
@@ -20,6 +18,7 @@ import {
   PanGestureHandler,
   State,
 } from 'react-native-gesture-handler';
+import {useLikePost, useDislikePost} from '../../Hooks/Query/FeedQuery';
 
 const SingleFeedProfile = ({
   item,
@@ -30,8 +29,9 @@ const SingleFeedProfile = ({
   handlePlayPause,
   viewableItems,
 }) => {
-  const {name, media_path, id, caption, media_type, like_count, dislike_count} =
-    item;
+  const {name, media_path, id, caption, media_type} = item;
+  const {mutate: likePost} = useLikePost();
+  const {mutate: dislikePost} = useDislikePost();
   const [scale, setScale] = useState(1);
   const [translateX, setTranslateX] = useState(0);
   const [translateY, setTranslateY] = useState(0);
@@ -51,23 +51,76 @@ const SingleFeedProfile = ({
     setAllPosts(prev => {
       return prev.map(post => {
         if (post.id === id) {
-          if (post.liked) {
+          if (post.reaction === 'like') {
             return {
               ...post,
               like_count: parseInt(post.like_count, 10) - 1,
-              liked: false,
+              reaction: null,
+            };
+          } else if (post.reaction === 'dislike') {
+            return {
+              ...post,
+              like_count: parseInt(post.like_count, 10) + 1,
+              dislike_count: parseInt(post.dislike_count, 10) - 1,
+              reaction: 'like',
             };
           } else {
             return {
               ...post,
               like_count: parseInt(post.like_count, 10) + 1,
-              liked: true,
+              reaction: 'like',
             };
           }
         }
         return post;
       });
     });
+    likePost(
+      {postid: id},
+      {
+        onSuccess: data => {
+          console.log('liked', data);
+        },
+      },
+    );
+  };
+
+  const handledislike = () => {
+    setAllPosts(prev => {
+      return prev.map(post => {
+        if (post.id === id) {
+          if (post.reaction === 'dislike') {
+            return {
+              ...post,
+              dislike_count: parseInt(post.dislike_count, 10) - 1,
+              reaction: null,
+            };
+          } else if (post.reaction === 'like') {
+            return {
+              ...post,
+              dislike_count: parseInt(post.dislike_count, 10) + 1,
+              like_count: parseInt(post.like_count, 10) - 1,
+              reaction: 'dislike',
+            };
+          } else {
+            return {
+              ...post,
+              dislike_count: parseInt(post.dislike_count, 10) + 1,
+              reaction: 'dislike',
+            };
+          }
+        }
+        return post;
+      });
+    });
+    dislikePost(
+      {postid: id},
+      {
+        onSuccess: data => {
+          console.log('disliked', data);
+        },
+      },
+    );
   };
 
   const handlePlayPausein = () => {
@@ -207,26 +260,26 @@ const SingleFeedProfile = ({
       <View style={styles.actioncontainer}>
         <TouchableOpacity onPress={handlelike}>
           <AntDesign
-            name={item.liked ? 'like1' : 'like2'}
+            name={item.reaction === 'like' ? 'like1' : 'like2'}
             size={24}
             color={colors.socialfeed.actionicons}
           />
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handledislike}>
           <AntDesign
-            name="dislike2"
+            name={item.reaction === 'dislike' ? 'dislike1' : 'dislike2'}
             size={24}
             color={colors.socialfeed.actionicons}
           />
         </TouchableOpacity>
-        <TouchableOpacity>
+        {/* <TouchableOpacity>
           <Ionicons
             name="chatbubble-outline"
             size={24}
             color={colors.socialfeed.actionicons}
           />
-        </TouchableOpacity>
-        <TouchableOpacity
+        </TouchableOpacity> */}
+        {/* <TouchableOpacity
           style={{
             marginLeft: 'auto',
           }}>
@@ -235,10 +288,11 @@ const SingleFeedProfile = ({
             size={24}
             color={colors.socialfeed.actionicons}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
       <View style={styles.statscontainer}>
         <Text style={styles.headingtext4}>{item.like_count} Likes</Text>
+        <Text style={styles.headingtext4}>{item.dislike_count} Dislikes</Text>
       </View>
     </View>
   );

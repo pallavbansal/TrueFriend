@@ -5,7 +5,7 @@ import {colors} from '../../Styles/ColorData';
 import {useNavigation} from '@react-navigation/native';
 import {getToken} from '../LiveStreaming/api';
 
-const SingleUser = ({item, meetingid}) => {
+const SingleUser = ({item}) => {
   const navigation = useNavigation();
   const [token, setToken] = useState('');
   const {profile_picture: imageUrl, online_status, id, name} = item.user;
@@ -20,15 +20,12 @@ const SingleUser = ({item, meetingid}) => {
   }, [navigation]);
 
   const handlewatchstream = () => {
-    if (meetingid) {
-      navigation.navigate('WatchStream', {
-        id: id,
-        token: token,
-        // meetingId: meetingid,
-        name: name,
-        mode: 'VIEWER',
-      });
-    }
+    navigation.navigate('WatchStream', {
+      id: id,
+      token: token,
+      name: name,
+      mode: 'VIEWER',
+    });
   };
 
   return (
