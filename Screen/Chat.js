@@ -1,5 +1,6 @@
 import {View, StyleSheet, ScrollView} from 'react-native';
 import React, {useState, useEffect, useRef} from 'react';
+import Toast from 'react-native-toast-message';
 import GradientScreen from '../Layouts/GradientScreen';
 import GradientText from '../Components/Common/GradientText';
 import {colors} from '../Styles/ColorData';
@@ -10,13 +11,20 @@ import {useSelector} from 'react-redux';
 import {useFetchChatting} from '../Hooks/Query/ChatQuery';
 import Loading from './Loading';
 import socket from '../Socket/Socket';
-
+import {useNavigation} from '@react-navigation/native';
 const Chat = ({route}) => {
   const [MessageData, setMessageData] = useState([]);
-  const {userid, name, imageUrl, type: chattype, grouproomid} = route.params;
+  const {
+    userid,
+    name,
+    imageUrl,
+    type: chattype,
+    grouproomid,
+    roomid,
+  } = route.params;
   const myuserid = useSelector(state => state.Auth.userid);
   const {name: myname} = useSelector(state => state.Auth.userinitaldata);
-  const [scrollPosition, setScrollPosition] = useState(0);
+  const [heightbeforefetch, setheightbeforefetch] = useState(0);
   const scrollViewRef = useRef(null);
   const {
     data,
@@ -33,6 +41,11 @@ const Chat = ({route}) => {
 
   useEffect(() => {
     const handleMessage = msg => {
+      if (
+        (chattype == 'group' && msg.room != grouproomid) ||
+        (chattype == 'single' && msg.room != roomid)
+      )
+        return;
       setMessageData(prev => [...prev, msg]);
     };
     socket.on('chat message', handleMessage);
@@ -46,22 +59,11 @@ const Chat = ({route}) => {
       const finaldata = data.pages.flatMap(page => {
         return page.data.chats.data;
       });
+      // reverse the array
       finaldata.reverse();
       setMessageData(finaldata);
     }
   }, [data]);
-
-  useEffect(() => {
-    if (MessageData.length > 20) {
-      console.log(
-        '-------------------------------------------',
-        MessageData.length,
-      );
-      if (scrollViewRef.current) {
-        scrollViewRef.current.scrollTo({y: scrollPosition, animated: false});
-      }
-    }
-  }, [MessageData]);
 
   if (isPending) {
     return <Loading />;
@@ -85,8 +87,16 @@ const Chat = ({route}) => {
               hasNextPage &&
               !isFetchingNextPage
             ) {
+              setheightbeforefetch(nativeEvent.contentSize.height);
               fetchNextPage();
             }
+          }}
+          onContentSizeChange={(w, h) => {
+            scrollViewRef.current.scrollTo({
+              y: h - heightbeforefetch,
+              animated: false,
+            });
+            setheightbeforefetch(0);
           }}
           scrollEventThrottle={400}>
           {MessageData.map((item, index) => (
@@ -94,7 +104,7 @@ const Chat = ({route}) => {
               MessageData={item}
               index={index}
               myid={myuserid}
-              key={item.id}
+              key={index}
             />
           ))}
         </ScrollView>
@@ -129,6 +139,7 @@ const Chat = ({route}) => {
           myname={myname}
           chattype={chattype}
           grouproomid={grouproomid}
+          roomid={roomid}
           MessageData={MessageData}
         />
       </View>

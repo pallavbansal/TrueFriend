@@ -32,6 +32,7 @@ import {
   WatchStream,
 } from './Screen/index';
 import Protect from './Auth/Protect';
+import socket from './Socket/Socket';
 
 const MainNavigator = () => {
   const Stack = createStackNavigator();
@@ -150,9 +151,17 @@ function App() {
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {});
-
     return () => {
       unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    socket.on('connect', () => {
+      console.log('connected to socket server in app.js');
+    });
+    return () => {
+      socket.off('connect');
     };
   }, []);
 

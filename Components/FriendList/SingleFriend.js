@@ -26,6 +26,7 @@ const SingleFriend = ({data, setfilteredfriendsdata}) => {
       imageUrl: data.imageUrl,
       type: data.type,
       grouproomid: data.grouproomid,
+      roomid: data.roomid,
     });
   };
 

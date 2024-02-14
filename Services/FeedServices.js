@@ -39,3 +39,35 @@ export async function getSocialFeedPosts(token, page) {
   }
   return response.json();
 }
+
+export async function likePost(token, postid) {
+  const response = await fetch(`${url}/post/like-post`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({post_id: postid}),
+  });
+  if (!response.ok) {
+    console.log('Error g', response);
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
+}
+
+export async function dislikePost(token, postid) {
+  const response = await fetch(`${url}/post/dislike-post`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({post_id: postid}),
+  });
+  if (!response.ok) {
+    console.log('Error g', response);
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
+}

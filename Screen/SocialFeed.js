@@ -16,8 +16,6 @@ const SocialFeed = () => {
   const [isMuted, setIsMuted] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [allPosts, setAllPosts] = useState([]);
-  const [pages, setPages] = useState([]);
-  // const [initalpage, setInitalPage] = useState(1);
   const {
     data,
     error,
@@ -48,16 +46,14 @@ const SocialFeed = () => {
 
   useEffect(() => {
     if (data) {
-      console.log('Data in feed', data.pageParams);
       const newData = data.pages.flatMap(page => page.data.posts.data);
-      setAllPosts(newData);
-      // setAllPosts(prevData => {
-      //   let combinedData = [...prevData, ...newData];
-      //   return combinedData.filter(
-      //     (value, index, self) =>
-      //       self.findIndex(v => v.id === value.id) === index,
-      //   );
-      // });
+      setAllPosts(prevData => {
+        let combinedData = [...prevData, ...newData];
+        return combinedData.filter(
+          (value, index, self) =>
+            self.findIndex(v => v.id === value.id) === index,
+        );
+      });
     }
   }, [data]);
 

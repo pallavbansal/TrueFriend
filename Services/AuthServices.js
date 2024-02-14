@@ -1,5 +1,4 @@
 const url = 'https://wooing.boxinallsoftech.com/public/api/v1';
-
 // Login service
 export async function login(data) {
   console.log('data', data);
