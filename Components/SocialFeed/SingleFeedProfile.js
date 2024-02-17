@@ -9,15 +9,11 @@ import {
 import React, {useState} from 'react';
 import {colors} from '../../Styles/ColorData';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Video from 'react-native-video';
 import {ActivityIndicator} from 'react-native';
-import {
-  PinchGestureHandler,
-  PanGestureHandler,
-  State,
-} from 'react-native-gesture-handler';
+import {PinchGestureHandler, State} from 'react-native-gesture-handler';
 import {useLikePost, useDislikePost} from '../../Hooks/Query/FeedQuery';
 
 const SingleFeedProfile = ({
@@ -28,6 +24,7 @@ const SingleFeedProfile = ({
   handleMuteUnmute,
   handlePlayPause,
   viewableItems,
+  setShowDetailFeed,
 }) => {
   const {name, media_path, id, caption, media_type} = item;
   const {mutate: likePost} = useLikePost();
@@ -145,20 +142,6 @@ const SingleFeedProfile = ({
     }
   };
 
-  // const onGestureEvent = event => {
-  //   if (scale > 1) {
-  //     setTranslateX(event.nativeEvent.translationX);
-  //     setTranslateY(event.nativeEvent.translationY);
-  //   }
-  // };
-
-  // const onHandlerStateChange = event => {
-  //   if (event.nativeEvent.oldState === State.ACTIVE) {
-  //     setTranslateX(0);
-  //     setTranslateY(0);
-  //   }
-  // };
-
   return (
     <View style={styles.container}>
       <View style={styles.topcontainer}>
@@ -185,15 +168,31 @@ const SingleFeedProfile = ({
         onHandlerStateChange={onPinchHandlerStateChange}>
         <View style={[styles.profilecontainer]}>
           {media_type == '1' ? (
-            <Image
-              source={{uri: media_path}}
-              style={{
-                width: '100%',
-                aspectRatio: 1,
-                transform: [{scale}, {translateX}, {translateY}],
-              }}
-              resizeMode="contain"
-            />
+            <View>
+              <Image
+                source={{uri: media_path}}
+                style={{
+                  width: '100%',
+                  aspectRatio: 1,
+                  transform: [{scale}, {translateX}, {translateY}],
+                }}
+                resizeMode="contain"
+              />
+              <TouchableOpacity
+                style={styles.expandbutton}
+                onPress={() =>
+                  setShowDetailFeed({
+                    show: true,
+                    data: item,
+                  })
+                }>
+                <FontAwesome5
+                  name={'expand'}
+                  size={18}
+                  color={colors.profile.edit}
+                />
+              </TouchableOpacity>
+            </View>
           ) : (
             <Pressable onPress={handlePlayPausein}>
               <Video
@@ -250,6 +249,21 @@ const SingleFeedProfile = ({
                 <MaterialIcons
                   name={isMuted ? 'volume-off' : 'volume-up'}
                   size={24}
+                  color={colors.profile.edit}
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.expandbutton}
+                onPress={() =>
+                  setShowDetailFeed({
+                    show: true,
+                    data: item,
+                  })
+                }>
+                <FontAwesome5
+                  name={'expand'}
+                  size={18}
                   color={colors.profile.edit}
                 />
               </TouchableOpacity>
@@ -367,6 +381,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: '40%',
     left: '45%',
+  },
+  expandbutton: {
+    // backgroundColor: 'white',
+    borderRadius: 13,
+    padding: 2,
+    position: 'absolute',
+    top: 7,
+    right: 7,
   },
 });
 

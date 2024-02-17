@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet} from 'react-native';
+import {View} from 'react-native';
 import React from 'react';
 import {colors} from '../Styles/ColorData';
 import LinearGradient from 'react-native-linear-gradient';
@@ -6,10 +6,10 @@ import {
   MeetingProvider,
   MeetingConsumer,
 } from '@videosdk.live/react-native-sdk';
-import ILSContainer from '../Components/Streaming/LiveStream/ILSContainer';
+import ILSContainer from '../Components/Call/CreateCall/ILSContainer';
 import {useNavigation} from '@react-navigation/native';
 
-const LiveStream = ({route}) => {
+const Call = ({route}) => {
   const navigation = useNavigation();
   const token = route.params.token;
   const meetingId = route.params.meetingId;
@@ -48,9 +48,6 @@ const LiveStream = ({route}) => {
           <MeetingConsumer
             {...{
               onMeetingLeft: () => {
-                console.log(
-                  '-------------------------------------Meeting Left-------------------------------------',
-                );
                 navigation.navigate('Discover');
               },
             }}>
@@ -64,4 +61,4 @@ const LiveStream = ({route}) => {
   );
 };
 
-export default LiveStream;
+export default Call;

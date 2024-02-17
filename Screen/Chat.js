@@ -1,6 +1,7 @@
 import {View, StyleSheet, ScrollView} from 'react-native';
 import React, {useState, useEffect, useRef} from 'react';
 import Toast from 'react-native-toast-message';
+import {getToken} from '../Components/LiveStreaming/api';
 import GradientScreen from '../Layouts/GradientScreen';
 import GradientText from '../Components/Common/GradientText';
 import {colors} from '../Styles/ColorData';
@@ -13,6 +14,7 @@ import Loading from './Loading';
 import socket from '../Socket/Socket';
 import {useNavigation} from '@react-navigation/native';
 const Chat = ({route}) => {
+  const navigation = useNavigation();
   const [MessageData, setMessageData] = useState([]);
   const {
     userid,
@@ -55,6 +57,26 @@ const Chat = ({route}) => {
   }, []);
 
   useEffect(() => {
+    const handleCall = async data => {
+      console.log('Received call:', data);
+      const token = await getToken();
+      navigation.navigate('Call', {
+        name: myname.trim(),
+        token: token,
+        meetingId: data.meetingId,
+        micEnabled: true,
+        webcamEnabled: data.type == 'video' ? true : false,
+        isCreator: false,
+        mode: 'CONFERENCE',
+      });
+    };
+    socket.on('call', handleCall);
+    return () => {
+      socket.off('call', handleCall);
+    };
+  }, []);
+
+  useEffect(() => {
     if (data) {
       const finaldata = data.pages.flatMap(page => {
         return page.data.chats.data;
@@ -77,6 +99,7 @@ const Chat = ({route}) => {
           imageUrl={imageUrl}
           userid={userid}
           chattype={chattype}
+          roomid={roomid}
         />
         <ScrollView
           ref={scrollViewRef}
