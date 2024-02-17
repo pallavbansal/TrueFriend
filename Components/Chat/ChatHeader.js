@@ -2,15 +2,25 @@ import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../../Styles/ColorData';
 import React, {useState, useEffect} from 'react';
 import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
+import {createMeeting, getToken} from '../LiveStreaming/api';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import GradientInput from '../Common/GradientInput';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import ReportUser from './ReportUser';
+import {useNavigation} from '@react-navigation/native';
+import {useSelector} from 'react-redux';
+import socket from '../../Socket/Socket';
 
-const ChatHeader = ({name, imageUrl, userid, chattype}) => {
+const ChatHeader = ({name, imageUrl, userid, chattype, roomid}) => {
+  const mydata = useSelector(state => state.Auth.userinitaldata);
+  console.log('mydata', mydata);
+  const navigation = useNavigation();
   const [optionsdialog, setoptionsdialog] = useState(false);
   const [reportdialog, setreportdialog] = useState(false);
+  const [token, setToken] = useState('');
+  const [meetingId, setMeetingId] = useState('');
+  const isCreator = true;
   const [filterdata, setfilterdata] = useState({
     items: [],
   });
@@ -45,6 +55,18 @@ const ChatHeader = ({name, imageUrl, userid, chattype}) => {
     }
   }, [chattype]);
 
+  useEffect(() => {
+    async function fetchData() {
+      const token = await getToken();
+      setToken(token);
+      if (isCreator) {
+        const _meetingId = await createMeeting({token});
+        setMeetingId(_meetingId);
+      }
+    }
+    fetchData();
+  }, [navigation]);
+
   const handlerreportdialog = () => {
     setreportdialog(!reportdialog);
   };
@@ -60,11 +82,47 @@ const ChatHeader = ({name, imageUrl, userid, chattype}) => {
   };
 
   const handleaudiocall = () => {
-    console.log('call');
+    navigation.navigate('Call', {
+      name: mydata.name.trim(),
+      token: token,
+      meetingId: meetingId,
+      micEnabled: true,
+      webcamEnabled: false,
+      isCreator: isCreator,
+      mode: 'CONFERENCE',
+    });
+    socket.emit('call', {
+      room: roomid,
+      caller: {
+        userid: mydata.id,
+        name: mydata.name,
+        imageUrl: mydata.profile_picture,
+      },
+      meetingId: meetingId,
+      type: 'audio',
+    });
   };
 
   const handlevideocall = () => {
-    console.log('video');
+    navigation.navigate('Call', {
+      name: mydata.name.trim(),
+      token: token,
+      meetingId: meetingId,
+      micEnabled: true,
+      webcamEnabled: true,
+      isCreator: isCreator,
+      mode: 'CONFERENCE',
+    });
+    socket.emit('call', {
+      room: roomid,
+      caller: {
+        userid: mydata.id,
+        name: mydata.name,
+        imageUrl: mydata.profile_picture,
+      },
+      meetingId: meetingId,
+      type: 'video',
+    });
   };
 
   return (

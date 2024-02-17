@@ -287,20 +287,7 @@ const FriendsList = () => {
             </Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.headingContainer}>
-          {/* <Text style={[styles.headingtext, {marginBottom: 5, marginTop: 20}]}>
-            Friend List
-          </Text> */}
-          {/* {selectedoptiontype === 'friends' ? (
-            <Text style={styles.headingtext2}>
-              Check out friends list & keep enjoying
-            </Text>
-          ) : (
-            <Text style={styles.headingtext2}>
-              Check out friend requests & keep enjoying
-            </Text>
-          )} */}
-        </View>
+        <View style={styles.headingContainer}></View>
         <View style={styles.friendlistcontainer}>
           {selectedoptiontype === 'friends' ? (
             <FlatList

@@ -18,6 +18,7 @@ import Temp from './Temp';
 import StartStream from './StartStream';
 import CreatePost from './CreatePost';
 import WatchStream from './WatchStream';
+import Call from './Call';
 
 export {
   Discover,
@@ -40,4 +41,5 @@ export {
   CreatePost,
   StartStream,
   WatchStream,
+  Call,
 };

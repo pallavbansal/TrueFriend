@@ -222,14 +222,14 @@ const styles = StyleSheet.create({
   nametext1: {
     fontFamily: 'Lexend',
     color: colors.arrow.primary,
-    fontWeight: '900',
+    fontWeight: 'bold',
     fontSize: 14,
     lineHeight: 20,
   },
   nametext2: {
     fontFamily: 'Lexend',
     color: colors.arrow.quadary,
-    fontWeight: '900',
+    fontWeight: 'bold',
     fontSize: 14,
     lineHeight: 20,
   },

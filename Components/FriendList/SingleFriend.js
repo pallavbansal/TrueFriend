@@ -1,12 +1,31 @@
 import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {useNavigation} from '@react-navigation/native';
 import {colors} from '../../Styles/ColorData';
+import socket from '../../Socket/Socket';
+import {useSelector} from 'react-redux';
+import {createMeeting, getToken} from '../LiveStreaming/api';
 
 const SingleFriend = ({data, setfilteredfriendsdata}) => {
+  const mydata = useSelector(state => state.Auth.userinitaldata);
   const navigation = useNavigation();
+  const [token, setToken] = useState('');
+  const [meetingId, setMeetingId] = useState('');
+  const isCreator = true;
+
+  useEffect(() => {
+    async function fetchData() {
+      const token = await getToken();
+      setToken(token);
+      if (isCreator) {
+        const _meetingId = await createMeeting({token});
+        setMeetingId(_meetingId);
+      }
+    }
+    fetchData();
+  }, [navigation]);
 
   const handleChat = () => {
     // setfilteredfriendsdata(prev => {
@@ -27,6 +46,29 @@ const SingleFriend = ({data, setfilteredfriendsdata}) => {
       type: data.type,
       grouproomid: data.grouproomid,
       roomid: data.roomid,
+    });
+  };
+
+  const handleCall = () => {
+    navigation.navigate('Call', {
+      name: mydata.name.trim(),
+      token: token,
+      meetingId: meetingId,
+      micEnabled: true,
+      webcamEnabled: false,
+      isCreator: isCreator,
+      mode: 'CONFERENCE',
+    });
+
+    socket.emit('call', {
+      room: data.roomid,
+      caller: {
+        userid: mydata.id,
+        name: mydata.name,
+        imageUrl: mydata.profile_picture,
+      },
+      meetingId: meetingId,
+      type: 'audio',
     });
   };
 
@@ -78,7 +120,7 @@ const SingleFriend = ({data, setfilteredfriendsdata}) => {
             </TouchableOpacity>
 
             {data.type == 'single' && (
-              <TouchableOpacity style={styles.callbutton}>
+              <TouchableOpacity style={styles.callbutton} onPress={handleCall}>
                 <Text
                   style={{
                     color: 'white',

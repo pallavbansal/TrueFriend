@@ -10,12 +10,17 @@ import {colors} from '../Styles/ColorData';
 import {useNavigation} from '@react-navigation/native';
 import {useFetchSocialFeedPosts} from '../Hooks/Query/FeedQuery';
 import Loading from './Loading';
+import DetailFeed from '../Components/SocialFeed/DetailFeed';
 
 const SocialFeed = () => {
   const navigation = useNavigation();
   const [isMuted, setIsMuted] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [allPosts, setAllPosts] = useState([]);
+  const [showdetailfeed, setShowDetailFeed] = useState({
+    show: false,
+    data: {},
+  });
   const {
     data,
     error,
@@ -34,6 +39,10 @@ const SocialFeed = () => {
 
   const handleCreatePost = () => {
     return navigation.navigate('CreatePost');
+  };
+
+  const closeDetailFeed = () => {
+    setShowDetailFeed({show: false, data: {}});
   };
 
   const handleMuteUnmute = useCallback(() => {
@@ -81,6 +90,7 @@ const SocialFeed = () => {
                 viewableItems={viewableItems}
                 handleMuteUnmute={handleMuteUnmute}
                 handlePlayPause={handlePlayPause}
+                setShowDetailFeed={setShowDetailFeed}
               />
             )}
             onEndReachedThreshold={0.5}
@@ -142,6 +152,10 @@ const SocialFeed = () => {
         </View>
         <BottomBar />
       </View>
+
+      {showdetailfeed.show && (
+        <DetailFeed data={showdetailfeed.data} close={closeDetailFeed} />
+      )}
     </GradientScreen>
   );
 };

@@ -30,6 +30,7 @@ import {
   CreatePost,
   StartStream,
   WatchStream,
+  Call,
 } from './Screen/index';
 import Protect from './Auth/Protect';
 import socket from './Socket/Socket';
@@ -67,6 +68,11 @@ const MainNavigator = () => {
       <Stack.Screen
         name="Chat"
         component={Chat}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Call"
+        component={Call}
         options={{headerShown: false}}
       />
       <Stack.Screen
