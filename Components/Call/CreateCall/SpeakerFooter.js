@@ -45,7 +45,7 @@ const SpeakerFooter = ({
           switchIds();
         }}
         iconName="exposure"
-        iconColor="#FFF"
+        iconColor="black"
       />
       <IconContainer
         backgroundColor="transparent"
@@ -53,9 +53,15 @@ const SpeakerFooter = ({
           changeWebcam();
         }}
         iconName="change-circle"
-        iconColor="#FFF"
+        iconColor="black"
       />
-      <TouchableOpacity onPress={handleendcall}>
+      <TouchableOpacity
+        onPress={handleendcall}
+        style={{
+          backgroundColor: 'white',
+          borderRadius: 50,
+          padding: 15,
+        }}>
         <LinearGradient
           start={{x: 0, y: 0}}
           end={{x: 1, y: 1}}
@@ -66,7 +72,7 @@ const SpeakerFooter = ({
             end={{x: 1, y: 1}}
             colors={colors.gradients.callinnergradient}
             style={styles.calliconcontainer}>
-            <Ionicons name="call" size={28} color="white" />
+            <Ionicons name="call" size={24} color="white" />
           </LinearGradient>
         </LinearGradient>
       </TouchableOpacity>
@@ -76,7 +82,7 @@ const SpeakerFooter = ({
           toggleMic();
         }}
         iconName={localMicOn ? 'mic' : 'mic-off'}
-        iconColor="#FFF"
+        iconColor="black"
       />
 
       <IconContainer
@@ -85,7 +91,7 @@ const SpeakerFooter = ({
           toggleWebcam();
         }}
         iconName={localWebcamOn ? 'videocam' : 'videocam-off'}
-        iconColor="#FFF"
+        iconColor="black"
       />
     </View>
   );
@@ -99,13 +105,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     alignItems: 'center',
     padding: 10,
-    marginBottom: 5,
+    marginVertical: 15,
     borderRadius: 50,
-    marginHorizontal: 5,
+    marginHorizontal: 10,
+    backgroundColor: 'white',
+    height: 75,
   },
   gradienticon: {
-    height: 85,
-    width: 85,
+    height: 60,
+    width: 60,
     borderRadius: 42.5,
     alignItems: 'center',
     justifyContent: 'center',
@@ -113,8 +121,8 @@ const styles = StyleSheet.create({
   calliconcontainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    height: 75,
-    width: 75,
+    height: 50,
+    width: 50,
     borderRadius: 40,
   },
 });

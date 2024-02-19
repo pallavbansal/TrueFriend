@@ -2,7 +2,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../../Styles/ColorData';
 import React, {useState, useEffect} from 'react';
 import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
-import {createMeeting, getToken} from '../LiveStreaming/api';
+import {getToken, createMeeting} from '../../Utils/Streamapi';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import GradientInput from '../Common/GradientInput';
@@ -98,7 +98,11 @@ const ChatHeader = ({name, imageUrl, userid, chattype, roomid}) => {
         name: mydata.name,
         imageUrl: mydata.profile_picture,
       },
+      reciever: {
+        name: name,
+      },
       meetingId: meetingId,
+      callaction: 'outgoing',
       type: 'audio',
     });
   };

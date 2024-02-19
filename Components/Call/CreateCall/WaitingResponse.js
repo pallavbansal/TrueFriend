@@ -1,82 +1,43 @@
-// import React, {useEffect, useRef} from 'react';
-// import {View, Text, StyleSheet, Animated, Easing} from 'react-native';
-// import FontAwesome from 'react-native-vector-icons/FontAwesome';
-
-// const AnimatedText = Animated.createAnimatedComponent(Text);
-
-// const WaitingText = () => {
-//   const fadeAnim = useRef(new Animated.Value(0)).current;
-
-//   useEffect(() => {
-//     Animated.loop(
-//       Animated.sequence([
-//         Animated.timing(fadeAnim, {
-//           toValue: 1,
-//           duration: 1000,
-//           easing: Easing.linear,
-//           useNativeDriver: true,
-//         }),
-//         Animated.timing(fadeAnim, {
-//           toValue: 0,
-//           duration: 1000,
-//           easing: Easing.linear,
-//           useNativeDriver: true,
-//         }),
-//       ]),
-//     ).start();
-//   }, [fadeAnim]);
-
-//   return (
-//     <AnimatedText style={{...styles.waitingText, opacity: fadeAnim}}>
-//       <FontAwesome
-//         name="hourglass-1"
-//         size={50}
-//         color="black"
-//         style={styles.icon}
-//       />
-//       <Text>Connecting...</Text>
-//     </AnimatedText>
-//   );
-// };
-
-// const WaitingToJoinView = () => (
-//   <View style={styles.container}>
-//     <WaitingText />
-//   </View>
-// );
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     backgroundColor: '#f0f0f0',
-//   },
-//   waitingText: {
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//     fontSize: 20,
-//     fontWeight: 'bold',
-//     color: 'black',
-//   },
-//   icon: {
-//     marginRight: 8,
-//   },
-// });
-
-// export default WaitingToJoinView;
-
 import React, {useEffect, useRef} from 'react';
-import {StyleSheet, Animated, Easing} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Animated,
+  Easing,
+  TouchableOpacity,
+} from 'react-native';
+import Sound from 'react-native-sound';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../../../Styles/ColorData';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
 
-const WaitingToJoinView = () => {
+const WaitingResponse = () => {
   const navigation = useNavigation();
   const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
   const moveAnim = useRef(new Animated.Value(0)).current; // Initial value for movement: 0
+
+  useEffect(() => {
+    const sound = new Sound('outgoing.mp3', Sound.MAIN_BUNDLE, error => {
+      if (error) {
+        console.log('Failed to load the sound', error);
+        return;
+      }
+      sound.play(success => {
+        if (success) {
+          console.log('successfully finished playing');
+        } else {
+          console.log('playback failed due to audio decoding errors');
+        }
+      });
+    });
+
+    return () => {
+      sound.release();
+    };
+  }, []);
 
   // Fade in animation for text
   useEffect(() => {
@@ -107,6 +68,10 @@ const WaitingToJoinView = () => {
     ).start();
   }, [moveAnim]);
 
+  const handleendcall = () => {
+    navigation.navigate('FriendsList');
+  };
+
   return (
     <LinearGradient
       colors={colors.gradients.buttongradient}
@@ -122,8 +87,31 @@ const WaitingToJoinView = () => {
         </Animated.Text>
 
         <Animated.Text style={[styles.text, {opacity: fadeAnim}]}>
-          Connecting...
+          Call in progress...
         </Animated.Text>
+
+        <TouchableOpacity
+          onPress={handleendcall}
+          style={{
+            backgroundColor: 'white',
+            borderRadius: 50,
+            padding: 15,
+            marginTop: 100,
+          }}>
+          <LinearGradient
+            start={{x: 0, y: 0}}
+            end={{x: 1, y: 1}}
+            colors={colors.gradients.calloutergradient}
+            style={styles.gradienticon}>
+            <LinearGradient
+              start={{x: 0, y: 0}}
+              end={{x: 1, y: 1}}
+              colors={colors.gradients.callinnergradient}
+              style={styles.calliconcontainer}>
+              <Ionicons name="call" size={24} color="white" />
+            </LinearGradient>
+          </LinearGradient>
+        </TouchableOpacity>
       </Animated.View>
     </LinearGradient>
   );
@@ -151,6 +139,20 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginTop: 20,
   },
+  gradienticon: {
+    height: 95,
+    width: 95,
+    borderRadius: 47.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  calliconcontainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 65,
+    width: 65,
+    borderRadius: 40,
+  },
 });
 
-export default WaitingToJoinView;
+export default WaitingResponse;

@@ -34,116 +34,120 @@ import {
 } from './Screen/index';
 import Protect from './Auth/Protect';
 import socket from './Socket/Socket';
+import CallHandler from './Components/Common/CallHandler';
 
 const MainNavigator = () => {
   const Stack = createStackNavigator();
-  return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="Splash"
-        component={Splash}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="Temp"
-        component={Temp}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="Discover"
-        component={Discover}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="Notification"
-        component={Notification}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="FriendsList"
-        component={FriendsList}
-        options={{headerShown: false}}
-      />
 
-      <Stack.Screen
-        name="Chat"
-        component={Chat}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="Call"
-        component={Call}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="UploadScreenshot"
-        component={UploadScreenshot}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen name="Profile" options={{headerShown: false}}>
-        {() => <Protect Route="Profile" Component={Profile} />}
-      </Stack.Screen>
-      <Stack.Screen
-        name="SocialFeed"
-        component={SocialFeed}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="CreatePost"
-        component={CreatePost}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="StartStream"
-        component={StartStream}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="LiveStream"
-        component={LiveStream}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="WatchStream"
-        component={WatchStream}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="Login"
-        component={Login}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="Verify"
-        component={Verify}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="ForgotPassword"
-        component={ForgotPassword}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="Registration"
-        component={Registration}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="ProfileCreation"
-        component={ProfileCreation}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="Payment"
-        component={Payment}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="Recharge"
-        component={Recharge}
-        options={{headerShown: false}}
-      />
-    </Stack.Navigator>
+  return (
+    <CallHandler>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Splash"
+          component={Splash}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Temp"
+          component={Temp}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Discover"
+          component={Discover}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Notification"
+          component={Notification}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="FriendsList"
+          component={FriendsList}
+          options={{headerShown: false}}
+        />
+
+        <Stack.Screen
+          name="Chat"
+          component={Chat}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Call"
+          component={Call}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="UploadScreenshot"
+          component={UploadScreenshot}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen name="Profile" options={{headerShown: false}}>
+          {() => <Protect Route="Profile" Component={Profile} />}
+        </Stack.Screen>
+        <Stack.Screen
+          name="SocialFeed"
+          component={SocialFeed}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="CreatePost"
+          component={CreatePost}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="StartStream"
+          component={StartStream}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="LiveStream"
+          component={LiveStream}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="WatchStream"
+          component={WatchStream}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Login"
+          component={Login}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Verify"
+          component={Verify}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="ForgotPassword"
+          component={ForgotPassword}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Registration"
+          component={Registration}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="ProfileCreation"
+          component={ProfileCreation}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Payment"
+          component={Payment}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Recharge"
+          component={Recharge}
+          options={{headerShown: false}}
+        />
+      </Stack.Navigator>
+    </CallHandler>
   );
 };
 

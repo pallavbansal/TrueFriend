@@ -1,20 +1,15 @@
-import React, {useRef, useState, useEffect} from 'react';
+import React, {useRef, useState} from 'react';
 import {
   View,
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
   Text,
   StyleSheet,
-  Alert,
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
 import Video from 'react-native-video';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import LinearGradient from 'react-native-linear-gradient';
-import {usePubSub, useMeeting} from '@videosdk.live/react-native-sdk';
-import ControlsOverlay from './ControlsOverlay';
+import {useMeeting} from '@videosdk.live/react-native-sdk';
 import BottomSheet from '../common/BottomSheet';
 import ChatViewer from '../common/ChatViewer';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -22,23 +17,12 @@ import {colors} from '../../../Styles/ColorData';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import StreamLoading from './StreamLoading';
 
-const {height} = Dimensions.get('window');
-
 const ViewerContainer = () => {
   const {changeMode, leave, hlsState, hlsUrls, participants} = useMeeting();
   const videoPlayer = useRef(null);
-  const [pause, setPause] = useState(false);
-  const [progress, setProgrss] = useState(0);
-  const [playableDuration, setplayableDuration] = useState(0);
   const bottomSheetRef = useRef();
   const [bottomSheetView, setBottomSheetView] = useState('CHAT');
 
-  const seekTo = sec => {
-    videoPlayer &&
-      videoPlayer.current &&
-      typeof videoPlayer.current.seek === 'function' &&
-      videoPlayer.current.seek(sec);
-  };
   return (
     <View
       style={{
@@ -62,117 +46,39 @@ const ViewerContainer = () => {
               borderBottomRightRadius: 30,
             }}
             onError={e => console.log('error', e)}
-            paused={pause}
-            onProgress={({currentTime, playableDuration}) => {
-              setProgrss(currentTime);
-              setplayableDuration(playableDuration);
-            }}
-            onLoad={data => {
-              const {duration} = data;
-              setplayableDuration(duration);
-            }}
-          />
-          <ControlsOverlay
-            playableDuration={playableDuration}
-            setPause={setPause}
-            pause={pause}
-            progress={progress}
-            seekTo={sec => {
-              seekTo(sec);
-            }}
           />
         </View>
       ) : (
         <StreamLoading />
       )}
 
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          position: 'absolute',
-          bottom: 250,
-          right: 10,
-          zIndex: 100,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          padding: 5,
-          borderRadius: 8,
-        }}>
-        <AntDesign name="eyeo" size={24} color="white" />
-        <Text
+      <View style={styles.bottomcontainer}>
+        <TouchableOpacity
           style={{
-            fontSize: 12,
-            color: 'white',
-            marginLeft: 4,
-            marginRight: 4,
-            fontWeight: 'bold',
+            width: 50,
+            backgroundColor: 'rgba(0,0,0,0.1)',
+            padding: 5,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 8,
           }}>
-          {participants ? [...participants.keys()].length : 1}
-        </Text>
-      </View>
-
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          position: 'absolute',
-          bottom: 210,
-          right: 10,
-          zIndex: 100,
-          backgroundColor: '#FF5D5D',
-          padding: 5,
-          borderRadius: 8,
-        }}>
-        <Text
-          style={{
-            fontSize: 12,
-            color: 'white',
-            marginLeft: 4,
-            marginRight: 4,
-            fontWeight: 'bold',
-          }}>
-          Live
-        </Text>
-      </View>
-
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          position: 'absolute',
-          bottom: 210,
-          left: 10,
-          zIndex: 100,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          padding: 5,
-          borderRadius: 8,
-        }}>
-        <TouchableOpacity>
           <MaterialIcons
             name="chat"
-            size={28}
-            color="white"
+            size={24}
+            color="black"
             onPress={() => {
               setBottomSheetView('CHAT');
               bottomSheetRef.current.show();
             }}
           />
         </TouchableOpacity>
-      </View>
-
-      <View style={styles.bottomcontainer}>
-        {/* <TouchableOpacity>
-          <MaterialIcons
-            name="chat"
-            size={24}
-            color="white"
-            onPress={() => {
-              setBottomSheetView('CHAT');
-              bottomSheetRef.current.show();
-            }}
-          />
-        </TouchableOpacity> */}
-        <TouchableOpacity onPress={leave}>
+        <TouchableOpacity
+          onPress={leave}
+          style={{
+            backgroundColor: 'white',
+            borderRadius: 50,
+            padding: 15,
+          }}>
           <LinearGradient
             start={{x: 0, y: 0}}
             end={{x: 1, y: 1}}
@@ -187,14 +93,26 @@ const ViewerContainer = () => {
             </LinearGradient>
           </LinearGradient>
         </TouchableOpacity>
-        {/* <TouchableOpacity>
-          <MaterialIcons
-            name="chat"
-            size={24}
-            color="white"
-            onPress={() => {}}
-          />
-        </TouchableOpacity> */}
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0,0,0,0.1)',
+            padding: 5,
+            gap: 5,
+            borderRadius: 8,
+            width: 50,
+          }}>
+          <AntDesign name="eye" size={24} color="black" />
+          <Text
+            style={{
+              fontSize: 12,
+              color: 'black',
+              fontWeight: 'bold',
+            }}>
+            {participants ? [...participants.keys()].length : 1}
+          </Text>
+        </View>
       </View>
 
       <BottomSheet
@@ -219,16 +137,20 @@ export default ViewerContainer;
 const styles = StyleSheet.create({
   bottomcontainer: {
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
+    justifyContent: 'center',
+    gap: 20,
     alignItems: 'center',
     padding: 5,
-    marginBottom: 5,
+    marginBottom: 15,
     borderRadius: 50,
     marginHorizontal: 5,
+    backgroundColor: 'white',
+    marginVertical: 15,
+    height: 75,
   },
   gradienticon: {
-    height: 85,
-    width: 85,
+    height: 60,
+    width: 60,
     borderRadius: 42.5,
     alignItems: 'center',
     justifyContent: 'center',
@@ -236,8 +158,8 @@ const styles = StyleSheet.create({
   calliconcontainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    height: 75,
-    width: 75,
+    height: 50,
+    width: 50,
     borderRadius: 40,
   },
 });

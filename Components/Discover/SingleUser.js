@@ -3,7 +3,7 @@ import React, {useEffect, useState} from 'react';
 import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../../Styles/ColorData';
 import {useNavigation} from '@react-navigation/native';
-import {getToken} from '../LiveStreaming/api';
+import {getToken} from '../../Utils/Streamapi';
 
 const SingleUser = ({item}) => {
   const navigation = useNavigation();
