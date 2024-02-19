@@ -1,19 +1,15 @@
-import React, {useRef, useState, useEffect} from 'react';
+import React, {useRef, useState} from 'react';
 import {
   View,
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
   Text,
   StyleSheet,
-  Alert,
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
 import Video from 'react-native-video';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import LinearGradient from 'react-native-linear-gradient';
-import {usePubSub, useMeeting} from '@videosdk.live/react-native-sdk';
+import {useMeeting} from '@videosdk.live/react-native-sdk';
 import ControlsOverlay from './ControlsOverlay';
 import BottomSheet from '../common/BottomSheet';
 import ChatViewer from '../common/ChatViewer';
@@ -21,8 +17,6 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {colors} from '../../../Styles/ColorData';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import StreamLoading from './StreamLoading';
-
-const {height} = Dimensions.get('window');
 
 const ViewerContainer = () => {
   const {changeMode, leave, hlsState, hlsUrls, participants} = useMeeting();

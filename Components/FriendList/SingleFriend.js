@@ -6,7 +6,7 @@ import {useNavigation} from '@react-navigation/native';
 import {colors} from '../../Styles/ColorData';
 import socket from '../../Socket/Socket';
 import {useSelector} from 'react-redux';
-import {createMeeting, getToken} from '../LiveStreaming/api';
+import {getToken, createMeeting} from '../../Utils/Streamapi';
 
 const SingleFriend = ({data, setfilteredfriendsdata}) => {
   const mydata = useSelector(state => state.Auth.userinitaldata);
@@ -67,7 +67,11 @@ const SingleFriend = ({data, setfilteredfriendsdata}) => {
         name: mydata.name,
         imageUrl: mydata.profile_picture,
       },
+      reciever: {
+        name: data.name,
+      },
       meetingId: meetingId,
+      callaction: 'outgoing',
       type: 'audio',
     });
   };

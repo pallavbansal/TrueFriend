@@ -6,7 +6,7 @@ import {
   MediaStream,
 } from '@videosdk.live/react-native-sdk';
 
-export default function ParticipantView({participantId, quality}) {
+export default function ParticipantView({participantId, quality, smaller}) {
   const {
     displayName,
     webcamStream,

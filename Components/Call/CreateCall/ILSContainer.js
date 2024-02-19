@@ -4,6 +4,7 @@ import {
 } from '@videosdk.live/react-native-sdk';
 import {useEffect, useRef, useState} from 'react';
 import WaitingToJoinView from './WaitingToJoinView';
+import WaitingResponse from './WaitingResponse';
 import React from 'react';
 import MeetingViewer from './MeetingViewer';
 

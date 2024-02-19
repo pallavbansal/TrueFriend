@@ -1,31 +1,28 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {View, Text, TouchableOpacity} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import {useMeeting} from '@videosdk.live/react-native-sdk';
 import Toast from 'react-native-toast-message';
 import SpeakerFooter from './SpeakerFooter';
 import {useOrientation} from './useOrientation';
 import ParticipantView from './ParticipantView';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import WaitingToJoinView from './WaitingToJoinView';
 
 export default function MeetingViewer({}) {
   const [localId, setLocalId] = useState(null);
   const [otherId, setOtherId] = useState(null);
+  const [waiting, setWaiting] = useState(true);
+  const [switchcam, setSwitchcam] = useState(false);
   const {
     localParticipant,
     participants,
-    pinnedParticipants,
     localWebcamOn,
     localMicOn,
     end,
     toggleWebcam,
     toggleMic,
     changeWebcam,
-    meetingId,
-    activeSpeakerId,
-    changeMode,
     hlsState,
-    startHls,
-    stopHls,
   } = useMeeting({
     onError: data => {
       const {code, message} = data;
@@ -50,21 +47,6 @@ export default function MeetingViewer({}) {
     }
   }, [hlsState]);
 
-  const _handleHLS = () => {
-    if (!hlsState || hlsState === 'HLS_STOPPED') {
-      startHls({
-        layout: {
-          type: 'SPOTLIGHT',
-          priority: 'PIN',
-        },
-        theme: 'DARK',
-        orientation: 'landscape',
-      });
-    } else if (hlsState === 'HLS_PLAYABLE') {
-      stopHls();
-    }
-  };
-
   useEffect(() => {
     if (hlsRef.current) {
       if (hlsState === 'HLS_STARTING' || hlsState === 'HLS_STOPPING') {
@@ -83,16 +65,19 @@ export default function MeetingViewer({}) {
         .map(participant => participant.id);
       if (nonLocalParticipantIds.length > 0) {
         setOtherId(nonLocalParticipantIds[0]);
+        setWaiting(false);
       }
     }
   }, [localParticipant, participants]);
 
-  // let nonLocalParticipantIds = [];
-  // if (localParticipant && participants) {
-  //   nonLocalParticipantIds = Array.from(participants.values())
-  //     .filter(participant => participant.id !== localParticipant.id)
-  //     .map(participant => participant.id);
-  // }
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (waiting) {
+        end();
+      }
+    }, 10000);
+    return () => clearTimeout(timer);
+  }, [waiting, end]);
 
   const switchIds = () => {
     const temp = localId;
@@ -100,10 +85,20 @@ export default function MeetingViewer({}) {
     setOtherId(temp);
   };
 
+  // const switchIds = () => {
+  //   setSwitchcam(prev => !prev);
+  // };
+
   const makenull = () => {
     setLocalId(null);
     setOtherId(null);
   };
+
+  if (waiting) {
+    return <WaitingToJoinView />;
+  }
+
+  console.log(switchcam, 'switchcam');
 
   return (
     <View
@@ -111,37 +106,13 @@ export default function MeetingViewer({}) {
         flex: 1,
       }}>
       {/* center */}
-      <View
-        style={{
-          flex: 1,
-          flexDirection: orientation == 'PORTRAIT' ? 'column' : 'row',
-          overflow: 'hidden',
-          borderBottomLeftRadius: 30,
-          borderBottomRightRadius: 30,
-        }}>
+      <View style={styles.callcontainer}>
         {localId && <ParticipantView participantId={localId} quality={'low'} />}
       </View>
-      {otherId && (
-        <View
-          style={{
-            position: 'absolute',
-            top: 10,
-            right: 10,
-            height: 125,
-            width: 125,
-            overflow: 'hidden',
-            borderWidth: 1,
-            zIndex: 1,
-            backgroundColor: 'rgba(0,0,0,0.3)',
-          }}>
-          <View
-            style={{
-              flex: 1,
-            }}>
-            <ParticipantView participantId={otherId} quality={'low'} />
-          </View>
-        </View>
-      )}
+
+      <View style={styles.callcontainer}>
+        {otherId && <ParticipantView participantId={otherId} quality={'low'} />}
+      </View>
 
       <SpeakerFooter
         localMicOn={localMicOn}
@@ -156,3 +127,30 @@ export default function MeetingViewer({}) {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  // bigger: {
+  //   flex: 1,
+  //   overflow: 'hidden',
+  //   borderBottomLeftRadius: 30,
+  //   borderBottomRightRadius: 30,
+  // },
+  // smaller: {
+  //   position: 'absolute',
+  //   top: 10,
+  //   right: 10,
+  //   height: 125,
+  //   width: 125,
+  //   overflow: 'hidden',
+  //   borderWidth: 1,
+  //   backgroundColor: 'rgba(0,0,0,0.3)',
+  //   zIndex: 100,
+  // },
+
+  callcontainer: {
+    flex: 1,
+    overflow: 'hidden',
+    borderRadius: 30,
+    margin: 5,
+  },
+});

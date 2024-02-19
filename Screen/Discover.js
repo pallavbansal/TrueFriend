@@ -12,59 +12,82 @@ import GradientInput from '../Components/Common/GradientInput';
 import SingleUser from '../Components/Discover/SingleUser';
 import Geolocation from '@react-native-community/geolocation';
 import NoData from '../Components/Common/NoData';
+import socket from '../Socket/Socket';
+import {useSelector} from 'react-redux';
 import {
   useLocationUpdate,
   useFetchDiscoverProfile,
 } from '../Hooks/Query/HomeQuery';
-const categories = [
-  {
-    user_id: '7',
-    user: {
-      id: 56,
-      name: 'John',
-      profile_picture:
-        'https://wooing.boxinallsoftech.com/public/uploads/profile/82578_1706872877_stable-diffusion-xl.jpg',
-      online_status: 'online',
-    },
-  },
-  // {
-  //   user: {
-  //     id: '1',
-  //     name: 'smartphones',
-  //     online_status: 'online',
-  //     meedingid: null,
-  //     profile_picture:
-  //       'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  //   },
-  // },
-  // {
-  //   user: {
-  //     id: '2',
-  //     name: 'laptops',
-  //     online_status: 'online',
-  //     profile_picture:
-  //       'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  //   },
-  // },
-  // {
-  //   user: {
-  //     id: '3',
-  //     name: 'fragrances',
-  //     online_status: 'online',
-  //     profile_picture:
-  //       'https://images.unsplash.com/photo-1613521140785-e85e427f8002?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  //   },
-  // },
-  // {
-  //   user: {
-  //     id: '4',
-  //     name: 'skincare',
-  //     online_status: 'online',
-  //     profile_picture:
-  //       'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  //   },
-  // },
-];
+
+// const friendsdata = [
+//   {
+//     id: 7,
+//     name: 'Jhon Doe',
+//     type: 'single',
+//     liked: true,
+//     imageUrl:
+//       'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+//     unseenmsg: 0,
+//   },
+//   {
+//     id: 44,
+//     name: 'Vivek',
+//     type: 'single',
+//     imageUrl:
+//       'https://images.unsplash.com/photo-1613521140785-e85e427f8002?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+//     unseenmsg: 0,
+//   },
+//   {
+//     id: 45,
+//     name: 'Vivek 2',
+//     type: 'single',
+//     liked: true,
+//     imageUrl:
+//       'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+//     unseenmsg: 0,
+//   },
+//   {
+//     id: 56,
+//     name: 'Jhon',
+//     type: 'single',
+//     imageUrl:
+//       'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+//     liked: true,
+//     unseenmsg: 0,
+//   },
+//   {
+//     id: 200,
+//     name: 'Friends Group',
+//     type: 'group',
+//     grouproomid: '123',
+//     imageUrl:
+//       'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+//     unseenmsg: 0,
+//   },
+// ];
+// const requestdata = [
+//   {
+//     id: 7,
+//     name: 'Jhon Doe',
+//     type: 'single',
+//     imageUrl:
+//       'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+//   },
+//   {
+//     id: 44,
+//     name: 'Vivek',
+//     type: 'single',
+//     imageUrl:
+//       'https://images.unsplash.com/photo-1613521140785-e85e427f8002?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+//   },
+//   {
+//     id: 45,
+//     name: 'Collage Friends',
+//     type: 'group',
+//     imageUrl:
+//       'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D',
+//   },
+// ];
 
 const Discover = () => {
   const navigation = useNavigation();
@@ -74,7 +97,8 @@ const Discover = () => {
     error: locationError,
     reset: locationReset,
   } = useLocationUpdate();
-
+  const myuserid = useSelector(state => state.Auth.userid);
+  const [isSocketConnected, setIsSocketConnected] = useState(socket.connected);
   const [locationupdated, setlocationupdated] = useState(false);
   const [pageoption, setpageOption] = useState('Discover');
   const [showfilter, setshowfilter] = useState(false);
@@ -106,6 +130,37 @@ const Discover = () => {
     isError: isDiscoverError,
   } = useFetchDiscoverProfile(filterdata.applied);
 
+  // useEffect(() => {
+  //   const handleConnect = () => setIsSocketConnected(true);
+  //   const handleDisconnect = () => setIsSocketConnected(false);
+
+  //   socket.on('connect', handleConnect);
+  //   socket.on('disconnect', handleDisconnect);
+
+  //   return () => {
+  //     socket.off('connect', handleConnect);
+  //     socket.off('disconnect', handleDisconnect);
+  //   };
+  // }, []);
+
+  // useEffect(() => {
+  //   console.log('Socket code in discover page', isSocketConnected);
+  //   if (isSocketConnected) {
+  //     console.log('Socket connected in discover page');
+  //     friendsdata.map(item => {
+  //       if (item.type === 'single') {
+  //         const roomid = [myuserid, item.id].sort().join('_');
+  //         item.roomid = roomid;
+  //         socket.emit('join room', roomid);
+  //       } else {
+  //         socket.emit('join room', item.grouproomid);
+  //       }
+  //     });
+  //   } else {
+  //     console.log('Socket not connected');
+  //   }
+  // }, [isSocketConnected]);
+
   useEffect(() => {
     if (!locationupdated) {
       handlelocation();
@@ -115,10 +170,6 @@ const Discover = () => {
   if (isDiscoverPending) {
     return <Loading />;
   }
-
-  const handleLogin = () => {
-    return navigation.navigate('Login');
-  };
 
   function handlelocation() {
     console.log('location update start');
@@ -192,23 +243,6 @@ const Discover = () => {
                 Nearby
               </Text>
             </TouchableOpacity>
-
-            {/* <TouchableOpacity onPress={handleLogin}>
-              <Text>LO</Text>
-            </TouchableOpacity> */}
-
-            {/* <TouchableOpacity
-              onPress={() => navigation.navigate('ProfileCreation')}>
-              <Text>PC</Text>
-            </TouchableOpacity> */}
-
-            {/* <TouchableOpacity onPress={() => navigation.navigate('Recharge')}>
-              <Text>RE</Text>
-            </TouchableOpacity> */}
-
-            {/* <TouchableOpacity onPress={() => navigation.navigate('Payment')}>
-              <Text>PY</Text>
-            </TouchableOpacity> */}
 
             <View
               style={{

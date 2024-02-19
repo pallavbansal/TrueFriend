@@ -19,6 +19,7 @@ import {useNavigation} from '@react-navigation/native';
 import SingleFriend from '../Components/FriendList/SingleFriend';
 import SingleRequest from '../Components/FriendList/SingleRequest';
 import SelectFriend from '../Components/FriendList/SelectFriend';
+import {getToken} from '../Utils/Streamapi';
 import socket from '../Socket/Socket';
 import {useSelector} from 'react-redux';
 import Toast from 'react-native-toast-message';
@@ -97,6 +98,7 @@ const requestdata = [
 const FriendsList = () => {
   const navigation = useNavigation();
   const myuserid = useSelector(state => state.Auth.userid);
+  const {name: myname} = useSelector(state => state.Auth.userinitaldata);
   const [selectedoptiontype, setselectedoptiontype] = useState('friends');
   const [showgroupmodal, setshowgroupmodal] = useState(false);
   const [grouplist, setgrouplist] = useState([]);

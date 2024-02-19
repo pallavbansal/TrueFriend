@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import React, {useState, useEffect, useCallback} from 'react';
-import {createMeeting, getToken} from '../Components/LiveStreaming/api';
+import {getToken, createMeeting} from '../Utils/Streamapi';
 import {useNavigation} from '@react-navigation/native';
 import {useFocusEffect} from '@react-navigation/native';
 import {colors} from '../Styles/ColorData';

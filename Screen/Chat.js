@@ -1,7 +1,7 @@
 import {View, StyleSheet, ScrollView} from 'react-native';
 import React, {useState, useEffect, useRef} from 'react';
 import Toast from 'react-native-toast-message';
-import {getToken} from '../Components/LiveStreaming/api';
+import {getToken} from '../Utils/Streamapi';
 import GradientScreen from '../Layouts/GradientScreen';
 import GradientText from '../Components/Common/GradientText';
 import {colors} from '../Styles/ColorData';
@@ -56,25 +56,25 @@ const Chat = ({route}) => {
     };
   }, []);
 
-  useEffect(() => {
-    const handleCall = async data => {
-      console.log('Received call:', data);
-      const token = await getToken();
-      navigation.navigate('Call', {
-        name: myname.trim(),
-        token: token,
-        meetingId: data.meetingId,
-        micEnabled: true,
-        webcamEnabled: data.type == 'video' ? true : false,
-        isCreator: false,
-        mode: 'CONFERENCE',
-      });
-    };
-    socket.on('call', handleCall);
-    return () => {
-      socket.off('call', handleCall);
-    };
-  }, []);
+  // useEffect(() => {
+  //   const handleCall = async data => {
+  //     console.log('Received call:', data);
+  //     const token = await getToken();
+  //     navigation.navigate('Call', {
+  //       name: myname.trim(),
+  //       token: token,
+  //       meetingId: data.meetingId,
+  //       micEnabled: true,
+  //       webcamEnabled: data.type == 'video' ? true : false,
+  //       isCreator: false,
+  //       mode: 'CONFERENCE',
+  //     });
+  //   };
+  //   socket.on('call', handleCall);
+  //   return () => {
+  //     socket.off('call', handleCall);
+  //   };
+  // }, []);
 
   useEffect(() => {
     if (data) {

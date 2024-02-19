@@ -41,7 +41,7 @@ const SpeakerFooter = ({
           bottomSheetRef.current.show();
         }}
         iconName="chat"
-        iconColor="#FFF"
+        iconColor="black"
       />
       <IconContainer
         backgroundColor="transparent"
@@ -49,9 +49,15 @@ const SpeakerFooter = ({
           changeWebcam();
         }}
         iconName="change-circle"
-        iconColor="#FFF"
+        iconColor="black"
       />
-      <TouchableOpacity onPress={end}>
+      <TouchableOpacity
+        onPress={end}
+        style={{
+          backgroundColor: 'white',
+          borderRadius: 50,
+          padding: 15,
+        }}>
         <LinearGradient
           start={{x: 0, y: 0}}
           end={{x: 1, y: 1}}
@@ -72,7 +78,7 @@ const SpeakerFooter = ({
           toggleMic();
         }}
         iconName={localMicOn ? 'mic' : 'mic-off'}
-        iconColor="#FFF"
+        iconColor="black"
       />
 
       <IconContainer
@@ -81,7 +87,7 @@ const SpeakerFooter = ({
           toggleWebcam();
         }}
         iconName={localWebcamOn ? 'videocam' : 'videocam-off'}
-        iconColor="#FFF"
+        iconColor="black"
       />
     </View>
   );
@@ -89,19 +95,47 @@ const SpeakerFooter = ({
 
 export default SpeakerFooter;
 
+// const styles = StyleSheet.create({
+//   bottomcontainer: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-evenly',
+//     alignItems: 'center',
+//     padding: 10,
+//     marginBottom: 5,
+//     borderRadius: 50,
+//     marginHorizontal: 5,
+//   },
+//   gradienticon: {
+//     height: 85,
+//     width: 85,
+//     borderRadius: 42.5,
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//   },
+//   calliconcontainer: {
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//     height: 75,
+//     width: 75,
+//     borderRadius: 40,
+//   },
+// });
+
 const styles = StyleSheet.create({
   bottomcontainer: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     alignItems: 'center',
     padding: 10,
-    marginBottom: 5,
+    marginVertical: 15,
     borderRadius: 50,
-    marginHorizontal: 5,
+    marginHorizontal: 10,
+    backgroundColor: 'white',
+    height: 75,
   },
   gradienticon: {
-    height: 85,
-    width: 85,
+    height: 60,
+    width: 60,
     borderRadius: 42.5,
     alignItems: 'center',
     justifyContent: 'center',
@@ -109,8 +143,8 @@ const styles = StyleSheet.create({
   calliconcontainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    height: 75,
-    width: 75,
+    height: 50,
+    width: 50,
     borderRadius: 40,
   },
 });
