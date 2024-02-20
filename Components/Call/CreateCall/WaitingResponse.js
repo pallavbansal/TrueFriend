@@ -13,6 +13,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../../../Styles/ColorData';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
+// import socket from '../../../Socket/Socket';
 
 const WaitingResponse = () => {
   const navigation = useNavigation();

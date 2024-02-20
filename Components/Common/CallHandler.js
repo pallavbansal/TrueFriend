@@ -6,66 +6,90 @@ import {
   StyleSheet,
   Image,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {getToken} from '../../Utils/Streamapi';
 import socket from '../../Socket/Socket';
-import {useSelector} from 'react-redux';
-
-// {"caller": {"imageUrl": "https://wooing.boxinallsoftech.com/public/uploads/profile/82578_1706872877_stable-diffusion-xl.jpg",
-// "name": "Jhon", "userid": 56}, "meetingId": "1tal-vvii-s8x7", "room": "45_56", "type": "audio"}
+import Sound from 'react-native-sound';
+import {colors} from '../../Styles/ColorData';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const CallHandler = ({children}) => {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const [callData, setCallData] = useState(null);
-  const isloggedin = useSelector(state => state.Auth.token);
-  const myid = useSelector(state => state.Auth.userid);
+  const [isMuted, setIsMuted] = useState(false);
+  const ringtone = useRef(null);
+
+  useEffect(() => {
+    ringtone.current = new Sound('incoming.mp3', Sound.MAIN_BUNDLE, error => {
+      if (error) {
+        console.log('failed to load the sound', error);
+        return;
+      }
+    });
+
+    const handleCall = data => {
+      console.log('Received call in call handler :', data);
+      if (data.callaction === 'incoming') {
+        console.log('incoming :', data);
+        setCallData(data);
+        setModalVisible(true);
+        setIsMuted(false);
+        ringtone.current.setVolume(1);
+        ringtone.current.play();
+        const timeoutId = setTimeout(handleReject, 15000);
+        return () => clearTimeout(timeoutId);
+      }
+      if (data.callaction === 'rejected') {
+        setModalVisible(false);
+        ringtone.current.stop();
+        setCallData(null);
+      }
+    };
+
+    socket.on('call', handleCall);
+
+    return () => {
+      socket.off('call', handleCall);
+      ringtone.current.release();
+    };
+  }, []);
 
   const handleAccept = async () => {
     setModalVisible(false);
-    socket.emit('call', {
-      ...callData,
-      callaction: 'accepted',
-    });
+    ringtone.current.stop();
+    socket.emit('call', {...callData, callaction: 'accepted'});
     const token = await getToken();
     navigation.navigate('Call', {
       name: callData?.reciever?.name.trim(),
       token: token,
       meetingId: callData.meetingId,
       micEnabled: true,
-      webcamEnabled: callData.type == 'video' ? true : false,
+      webcamEnabled: callData.type === 'video' ? true : false,
       isCreator: false,
       mode: 'CONFERENCE',
     });
   };
 
   const handleReject = () => {
-    socket.emit('call', {
-      ...callData,
-      callaction: 'rejected',
-    });
+    ringtone.current.stop();
+    socket.emit('call', {...callData, callaction: 'rejected'});
     setModalVisible(false);
     console.log('Call rejected');
     setCallData(null);
   };
 
-  useEffect(() => {
-    const handleCall = data => {
-      console.log('Received call in call handler :', data);
-      if (data.callaction == 'incoming') {
-        console.log('incomming :', data);
-        setCallData(data);
-        setModalVisible(true);
-        const timeoutId = setTimeout(handleReject, 15000);
-        return () => clearTimeout(timeoutId);
-      }
-    };
-    socket.on('call', handleCall);
-    return () => {
-      socket.off('call', handleCall);
-    };
-  }, []);
+  const handleMuteUnmute = () => {
+    if (isMuted) {
+      ringtone.current.setVolume(1);
+      setIsMuted(false);
+    }
+    if (!isMuted) {
+      ringtone.current.setVolume(0);
+      setIsMuted(true);
+    }
+  };
 
   return (
     <>
@@ -88,6 +112,17 @@ const CallHandler = ({children}) => {
                 <Text style={styles.modalText}>
                   {callData?.type == 'audio' ? 'Audio' : 'Video'} Call
                 </Text>
+              </View>
+              <View>
+                <TouchableOpacity
+                  onPress={handleMuteUnmute}
+                  style={styles.mutebutton}>
+                  <MaterialIcons
+                    name={isMuted ? 'volume-off' : 'volume-up'}
+                    size={28}
+                    color={colors.profile.edit}
+                  />
+                </TouchableOpacity>
               </View>
             </View>
 
@@ -166,6 +201,14 @@ const styles = StyleSheet.create({
     height: 75,
     borderRadius: 25,
     marginBottom: 15,
+  },
+  mutebutton: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 5,
+    position: 'absolute',
+    bottom: 10,
+    left: 10,
   },
 });
 
