@@ -56,26 +56,6 @@ const Chat = ({route}) => {
     };
   }, []);
 
-  // useEffect(() => {
-  //   const handleCall = async data => {
-  //     console.log('Received call:', data);
-  //     const token = await getToken();
-  //     navigation.navigate('Call', {
-  //       name: myname.trim(),
-  //       token: token,
-  //       meetingId: data.meetingId,
-  //       micEnabled: true,
-  //       webcamEnabled: data.type == 'video' ? true : false,
-  //       isCreator: false,
-  //       mode: 'CONFERENCE',
-  //     });
-  //   };
-  //   socket.on('call', handleCall);
-  //   return () => {
-  //     socket.off('call', handleCall);
-  //   };
-  // }, []);
-
   useEffect(() => {
     if (data) {
       const finaldata = data.pages.flatMap(page => {

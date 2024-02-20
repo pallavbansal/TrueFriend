@@ -124,7 +124,11 @@ const ChatHeader = ({name, imageUrl, userid, chattype, roomid}) => {
         name: mydata.name,
         imageUrl: mydata.profile_picture,
       },
+      reciever: {
+        name: name,
+      },
       meetingId: meetingId,
+      callaction: 'outgoing',
       type: 'video',
     });
   };

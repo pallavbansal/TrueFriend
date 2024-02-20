@@ -98,8 +98,6 @@ export default function MeetingViewer({}) {
     return <WaitingToJoinView />;
   }
 
-  console.log(switchcam, 'switchcam');
-
   return (
     <View
       style={{

@@ -16,9 +16,7 @@ const Call = ({route}) => {
   const [response, setResponse] = useState('');
   const token = route.params.token;
   const meetingId = route.params.meetingId;
-  const micEnabled = route.params.micEnabled
-    ? route.params.webcamEnabled
-    : false;
+  const micEnabled = route.params.micEnabled ? route.params.micEnabled : false;
   const webcamEnabled = route.params.webcamEnabled
     ? route.params.webcamEnabled
     : false;
@@ -74,10 +72,10 @@ const Call = ({route}) => {
               webcamEnabled: webcamEnabled,
               name,
               mode, // "CONFERENCE" || "VIEWER"
-              notification: {
-                title: 'Video SDK Meeting',
-                message: 'Meeting is running.',
-              },
+              // notification: {
+              //   title: 'Video SDK Meeting',
+              //   message: 'Meeting is running.',
+              // },
             }}
             token={token}>
             <MeetingConsumer

@@ -98,7 +98,6 @@ const requestdata = [
 const FriendsList = () => {
   const navigation = useNavigation();
   const myuserid = useSelector(state => state.Auth.userid);
-  const {name: myname} = useSelector(state => state.Auth.userinitaldata);
   const [selectedoptiontype, setselectedoptiontype] = useState('friends');
   const [showgroupmodal, setshowgroupmodal] = useState(false);
   const [grouplist, setgrouplist] = useState([]);
