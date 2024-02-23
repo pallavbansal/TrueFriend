@@ -12,7 +12,6 @@ import GradientInput from '../Components/Common/GradientInput';
 import SingleUser from '../Components/Discover/SingleUser';
 import Geolocation from '@react-native-community/geolocation';
 import NoData from '../Components/Common/NoData';
-import socket from '../Socket/Socket';
 import {useSelector} from 'react-redux';
 import {
   useLocationUpdate,
@@ -98,7 +97,7 @@ const Discover = () => {
     reset: locationReset,
   } = useLocationUpdate();
   const myuserid = useSelector(state => state.Auth.userid);
-  const [isSocketConnected, setIsSocketConnected] = useState(socket.connected);
+  console.log('My User ID', myuserid);
   const [locationupdated, setlocationupdated] = useState(false);
   const [pageoption, setpageOption] = useState('Discover');
   const [showfilter, setshowfilter] = useState(false);
@@ -129,37 +128,6 @@ const Discover = () => {
     data: discoverData,
     isError: isDiscoverError,
   } = useFetchDiscoverProfile(filterdata.applied);
-
-  // useEffect(() => {
-  //   const handleConnect = () => setIsSocketConnected(true);
-  //   const handleDisconnect = () => setIsSocketConnected(false);
-
-  //   socket.on('connect', handleConnect);
-  //   socket.on('disconnect', handleDisconnect);
-
-  //   return () => {
-  //     socket.off('connect', handleConnect);
-  //     socket.off('disconnect', handleDisconnect);
-  //   };
-  // }, []);
-
-  // useEffect(() => {
-  //   console.log('Socket code in discover page', isSocketConnected);
-  //   if (isSocketConnected) {
-  //     console.log('Socket connected in discover page');
-  //     friendsdata.map(item => {
-  //       if (item.type === 'single') {
-  //         const roomid = [myuserid, item.id].sort().join('_');
-  //         item.roomid = roomid;
-  //         socket.emit('join room', roomid);
-  //       } else {
-  //         socket.emit('join room', item.grouproomid);
-  //       }
-  //     });
-  //   } else {
-  //     console.log('Socket not connected');
-  //   }
-  // }, [isSocketConnected]);
 
   useEffect(() => {
     if (!locationupdated) {

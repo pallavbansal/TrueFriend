@@ -8,48 +8,28 @@ import socket from '../../Socket/Socket';
 import {useSelector} from 'react-redux';
 import {getToken, createMeeting} from '../../Utils/Streamapi';
 
-const SingleFriend = ({data, setfilteredfriendsdata}) => {
+const SingleFriend = ({data}) => {
   const mydata = useSelector(state => state.Auth.userinitaldata);
   const navigation = useNavigation();
-  const [token, setToken] = useState('');
-  const [meetingId, setMeetingId] = useState('');
   const isCreator = true;
 
-  useEffect(() => {
-    async function fetchData() {
-      const token = await getToken();
-      setToken(token);
-      if (isCreator) {
-        const _meetingId = await createMeeting({token});
-        setMeetingId(_meetingId);
-      }
-    }
-    fetchData();
-  }, [navigation]);
-
   const handleChat = () => {
-    // setfilteredfriendsdata(prev => {
-    //   return prev.map(item => {
-    //     if (item.id == data.id) {
-    //       return {
-    //         ...item,
-    //         unseenmsg: 0,
-    //       };
-    //     }
-    //     return item;
-    //   });
-    // });
     navigation.navigate('Chat', {
       userid: data.id,
       name: data.name,
       imageUrl: data.imageUrl,
       type: data.type,
       grouproomid: data.grouproomid,
-      roomid: data.roomid,
     });
   };
 
-  const handleCall = () => {
+  const handleCall = async () => {
+    const token = await getToken();
+    let meetingId = '';
+    if (isCreator) {
+      meetingId = await createMeeting({token});
+    }
+
     navigation.navigate('Call', {
       name: mydata.name.trim(),
       token: token,
@@ -61,7 +41,6 @@ const SingleFriend = ({data, setfilteredfriendsdata}) => {
     });
 
     socket.emit('call', {
-      room: data.roomid,
       caller: {
         userid: mydata.id,
         name: mydata.name,
@@ -69,6 +48,7 @@ const SingleFriend = ({data, setfilteredfriendsdata}) => {
       },
       reciever: {
         name: data.name,
+        id: data.id,
       },
       meetingId: meetingId,
       callaction: 'outgoing',

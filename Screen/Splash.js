@@ -11,6 +11,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Loading from './Loading';
 import {colors} from '../Styles/ColorData';
+import socket from '../Socket/Socket';
 
 const Splash = () => {
   const dispatch = useDispatch();
@@ -28,6 +29,7 @@ const Splash = () => {
 
       if (token && userid && userinitaldata) {
         dispatch(LoginRed({userid, token, userinitaldata}));
+        socket.emit('register', userid);
         return navigation.reset({
           index: 0,
           routes: [{name: 'Discover'}],

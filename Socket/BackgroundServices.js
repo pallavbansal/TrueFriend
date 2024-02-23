@@ -57,8 +57,6 @@ const friendsdata = [
 const myuserid = 56;
 
 const connectToSocket = async () => {
-  // socket = io('http://wooing-chat.onrender.com');
-
   socket.on('connect', () => {
     console.log('Socket connection opened for background service');
     friendsdata.map(item => {
@@ -150,7 +148,7 @@ const socketInBackground = async () => {
     await new Promise(resolve => {
       BackgroundService.on('stop', () => {
         if (socket) {
-          socket.disconnect();
+          // socket.disconnect();
         }
         ringtone.release();
         resolve();

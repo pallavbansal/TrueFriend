@@ -23,7 +23,6 @@ const ChatBottom = ({
   myname,
   chattype,
   grouproomid,
-  roomid,
   MessageData,
 }) => {
   const [typetext, settypetext] = useState('');
@@ -36,11 +35,7 @@ const ChatBottom = ({
     sender: {
       name: myname,
     },
-    // room:
-    //   chattype == 'group'
-    //     ? grouproomid
-    //     : [senderid, receiverid].sort().join('_'),
-    room: chattype == 'group' ? grouproomid : roomid,
+    chattype: chattype,
     created_at: new Date(),
   };
   const handleinput = text => {
@@ -56,11 +51,6 @@ const ChatBottom = ({
       MessageData[MessageData.length - 1].created_at,
     );
     const today = new Date();
-
-    // console.log('length', MessageData.length, new Date());
-    // console.log('Day', lastMessageDate.getDate(), today.getDate());
-    // console.log('Month', lastMessageDate.getMonth(), today.getMonth());
-    // console.log('Year', lastMessageDate.getFullYear(), today.getFullYear());
 
     if (
       lastMessageDate.getDate() !== today.getDate() ||

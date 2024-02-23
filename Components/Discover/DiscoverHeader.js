@@ -15,6 +15,7 @@ import {useDispatch} from 'react-redux';
 import {LogoutRed} from '../../Store/Auth';
 import {useFetchProfile} from '../../Hooks/Query/ProfileQuery';
 import Loading from '../../Screen/Loading';
+import socket from '../../Socket/Socket';
 
 const DiscoverHeader = () => {
   const navigation = useNavigation();
@@ -26,6 +27,7 @@ const DiscoverHeader = () => {
   };
   const handleLogout = () => {
     dispatch(LogoutRed());
+    socket.disconnect();
     return navigation.reset({
       index: 0,
       routes: [{name: 'Login'}],

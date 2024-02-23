@@ -1,7 +1,5 @@
 import {View, StyleSheet, ScrollView} from 'react-native';
 import React, {useState, useEffect, useRef} from 'react';
-import Toast from 'react-native-toast-message';
-import {getToken} from '../Utils/Streamapi';
 import GradientScreen from '../Layouts/GradientScreen';
 import GradientText from '../Components/Common/GradientText';
 import {colors} from '../Styles/ColorData';
@@ -12,18 +10,9 @@ import {useSelector} from 'react-redux';
 import {useFetchChatting} from '../Hooks/Query/ChatQuery';
 import Loading from './Loading';
 import socket from '../Socket/Socket';
-import {useNavigation} from '@react-navigation/native';
 const Chat = ({route}) => {
-  const navigation = useNavigation();
   const [MessageData, setMessageData] = useState([]);
-  const {
-    userid,
-    name,
-    imageUrl,
-    type: chattype,
-    grouproomid,
-    roomid,
-  } = route.params;
+  const {userid, name, imageUrl, type: chattype, grouproomid} = route.params;
   const myuserid = useSelector(state => state.Auth.userid);
   const {name: myname} = useSelector(state => state.Auth.userinitaldata);
   const [heightbeforefetch, setheightbeforefetch] = useState(0);
@@ -43,12 +32,29 @@ const Chat = ({route}) => {
 
   useEffect(() => {
     const handleMessage = msg => {
-      if (
-        (chattype == 'group' && msg.room != grouproomid) ||
-        (chattype == 'single' && msg.room != roomid)
-      )
-        return;
-      setMessageData(prev => [...prev, msg]);
+      console.log('msg in chat :', msg, myuserid);
+      // if (
+      //   (chattype == 'group' && msg.receiver_id != grouproomid) ||
+      //   (chattype == 'single' && msg.receiver_id != myuserid)
+      // )
+      //   return;
+      // setMessageData(prev => [...prev, msg]);
+
+      if (chattype == 'group' && msg.receiver_id == grouproomid) {
+        setMessageData(prev => [...prev, msg]);
+      } else if (
+        chattype == 'single' &&
+        msg.receiver_id == myuserid &&
+        msg.sender_id == userid
+      ) {
+        setMessageData(prev => [...prev, msg]);
+      } else if (
+        chattype == 'single' &&
+        msg.sender_id == myuserid &&
+        msg.receiver_id == userid
+      ) {
+        setMessageData(prev => [...prev, msg]);
+      }
     };
     socket.on('chat message', handleMessage);
     return () => {
@@ -79,7 +85,6 @@ const Chat = ({route}) => {
           imageUrl={imageUrl}
           userid={userid}
           chattype={chattype}
-          roomid={roomid}
         />
         <ScrollView
           ref={scrollViewRef}
@@ -142,7 +147,6 @@ const Chat = ({route}) => {
           myname={myname}
           chattype={chattype}
           grouproomid={grouproomid}
-          roomid={roomid}
           MessageData={MessageData}
         />
       </View>
