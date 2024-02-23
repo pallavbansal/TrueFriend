@@ -35,9 +35,21 @@ import {
 import Protect from './Auth/Protect';
 import socket from './Socket/Socket';
 import CallHandler from './Components/Common/CallHandler';
+import {
+  startBackgroundSocketService,
+  stopBackgroundSocketService,
+} from './Socket/BackgroundServices.js';
+import {createChannel} from './Socket/Notification.js';
 
 const MainNavigator = () => {
   const Stack = createStackNavigator();
+
+  useEffect(() => {
+    startBackgroundSocketService();
+    return () => {
+      stopBackgroundSocketService();
+    };
+  }, []);
 
   return (
     <CallHandler>
@@ -173,6 +185,10 @@ function App() {
     return () => {
       socket.off('connect');
     };
+  }, []);
+
+  useEffect(() => {
+    createChannel();
   }, []);
 
   return (

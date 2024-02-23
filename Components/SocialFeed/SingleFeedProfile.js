@@ -3,6 +3,7 @@ import {
   Text,
   StyleSheet,
   Image,
+  Modal,
   TouchableOpacity,
   Pressable,
 } from 'react-native';
@@ -11,10 +12,12 @@ import {colors} from '../../Styles/ColorData';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import Video from 'react-native-video';
 import {ActivityIndicator} from 'react-native';
 import {PinchGestureHandler, State} from 'react-native-gesture-handler';
 import {useLikePost, useDislikePost} from '../../Hooks/Query/FeedQuery';
+import CommentModal from './CommentModal';
 
 const SingleFeedProfile = ({
   item,
@@ -30,6 +33,8 @@ const SingleFeedProfile = ({
   const {mutate: likePost} = useLikePost();
   const {mutate: dislikePost} = useDislikePost();
   const [scale, setScale] = useState(1);
+  const [showcommentmodal, setShowCommentModal] = useState(false);
+
   const [translateX, setTranslateX] = useState(0);
   const [translateY, setTranslateY] = useState(0);
 
@@ -286,13 +291,13 @@ const SingleFeedProfile = ({
             color={colors.socialfeed.actionicons}
           />
         </TouchableOpacity>
-        {/* <TouchableOpacity>
+        <TouchableOpacity onPress={() => setShowCommentModal(true)}>
           <Ionicons
             name="chatbubble-outline"
             size={24}
             color={colors.socialfeed.actionicons}
           />
-        </TouchableOpacity> */}
+        </TouchableOpacity>
         {/* <TouchableOpacity
           style={{
             marginLeft: 'auto',
@@ -308,6 +313,15 @@ const SingleFeedProfile = ({
         <Text style={styles.headingtext4}>{item.like_count} Likes</Text>
         <Text style={styles.headingtext4}>{item.dislike_count} Dislikes</Text>
       </View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showcommentmodal}
+        onRequestClose={() => {
+          setShowCommentModal(false);
+        }}>
+        <CommentModal feed={item} />
+      </Modal>
     </View>
   );
 };
@@ -338,13 +352,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 10,
-    gap: 10,
+    gap: 12,
   },
   statscontainer: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 10,
-    gap: 10,
+    gap: 5,
   },
   headingtext2: {
     fontFamily: 'Lexend',
@@ -363,7 +377,7 @@ const styles = StyleSheet.create({
   headingtext4: {
     color: colors.login.headingtext2,
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 12,
     lineHeight: 22.4,
   },
   mutebutton: {
