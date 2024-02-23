@@ -19,6 +19,7 @@ const CallHandler = ({children}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [callData, setCallData] = useState(null);
   const [isMuted, setIsMuted] = useState(false);
+  const [rejectTimeoutId, setRejectTimeoutId] = useState(null);
   const ringtone = useRef(null);
 
   useEffect(() => {
@@ -39,12 +40,7 @@ const CallHandler = ({children}) => {
         ringtone.current.setVolume(1);
         ringtone.current.play();
         const timeoutId = setTimeout(handleReject, 15000);
-        return () => clearTimeout(timeoutId);
-      }
-      if (data.callaction === 'rejected') {
-        setModalVisible(false);
-        ringtone.current.stop();
-        setCallData(null);
+        setRejectTimeoutId(timeoutId);
       }
     };
 
@@ -56,28 +52,30 @@ const CallHandler = ({children}) => {
     };
   }, []);
 
-  const handleAccept = async () => {
+  const handleAccept = async data => {
+    clearTimeout(rejectTimeoutId);
     setModalVisible(false);
     ringtone.current.stop();
-    socket.emit('call', {...callData, callaction: 'accepted'});
+    socket.emit('call', {...data, callaction: 'accepted'});
     const token = await getToken();
     navigation.navigate('Call', {
-      name: callData?.reciever?.name.trim(),
+      name: data?.reciever?.name.trim(),
       token: token,
-      meetingId: callData.meetingId,
+      meetingId: data.meetingId,
       micEnabled: true,
-      webcamEnabled: callData.type === 'video' ? true : false,
+      webcamEnabled: data.type === 'video' ? true : false,
       isCreator: false,
       mode: 'CONFERENCE',
     });
   };
 
-  const handleReject = () => {
+  const handleReject = data => {
+    console.log(data);
     ringtone.current.stop();
-    socket.emit('call', {...callData, callaction: 'rejected'});
+    socket.emit('call', {...data, callaction: 'rejected'});
     setModalVisible(false);
     console.log('Call rejected');
-    setCallData(null);
+    // setCallData(null);
   };
 
   const handleMuteUnmute = () => {
@@ -129,12 +127,12 @@ const CallHandler = ({children}) => {
             <View style={styles.buttonContainer}>
               <TouchableOpacity
                 style={[styles.button, styles.buttonClose]}
-                onPress={handleReject}>
+                onPress={() => handleReject(callData)}>
                 <Text style={styles.textStyle}>Decline</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.button, styles.buttonAccept]}
-                onPress={handleAccept}>
+                onPress={() => handleAccept(callData)}>
                 <Text style={styles.textStyle}>Answer</Text>
               </TouchableOpacity>
             </View>

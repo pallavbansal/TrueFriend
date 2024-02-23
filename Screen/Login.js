@@ -21,6 +21,7 @@ import {useLogin} from '../Hooks/Query/AuthQuery';
 import {useDispatch} from 'react-redux';
 import {LoginRed} from '../Store/Auth';
 import {logindata} from '../Utils/Logindata';
+import socket from '../Socket/Socket';
 import Toast from 'react-native-toast-message';
 
 const Login = () => {
@@ -36,22 +37,6 @@ const Login = () => {
     password: '',
   });
   const {mutate, isPending, error, reset} = useLogin();
-  // useEffect(() => {
-  //   const backAction = () => {
-  //     navigation.reset({
-  //       index: 0,
-  //       routes: [{name: 'Login'}],
-  //     });
-  //     return true;
-  //   };
-
-  //   const backHandler = BackHandler.addEventListener(
-  //     'hardwareBackPress',
-  //     backAction,
-  //   );
-
-  //   return () => backHandler.remove();
-  // }, [navigation]);
 
   const handleSubmit = () => {
     if (logininputs.email == '' || logininputs.password == '') {
@@ -82,6 +67,7 @@ const Login = () => {
               }),
             );
             setLoginInputs({email: '', password: ''});
+            socket.emit('register', data.data.user.id);
             if (data.data.profile_filled == 0) {
               return navigation.navigate('ProfileCreation');
             }

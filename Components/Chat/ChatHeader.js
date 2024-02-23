@@ -12,7 +12,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 import socket from '../../Socket/Socket';
 
-const ChatHeader = ({name, imageUrl, userid, chattype, roomid}) => {
+const ChatHeader = ({name, imageUrl, userid, chattype}) => {
   const mydata = useSelector(state => state.Auth.userinitaldata);
   console.log('mydata', mydata);
   const navigation = useNavigation();
@@ -92,7 +92,6 @@ const ChatHeader = ({name, imageUrl, userid, chattype, roomid}) => {
       mode: 'CONFERENCE',
     });
     socket.emit('call', {
-      room: roomid,
       caller: {
         userid: mydata.id,
         name: mydata.name,
@@ -100,6 +99,7 @@ const ChatHeader = ({name, imageUrl, userid, chattype, roomid}) => {
       },
       reciever: {
         name: name,
+        id: userid,
       },
       meetingId: meetingId,
       callaction: 'outgoing',
@@ -118,7 +118,6 @@ const ChatHeader = ({name, imageUrl, userid, chattype, roomid}) => {
       mode: 'CONFERENCE',
     });
     socket.emit('call', {
-      room: roomid,
       caller: {
         userid: mydata.id,
         name: mydata.name,
@@ -126,6 +125,7 @@ const ChatHeader = ({name, imageUrl, userid, chattype, roomid}) => {
       },
       reciever: {
         name: name,
+        id: userid,
       },
       meetingId: meetingId,
       callaction: 'outgoing',

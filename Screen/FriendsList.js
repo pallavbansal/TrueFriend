@@ -19,11 +19,11 @@ import {useNavigation} from '@react-navigation/native';
 import SingleFriend from '../Components/FriendList/SingleFriend';
 import SingleRequest from '../Components/FriendList/SingleRequest';
 import SelectFriend from '../Components/FriendList/SelectFriend';
-import {getToken} from '../Utils/Streamapi';
 import socket from '../Socket/Socket';
 import {useSelector} from 'react-redux';
 import Toast from 'react-native-toast-message';
 import Loading from './Loading';
+import {useFetchFriends} from '../Hooks/Query/RequestQuery';
 
 const friendsdata = [
   {
@@ -105,6 +105,7 @@ const FriendsList = () => {
   const [filteredrequestdata, setfilteredrequestdata] = useState(requestdata);
   const [searchfilter, setsearchfilter] = useState('');
   const [socketconnected, setsocketconnected] = useState(true);
+  // const {data, isPending, error, isError} = useFetchFriends();
 
   useEffect(() => {
     if (selectedoptiontype === 'friends') {
@@ -140,11 +141,7 @@ const FriendsList = () => {
     if (socket.connected) {
       setsocketconnected(true);
       friendsdata.map(item => {
-        if (item.type === 'single') {
-          const roomid = [myuserid, item.id].sort().join('_');
-          item.roomid = roomid;
-          socket.emit('join room', roomid);
-        } else {
+        if (item.type === 'group') {
           socket.emit('join room', item.grouproomid);
         }
       });
@@ -191,6 +188,12 @@ const FriendsList = () => {
     }, 2000);
     return <Loading />;
   }
+
+  // if (isPending) {
+  //   return <Loading />;
+  // }
+
+  // console.log('friends data', data);
 
   return (
     <GradientScreen>
@@ -295,11 +298,7 @@ const FriendsList = () => {
               data={filteredfriendsdata.filter(item => item.id !== myuserid)}
               keyExtractor={item => item.id.toString()}
               renderItem={({item, index}) => (
-                <SingleFriend
-                  data={item}
-                  index={index}
-                  setfilteredfriendsdata={setfilteredfriendsdata}
-                />
+                <SingleFriend data={item} index={index} />
               )}
               onEndReachedThreshold={0.1}
               showsVerticalScrollIndicator={false}

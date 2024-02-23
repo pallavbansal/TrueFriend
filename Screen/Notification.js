@@ -1,14 +1,15 @@
 import {View, Text, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import GradientScreen from '../Layouts/GradientScreen';
 import {colors} from '../Styles/ColorData';
 import SingleNotification from '../Components/Notification/SingleNotification';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation} from '@react-navigation/native';
+import socket from '../Socket/Socket';
 
 // like,newmessage,newrequest,missedcall
 
-const notifidata = [
+const data = [
   {
     id: 1,
     type: 'like',
@@ -76,7 +77,39 @@ const notifidata = [
 ];
 
 const Notification = () => {
+  const [notifidata, setNotifidata] = useState(data);
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const handleNotification = data => {
+      console.log('Received notification:', data);
+      const newdata = {
+        ...data,
+        id: notifidata.length + 1 + Math.random() * 1000,
+      };
+      setNotifidata(prev => [newdata, ...prev]);
+    };
+
+    socket.on('notification', handleNotification);
+
+    // Cleanup function
+    return () => {
+      socket.off('notification', handleNotification);
+    };
+  }, []);
+
+  const handletext = () => {
+    socket.emit('notification', {
+      receiverid: 44,
+      id: notifidata.length + 1,
+      title: 'John Doe',
+      type: 'like',
+      text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+      time: '03:00 PM',
+      date: '12/12/2020',
+    });
+  };
+
   return (
     <GradientScreen>
       <View style={styles.container}>
@@ -90,6 +123,14 @@ const Notification = () => {
               size={24}
               color={colors.arrow.primary}
               style={{marginLeft: 20, marginTop: 30}}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handletext}>
+            <MaterialIcons
+              name="arrow-back"
+              size={24}
+              color={colors.arrow.primary}
+              style={{marginLeft: 200}}
             />
           </TouchableOpacity>
         </View>

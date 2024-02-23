@@ -87,7 +87,9 @@ const WatchStream = ({route}) => {
               },
             }}>
             {() => {
-              return <WatchContainer webcamEnabled={webcamEnabled} />;
+              return (
+                <WatchContainer webcamEnabled={webcamEnabled} userid={id} />
+              );
             }}
           </MeetingConsumer>
         </MeetingProvider>

@@ -44,12 +44,12 @@ import {createChannel} from './Socket/Notification.js';
 const MainNavigator = () => {
   const Stack = createStackNavigator();
 
-  useEffect(() => {
-    startBackgroundSocketService();
-    return () => {
-      stopBackgroundSocketService();
-    };
-  }, []);
+  // useEffect(() => {
+  //   startBackgroundSocketService();
+  //   return () => {
+  //     stopBackgroundSocketService();
+  //   };
+  // }, []);
 
   return (
     <CallHandler>
@@ -179,8 +179,10 @@ function App() {
   }, []);
 
   useEffect(() => {
+    console.log('trying to connect to socket server in app.js');
     socket.on('connect', () => {
       console.log('connected to socket server in app.js');
+      console.log('socket id:', socket.id, socket.connected);
     });
     return () => {
       socket.off('connect');

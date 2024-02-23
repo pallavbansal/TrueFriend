@@ -13,15 +13,35 @@ import {useMeeting} from '@videosdk.live/react-native-sdk';
 import BottomSheet from '../common/BottomSheet';
 import ChatViewer from '../common/ChatViewer';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import {colors} from '../../../Styles/ColorData';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {useSendRequest} from '../../../Hooks/Query/RequestQuery';
 import StreamLoading from './StreamLoading';
 
-const ViewerContainer = () => {
+const ViewerContainer = ({userid}) => {
+  console.log('userid', userid);
   const {changeMode, leave, hlsState, hlsUrls, participants} = useMeeting();
   const videoPlayer = useRef(null);
   const bottomSheetRef = useRef();
   const [bottomSheetView, setBottomSheetView] = useState('CHAT');
+  const {isPending, error, mutate, reset} = useSendRequest();
+
+  const handlefollow = () => {
+    console.log('follow');
+
+    const formdata = {
+      receiver_id: userid,
+    };
+    mutate(
+      {data: formdata},
+      {
+        onSuccess: data => {
+          console.log('follow success', data);
+        },
+      },
+    );
+  };
 
   return (
     <View
@@ -47,9 +67,39 @@ const ViewerContainer = () => {
             }}
             onError={e => console.log('error', e)}
           />
+          <View
+            style={{
+              position: 'absolute',
+              bottom: 10,
+              right: 10,
+              height: 50,
+              width: 50,
+              backgroundColor: 'black',
+              zIndex: 100,
+            }}></View>
         </View>
       ) : (
-        <StreamLoading />
+        <View style={{flex: 1}}>
+          <StreamLoading />
+          <View
+            style={{
+              position: 'absolute',
+              bottom: 15,
+              right: 15,
+            }}>
+            <TouchableOpacity
+              style={{
+                backgroundColor: 'rgba(0,0,0,0.2)',
+                padding: 5,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 8,
+              }}
+              onPress={handlefollow}>
+              <SimpleLineIcons name="user-follow" size={24} color="black" />
+            </TouchableOpacity>
+          </View>
+        </View>
       )}
 
       <View style={styles.bottomcontainer}>
