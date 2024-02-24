@@ -18,8 +18,8 @@ const ChatHeader = ({name, imageUrl, userid, chattype}) => {
   const navigation = useNavigation();
   const [optionsdialog, setoptionsdialog] = useState(false);
   const [reportdialog, setreportdialog] = useState(false);
-  const [token, setToken] = useState('');
-  const [meetingId, setMeetingId] = useState('');
+  // const [token, setToken] = useState('');
+  // const [meetingId, setMeetingId] = useState('');
   const isCreator = true;
   const [filterdata, setfilterdata] = useState({
     items: [],
@@ -55,17 +55,17 @@ const ChatHeader = ({name, imageUrl, userid, chattype}) => {
     }
   }, [chattype]);
 
-  useEffect(() => {
-    async function fetchData() {
-      const token = await getToken();
-      setToken(token);
-      if (isCreator) {
-        const _meetingId = await createMeeting({token});
-        setMeetingId(_meetingId);
-      }
-    }
-    fetchData();
-  }, [navigation]);
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     const token = await getToken();
+  //     setToken(token);
+  //     if (isCreator) {
+  //       const _meetingId = await createMeeting({token});
+  //       setMeetingId(_meetingId);
+  //     }
+  //   }
+  //   fetchData();
+  // }, [navigation]);
 
   const handlerreportdialog = () => {
     setreportdialog(!reportdialog);
@@ -81,17 +81,13 @@ const ChatHeader = ({name, imageUrl, userid, chattype}) => {
     console.log(item);
   };
 
-  const handleaudiocall = () => {
-    navigation.navigate('Call', {
-      name: mydata.name.trim(),
-      token: token,
-      meetingId: meetingId,
-      micEnabled: true,
-      webcamEnabled: false,
-      isCreator: isCreator,
-      mode: 'CONFERENCE',
-    });
-    socket.emit('call', {
+  const handleaudiocall = async () => {
+    const token = await getToken();
+    let meetingId = '';
+    if (isCreator) {
+      meetingId = await createMeeting({token});
+    }
+    const finaldata = {
       caller: {
         userid: mydata.id,
         name: mydata.name,
@@ -104,20 +100,28 @@ const ChatHeader = ({name, imageUrl, userid, chattype}) => {
       meetingId: meetingId,
       callaction: 'outgoing',
       type: 'audio',
-    });
-  };
+    };
 
-  const handlevideocall = () => {
     navigation.navigate('Call', {
       name: mydata.name.trim(),
       token: token,
       meetingId: meetingId,
       micEnabled: true,
-      webcamEnabled: true,
+      webcamEnabled: false,
       isCreator: isCreator,
       mode: 'CONFERENCE',
+      finaldata: finaldata,
     });
-    socket.emit('call', {
+    socket.emit('call', finaldata);
+  };
+
+  const handlevideocall = async () => {
+    const token = await getToken();
+    let meetingId = '';
+    if (isCreator) {
+      meetingId = await createMeeting({token});
+    }
+    const finaldata = {
       caller: {
         userid: mydata.id,
         name: mydata.name,
@@ -130,7 +134,19 @@ const ChatHeader = ({name, imageUrl, userid, chattype}) => {
       meetingId: meetingId,
       callaction: 'outgoing',
       type: 'video',
+    };
+
+    navigation.navigate('Call', {
+      name: mydata.name.trim(),
+      token: token,
+      meetingId: meetingId,
+      micEnabled: true,
+      webcamEnabled: true,
+      isCreator: isCreator,
+      mode: 'CONFERENCE',
+      finaldata: finaldata,
     });
+    socket.emit('call', finaldata);
   };
 
   return (

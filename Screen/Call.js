@@ -14,6 +14,7 @@ import WaitingResponse from '../Components/Call/CreateCall/WaitingResponse';
 const Call = ({route}) => {
   const navigation = useNavigation();
   const [response, setResponse] = useState('');
+  const [rejectTimeoutId, setRejectTimeoutId] = useState(null);
   const token = route.params.token;
   const meetingId = route.params.meetingId;
   const micEnabled = route.params.micEnabled ? route.params.micEnabled : false;
@@ -22,6 +23,7 @@ const Call = ({route}) => {
     : false;
   const name = route.params.name ? route.params.name : 'Test User';
   const mode = route.params.mode ? route.params.mode : 'CONFERENCE';
+  const finaldata = route.params.finaldata;
 
   useEffect(() => {
     const handleresponse = data => {
@@ -41,15 +43,20 @@ const Call = ({route}) => {
         setResponse('rejected');
       }
     }, 15000); // 15 seconds
+    setRejectTimeoutId(timeoutId);
 
     return () => {
       socket.off('call', handleresponse);
       clearTimeout(timeoutId); // Clear the timeout if the component is unmounted
     };
-  }, [response]);
+  }, []);
 
   useEffect(() => {
+    if (response == 'accepted') {
+      clearTimeout(rejectTimeoutId);
+    }
     if (response == 'rejected') {
+      console.log('Call rejected in call.js');
       navigation.navigate('FriendsList');
     }
   }, [response]);
@@ -93,7 +100,7 @@ const Call = ({route}) => {
       </LinearGradient>
     );
   } else {
-    return <WaitingResponse />;
+    return <WaitingResponse finaldata={finaldata} />;
   }
 };
 

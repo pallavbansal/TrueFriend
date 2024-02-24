@@ -60,11 +60,7 @@ const connectToSocket = async () => {
   socket.on('connect', () => {
     console.log('Socket connection opened for background service');
     friendsdata.map(item => {
-      if (item.type === 'single') {
-        const roomid = [myuserid, item.id].sort().join('_');
-        item.roomid = roomid;
-        socket.emit('join room', roomid);
-      } else {
+      if (item.type === 'group') {
         socket.emit('join room', item.grouproomid);
       }
     });

@@ -30,17 +30,7 @@ const SingleFriend = ({data}) => {
       meetingId = await createMeeting({token});
     }
 
-    navigation.navigate('Call', {
-      name: mydata.name.trim(),
-      token: token,
-      meetingId: meetingId,
-      micEnabled: true,
-      webcamEnabled: false,
-      isCreator: isCreator,
-      mode: 'CONFERENCE',
-    });
-
-    socket.emit('call', {
+    const finaldata = {
       caller: {
         userid: mydata.id,
         name: mydata.name,
@@ -53,7 +43,18 @@ const SingleFriend = ({data}) => {
       meetingId: meetingId,
       callaction: 'outgoing',
       type: 'audio',
+    };
+    navigation.navigate('Call', {
+      name: mydata.name.trim(),
+      token: token,
+      meetingId: meetingId,
+      micEnabled: true,
+      webcamEnabled: false,
+      isCreator: isCreator,
+      mode: 'CONFERENCE',
+      finaldata: finaldata,
     });
+    socket.emit('call', finaldata);
   };
 
   return (

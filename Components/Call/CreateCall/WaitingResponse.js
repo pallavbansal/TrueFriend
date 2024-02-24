@@ -13,9 +13,9 @@ import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../../../Styles/ColorData';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useNavigation} from '@react-navigation/native';
-// import socket from '../../../Socket/Socket';
+import socket from '../../../Socket/Socket';
 
-const WaitingResponse = () => {
+const WaitingResponse = ({finaldata}) => {
   const navigation = useNavigation();
   const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
   const moveAnim = useRef(new Animated.Value(0)).current; // Initial value for movement: 0
@@ -70,6 +70,10 @@ const WaitingResponse = () => {
   }, [moveAnim]);
 
   const handleendcall = () => {
+    socket.emit('call', {
+      ...finaldata,
+      callaction: 'outgoing-rejected',
+    });
     navigation.navigate('FriendsList');
   };
 

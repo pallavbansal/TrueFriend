@@ -4,15 +4,54 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {colors} from '../../Styles/ColorData';
+import {useUpdateRequest} from '../../Hooks/Query/RequestQuery';
+import {useNavigation} from '@react-navigation/native';
 
-const SingleRequest = ({data}) => {
+const SingleRequest = ({data, setfilteredrequestdata}) => {
+  console.log('data', data);
+  const navigation = useNavigation();
+  const {mutate, isPending, error, reset} = useUpdateRequest();
+
+  const acceptRequest = () => {
+    console.log('accept', data.friend_id);
+    const finaldata = {
+      friend_request_id: data.friend_id,
+      status: 'ACCEPTED',
+    };
+    // mutate(
+    //   {data: finaldata},
+    //   {
+    //     onSuccess: data => {
+    //       console.log('Request success accept', data);
+    //       setfilteredrequestdata(prev => {
+    //         return prev.filter(item => item.friend_id !== data.friend_id);
+    //       });
+    //     },
+    //   },
+    // );
+  };
+
+  const deleteRequest = () => {
+    console.log('delete', data.friend_id);
+    setfilteredrequestdata(prev => {
+      return prev.filter(item => item.friend_id !== data.friend_id);
+    });
+  };
+
+  const handleprofile = () => {
+    console.log('handleprofile', data);
+    if (data.type != 'group') {
+      return navigation.navigate('ProfileById', {userid: data.friend_id});
+    }
+  };
+
   return (
     <View>
       <View style={styles.fricontainer}>
-        {data.imageUrl ? (
-          <View>
+        {data.profile_picture ? (
+          <TouchableOpacity onPress={handleprofile}>
             <Image
-              source={{uri: data.imageUrl}}
+              source={{uri: data.profile_picture}}
               style={{
                 height: 65,
                 width: 65,
@@ -21,7 +60,7 @@ const SingleRequest = ({data}) => {
                 borderWidth: 2,
               }}
             />
-          </View>
+          </TouchableOpacity>
         ) : (
           <View
             style={[
@@ -37,7 +76,9 @@ const SingleRequest = ({data}) => {
           <Text style={styles.text1}>{data.name}</Text>
 
           <View style={{flexDirection: 'row', gap: 10, marginTop: 10}}>
-            <TouchableOpacity style={styles.acceptbutton}>
+            <TouchableOpacity
+              style={styles.acceptbutton}
+              onPress={acceptRequest}>
               <Text
                 style={{
                   color: 'white',
@@ -47,7 +88,9 @@ const SingleRequest = ({data}) => {
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.deletebutton}>
+            <TouchableOpacity
+              style={styles.deletebutton}
+              onPress={deleteRequest}>
               <Text
                 style={{
                   color: 'black',
@@ -59,16 +102,16 @@ const SingleRequest = ({data}) => {
           </View>
         </View>
       </View>
-      {data.type == 'single' ? (
+      {data.type == 'group' ? (
         <View style={styles.likecontainer}>
           <TouchableOpacity>
-            <Entypo name="user" size={18} color={colors.arrow.secondary} />
+            <Entypo name="users" size={18} color={colors.arrow.secondary} />
           </TouchableOpacity>
         </View>
       ) : (
         <View style={styles.likecontainer}>
           <TouchableOpacity>
-            <Entypo name="users" size={18} color={colors.arrow.secondary} />
+            <Entypo name="user" size={18} color={colors.arrow.secondary} />
           </TouchableOpacity>
         </View>
       )}

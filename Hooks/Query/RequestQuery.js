@@ -2,6 +2,7 @@ import {
   sendRequest,
   updateRequest,
   fetchFriends,
+  fetchFriendRequests,
 } from '../../Services/RequestServices';
 import {useMutation, useQuery} from '@tanstack/react-query';
 import {useSelector} from 'react-redux';
@@ -27,6 +28,14 @@ export const useFetchFriends = () => {
   const {isPending, error, data, isError} = useQuery({
     queryFn: () => fetchFriends(token),
     queryKey: ['fetchFriends', token],
+  });
+  return {isPending, error, data, isError};
+};
+export const useFetchFriendRequests = () => {
+  const token = useSelector(state => state.Auth.token);
+  const {isPending, error, data, isError} = useQuery({
+    queryFn: () => fetchFriendRequests(token),
+    queryKey: ['fetchFriendRequests', token],
   });
   return {isPending, error, data, isError};
 };

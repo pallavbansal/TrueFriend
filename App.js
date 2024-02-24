@@ -13,6 +13,7 @@ import {
   Discover,
   Notification,
   Profile,
+  ProfileById,
   SocialFeed,
   Login,
   Verify,
@@ -98,6 +99,13 @@ const MainNavigator = () => {
         <Stack.Screen name="Profile" options={{headerShown: false}}>
           {() => <Protect Route="Profile" Component={Profile} />}
         </Stack.Screen>
+
+        <Stack.Screen
+          name="ProfileById"
+          component={ProfileById}
+          options={{headerShown: false}}
+        />
+
         <Stack.Screen
           name="SocialFeed"
           component={SocialFeed}

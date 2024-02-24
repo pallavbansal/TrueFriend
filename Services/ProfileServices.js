@@ -32,6 +32,24 @@ export async function fetchProfile(token) {
   return response.json();
 }
 
+export async function fetchProfileById(id, token) {
+  const response = await fetch(
+    `${url}/profile/fetch-profile-by-id?user_id=${id}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  if (!response.ok) {
+    console.log('Error g', response);
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
+}
+
 export async function updateProfile(data, token) {
   const formData = new FormData();
   formData.append('mobile_number', data.mobile_number);
