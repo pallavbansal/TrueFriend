@@ -19,11 +19,13 @@ import StartStream from './StartStream';
 import CreatePost from './CreatePost';
 import WatchStream from './WatchStream';
 import Call from './Call';
+import ProfileById from './ProfileById';
 
 export {
   Discover,
   Notification,
   Profile,
+  ProfileById,
   SocialFeed,
   Login,
   Verify,

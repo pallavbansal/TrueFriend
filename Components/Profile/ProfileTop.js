@@ -4,7 +4,13 @@ import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../../Styles/ColorData';
 import React from 'react';
 
-const ProfileTop = ({finaldata, handleeditprofile}) => {
+const ProfileTop = ({
+  finaldata,
+  handleeditprofile,
+  ismyid,
+  request_status,
+  requestaction,
+}) => {
   return (
     <>
       <View
@@ -103,26 +109,110 @@ const ProfileTop = ({finaldata, handleeditprofile}) => {
           }}
         />
       </View>
-      <View
-        style={{
-          position: 'absolute',
-          right: 10,
-          bottom: -20,
-        }}>
+      {ismyid && (
         <View
           style={{
-            backgroundColor: colors.profile.edit,
-            height: 40,
-            width: 40,
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: 20,
+            position: 'absolute',
+            right: 10,
+            bottom: -20,
           }}>
-          <TouchableOpacity onPress={handleeditprofile}>
-            <AntDesign name="edit" size={28} color="white" />
-          </TouchableOpacity>
+          <View
+            style={{
+              backgroundColor: colors.profile.edit,
+              height: 40,
+              width: 40,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 20,
+            }}>
+            <TouchableOpacity onPress={handleeditprofile}>
+              <AntDesign name="edit" size={28} color="white" />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      )}
+
+      {/*  Friends,Sent,Received,Noaction  */}
+      {!ismyid && (
+        <View
+          style={{
+            position: 'absolute',
+            right: 10,
+            bottom: -15,
+          }}>
+          <View
+            style={[
+              styles.requestbutton,
+              {
+                backgroundColor:
+                  request_status === 'Sent'
+                    ? 'grey'
+                    : request_status === 'Friends'
+                    ? 'green'
+                    : colors.profile.edit,
+              },
+            ]}>
+            {request_status === 'Sent' && (
+              <Text
+                style={{
+                  color: 'white',
+                  fontWeight: 'bold',
+                }}>
+                Request Sent
+              </Text>
+            )}
+            {request_status === 'Friends' && (
+              <Text
+                style={{
+                  color: 'white',
+                  fontWeight: 'bold',
+                }}>
+                Friends
+              </Text>
+            )}
+            {request_status === 'Received' && (
+              <View
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  gap: 20,
+                }}>
+                <TouchableOpacity
+                  onPress={() => requestaction('acceptrequest')}>
+                  <Text
+                    style={{
+                      color: 'white',
+                      fontWeight: 'bold',
+                    }}>
+                    Accept
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => requestaction('rejectrequest')}>
+                  <Text
+                    style={{
+                      color: 'white',
+                      fontWeight: 'bold',
+                    }}>
+                    Reject
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            {request_status === 'Noaction' && (
+              <TouchableOpacity onPress={() => requestaction('sendrequest')}>
+                <Text
+                  style={{
+                    color: 'white',
+                    fontWeight: 'bold',
+                  }}>
+                  Add Friend
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+      )}
     </>
   );
 };
@@ -137,5 +227,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-end',
     paddingRight: 20,
+  },
+  requestbutton: {
+    backgroundColor: colors.profile.edit,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 20,
+    padding: 5,
+    paddingHorizontal: 10,
   },
 });

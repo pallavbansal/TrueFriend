@@ -33,7 +33,7 @@ const CreatePost = () => {
   });
 
   useEffect(() => {
-    if (postinputs.caption.length > 0 && postinputs.Image?.path) {
+    if (postinputs.caption.length > 0 && postinputs.Image?.length > 0) {
       setPostInputs({...postinputs, valid: true, showerror: false});
     } else {
       setPostInputs({...postinputs, valid: false});
@@ -46,10 +46,14 @@ const CreatePost = () => {
       return;
     }
     const formdata = {
+      // caption: postinputs.caption,
+      // media_type: postinputs.Image.type === 'image' ? 1 : 2,
+      // media: postinputs.Image,
       caption: postinputs.caption,
-      media_type: postinputs.Image.type === 'image' ? 1 : 2,
       media: postinputs.Image,
+      media_type: postinputs.Image.map(item => (item.type === 'image' ? 1 : 2)),
     };
+    console.log('formdata', formdata);
     mutate(
       {data: formdata},
       {
@@ -69,11 +73,13 @@ const CreatePost = () => {
     try {
       const response = await MultipleImagePicker.openPicker({
         mediaType: 'all',
-        maxSelectedAssets: 1,
+        maxSelectedAssets: 5,
       });
       if (response && response.length > 0) {
-        console.log('response', response[0]);
-        setPostInputs({...postinputs, Image: response[0]});
+        // console.log('response-----------', response[0]);
+        // setPostInputs({...postinputs, Image: response[0]});
+        console.log('response-----------', response);
+        setPostInputs({...postinputs, Image: response});
       }
     } catch (e) {
       console.log(e);

@@ -6,22 +6,30 @@ import {
   FlatList,
   ScrollView,
 } from 'react-native';
+import {useFetchProfileById} from '../Hooks/Query/ProfileQuery';
 import React, {useEffect, useState} from 'react';
 import BottomBar from '../Layouts/BottomBar';
 import GradientScreen from '../Layouts/GradientScreen';
 import {colors} from '../Styles/ColorData';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import SingleMedia from '../Components/Profile/SingleMedia';
-import {useFetchProfile} from '../Hooks/Query/ProfileQuery';
 import ProfileTop from '../Components/Profile/ProfileTop';
-import EditProfile from '../Components/Profile/EditProfile';
 import DetailMedia from '../Components/Profile/DetailMedia';
 import Loading from './Loading';
 
-const Profile = () => {
-  const {isPending, error, data: profiledata, isError} = useFetchProfile();
+const ProfileById = ({route}) => {
+  const {userid} = route.params;
+  {
+    /* Friends,Sent,Received,Noaction */
+  }
+  const [request_status, setrequest_status] = useState('Noaction');
+  const {
+    isPending,
+    error,
+    data: profiledata,
+    isError,
+  } = useFetchProfileById(userid);
   const [selectedmediatype, setselectedmediatype] = useState('pictures');
-  const [showeditmodel, setshoweditmodel] = useState(false);
   const [showdetailmodel, setshowdetailmodel] = useState({
     show: false,
     data: null,
@@ -33,13 +41,6 @@ const Profile = () => {
     if (profiledata) {
       setpicturedata2([]);
       setvideodata2([]);
-      // profiledata.data.profile.media.map(item => {
-      //   if (item.media_type === '1') {
-      //     setpicturedata2(prev => [...prev, item]);
-      //   } else {
-      //     setvideodata2(prev => [...prev, item]);
-      //   }
-      // });
       profiledata.data.profile.media.map(item => {
         item.post_media.map(item2 => {
           if (item2.media_type === '1') {
@@ -52,9 +53,6 @@ const Profile = () => {
     }
   }, [profiledata]);
 
-  function handleeditprofile() {
-    setshoweditmodel(true);
-  }
   function closedetailmodel() {
     setshowdetailmodel({
       show: false,
@@ -62,13 +60,15 @@ const Profile = () => {
     });
   }
 
+  // acceptrequest,sendrequest,rejectrequest
+  function requestaction(option) {
+    console.log('requestaction', option);
+  }
+
   if (isPending) {
     return <Loading />;
   }
 
-  // if (isError) {
-  //   return <Text>Error: {error.message}</Text>;
-  // }
   const finaldata = profiledata.data.profile;
   const Biodata = [
     {
@@ -93,14 +93,6 @@ const Profile = () => {
       Marital_Status: finaldata.marital_status.toUpperCase(),
     },
   ];
-  if (showeditmodel) {
-    return (
-      <EditProfile
-        setshoweditmodel={setshoweditmodel}
-        initialdata={finaldata}
-      />
-    );
-  }
 
   return (
     <GradientScreen>
@@ -108,8 +100,10 @@ const Profile = () => {
         <View style={styles.imagecontainer}>
           <ProfileTop
             finaldata={finaldata}
-            handleeditprofile={handleeditprofile}
-            ismyid={true}
+            ismyid={false}
+            request_status={request_status}
+            setrequest_status={setrequest_status}
+            requestaction={requestaction}
           />
         </View>
         <View style={styles.biocontainer}>
@@ -307,7 +301,7 @@ const Profile = () => {
           <DetailMedia
             data={showdetailmodel.data}
             close={closedetailmodel}
-            ismyid={true}
+            ismyid={false}
           />
         )}
         <BottomBar />
@@ -316,7 +310,7 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default ProfileById;
 
 const styles = StyleSheet.create({
   container: {

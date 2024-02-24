@@ -93,6 +93,7 @@ function BottomBar() {
     <View style={[styles.tabContainer, styles.hidetab]}>
       {routes.map((routeItem, index) => {
         const isFocused = route.name === routeItem.name;
+
         return (
           <TouchableOpacity
             key={index}

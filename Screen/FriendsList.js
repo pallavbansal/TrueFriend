@@ -23,7 +23,10 @@ import socket from '../Socket/Socket';
 import {useSelector} from 'react-redux';
 import Toast from 'react-native-toast-message';
 import Loading from './Loading';
-import {useFetchFriends} from '../Hooks/Query/RequestQuery';
+import {
+  useFetchFriends,
+  useFetchFriendRequests,
+} from '../Hooks/Query/RequestQuery';
 
 const friendsdata = [
   {
@@ -71,29 +74,29 @@ const friendsdata = [
     unseenmsg: 0,
   },
 ];
-const requestdata = [
-  {
-    id: 7,
-    name: 'Jhon Doe',
-    type: 'single',
-    imageUrl:
-      'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  },
-  {
-    id: 44,
-    name: 'Vivek',
-    type: 'single',
-    imageUrl:
-      'https://images.unsplash.com/photo-1613521140785-e85e427f8002?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  },
-  {
-    id: 45,
-    name: 'Collage Friends',
-    type: 'group',
-    imageUrl:
-      'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D',
-  },
-];
+// const requestdata = [
+//   {
+//     id: 7,
+//     name: 'Jhon Doe',
+//     type: 'single',
+//     imageUrl:
+//       'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+//   },
+//   {
+//     id: 44,
+//     name: 'Vivek',
+//     type: 'single',
+//     imageUrl:
+//       'https://images.unsplash.com/photo-1613521140785-e85e427f8002?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+//   },
+//   {
+//     id: 45,
+//     name: 'Collage Friends',
+//     type: 'group',
+//     imageUrl:
+//       'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D',
+//   },
+// ];
 
 const FriendsList = () => {
   const navigation = useNavigation();
@@ -102,10 +105,29 @@ const FriendsList = () => {
   const [showgroupmodal, setshowgroupmodal] = useState(false);
   const [grouplist, setgrouplist] = useState([]);
   const [filteredfriendsdata, setfilteredfriendsdata] = useState(friendsdata);
-  const [filteredrequestdata, setfilteredrequestdata] = useState(requestdata);
+  const [filteredrequestdata, setfilteredrequestdata] = useState([]);
   const [searchfilter, setsearchfilter] = useState('');
   const [socketconnected, setsocketconnected] = useState(true);
-  // const {data, isPending, error, isError} = useFetchFriends();
+
+  // const {
+  //   data: friendsdata2,
+  //   isPending: friendsdatapending,
+  //   error: friendserror,
+  //   isError: friendsisError,
+  // } = useFetchFriends();
+
+  const {
+    data: requestdata2,
+    isPending: requestdatapending,
+    error: requesterror,
+    isError: requestisError,
+  } = useFetchFriendRequests();
+
+  useEffect(() => {
+    if (requestdata2?.data?.friends) {
+      setfilteredrequestdata(requestdata2.data.friends);
+    }
+  }, [requestdata2]);
 
   useEffect(() => {
     if (selectedoptiontype === 'friends') {
@@ -119,15 +141,15 @@ const FriendsList = () => {
         setfilteredfriendsdata(friendsdata);
       }
     }
-    if (selectedoptiontype === 'requests') {
+    if (selectedoptiontype === 'requests' && requestdata2?.data?.friends) {
       if (searchfilter) {
         setfilteredrequestdata(
-          requestdata.filter(item =>
+          requestdata2.data.friends.filter(item =>
             item.name.toLowerCase().includes(searchfilter.toLowerCase()),
           ),
         );
       } else {
-        setfilteredrequestdata(requestdata);
+        setfilteredrequestdata(requestdata2.data.friends);
       }
     }
   }, [searchfilter, selectedoptiontype]);
@@ -176,24 +198,22 @@ const FriendsList = () => {
     };
   }, []);
 
-  if (!socketconnected) {
-    setTimeout(() => {
-      navigation.goBack();
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Network Error, Please try again later.',
-        visibilityTime: 2000,
-      });
-    }, 2000);
-    return <Loading />;
-  }
-
-  // if (isPending) {
+  // if (!socketconnected) {
+  //   setTimeout(() => {
+  //     navigation.goBack();
+  //     Toast.show({
+  //       type: 'error',
+  //       text1: 'Error',
+  //       text2: 'Network Error, Please try again later.',
+  //       visibilityTime: 2000,
+  //     });
+  //   }, 2000);
   //   return <Loading />;
   // }
 
-  // console.log('friends data', data);
+  if (requestdatapending) {
+    return <Loading />;
+  }
 
   return (
     <GradientScreen>
@@ -294,11 +314,41 @@ const FriendsList = () => {
         <View style={styles.headingContainer}></View>
         <View style={styles.friendlistcontainer}>
           {selectedoptiontype === 'friends' ? (
+            filteredfriendsdata.filter(item => item.id !== myuserid).length >
+            0 ? (
+              <FlatList
+                data={filteredfriendsdata.filter(item => item.id !== myuserid)}
+                keyExtractor={item => item.id.toString()}
+                renderItem={({item, index}) => (
+                  <SingleFriend data={item} index={index} />
+                )}
+                onEndReachedThreshold={0.1}
+                showsVerticalScrollIndicator={false}
+                numColumns={1}
+                contentContainerStyle={{paddingBottom: 250}}
+              />
+            ) : (
+              <Text
+                style={{
+                  color: colors.login.headingtext2,
+                  marginTop: 80,
+                  fontSize: 20,
+                  fontWeight: '900',
+                  textAlign: 'center',
+                }}>
+                No Friends Found
+              </Text>
+            )
+          ) : filteredrequestdata.length > 0 ? (
             <FlatList
-              data={filteredfriendsdata.filter(item => item.id !== myuserid)}
-              keyExtractor={item => item.id.toString()}
+              data={filteredrequestdata}
+              keyExtractor={item => item.friend_id.toString()}
               renderItem={({item, index}) => (
-                <SingleFriend data={item} index={index} />
+                <SingleRequest
+                  data={item}
+                  index={index}
+                  setfilteredrequestdata={setfilteredrequestdata}
+                />
               )}
               onEndReachedThreshold={0.1}
               showsVerticalScrollIndicator={false}
@@ -306,17 +356,16 @@ const FriendsList = () => {
               contentContainerStyle={{paddingBottom: 250}}
             />
           ) : (
-            <FlatList
-              data={filteredrequestdata}
-              keyExtractor={item => item.id.toString()}
-              renderItem={({item, index}) => (
-                <SingleRequest data={item} index={index} />
-              )}
-              onEndReachedThreshold={0.1}
-              showsVerticalScrollIndicator={false}
-              numColumns={1}
-              contentContainerStyle={{paddingBottom: 250}}
-            />
+            <Text
+              style={{
+                color: colors.login.headingtext2,
+                marginTop: 80,
+                fontSize: 20,
+                fontWeight: '900',
+                textAlign: 'center',
+              }}>
+              No Requests Found
+            </Text>
           )}
         </View>
         <Modal

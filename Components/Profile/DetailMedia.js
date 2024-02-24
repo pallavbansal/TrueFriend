@@ -11,7 +11,7 @@ import {colors} from '../../Styles/ColorData';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Video from 'react-native-video';
 
-const DetailMedia = ({close, data}) => {
+const DetailMedia = ({close, data, ismyid}) => {
   const [isPaused, setIsPaused] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const handleclose = event => {
@@ -66,15 +66,17 @@ const DetailMedia = ({close, data}) => {
               />
             )}
 
-            <TouchableOpacity
-              onPress={handleDelete}
-              style={styles.deletebutton}>
-              <MaterialIcons
-                name="delete"
-                size={28}
-                color={colors.profile.edit}
-              />
-            </TouchableOpacity>
+            {ismyid && (
+              <TouchableOpacity
+                onPress={handleDelete}
+                style={styles.deletebutton}>
+                <MaterialIcons
+                  name="delete"
+                  size={28}
+                  color={colors.profile.edit}
+                />
+              </TouchableOpacity>
+            )}
             {data.media_type === '2' && (
               <TouchableOpacity
                 onPress={handlePause}

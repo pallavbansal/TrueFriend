@@ -6,7 +6,6 @@ import {
   Modal,
   TouchableOpacity,
   Pressable,
-  ScrollView,
 } from 'react-native';
 import React, {useState} from 'react';
 import {colors} from '../../Styles/ColorData';
@@ -20,8 +19,6 @@ import {PinchGestureHandler, State} from 'react-native-gesture-handler';
 import {useLikePost, useDislikePost} from '../../Hooks/Query/FeedQuery';
 import CommentModal from './CommentModal';
 import {useNavigation} from '@react-navigation/native';
-import {Dimensions} from 'react-native';
-const windowWidth = Dimensions.get('window').width;
 
 const SingleFeedProfile = ({
   item,
@@ -33,14 +30,13 @@ const SingleFeedProfile = ({
   viewableItems,
   setShowDetailFeed,
 }) => {
-  // console.log(viewableItems, 'viewableItems');
+  console.log('item', item);
   const navigation = useNavigation();
-  const {id, caption} = item;
+  const {name, media_path, id, caption, media_type} = item.post_media[0];
   const {mutate: likePost} = useLikePost();
   const {mutate: dislikePost} = useDislikePost();
   const [scale, setScale] = useState(1);
   const [showcommentmodal, setShowCommentModal] = useState(false);
-  const [currentHorIndex, setCurrentHorIndex] = useState(0);
 
   const [translateX, setTranslateX] = useState(0);
   const [translateY, setTranslateY] = useState(0);
@@ -161,12 +157,6 @@ const SingleFeedProfile = ({
     });
   };
 
-  const handleScroll = event => {
-    const scrollPosition = event.nativeEvent.contentOffset.x;
-    const currentIndex = Math.round(scrollPosition / windowWidth);
-    setCurrentHorIndex(currentIndex);
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.topcontainer}>
@@ -190,160 +180,114 @@ const SingleFeedProfile = ({
         </View>
       </View>
 
-      <ScrollView
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
-        snapToInterval={windowWidth}
-        decelerationRate="fast"
-        onScroll={handleScroll}
-        scrollEventThrottle={16}>
-        {item.post_media.map((media, index) => {
-          return (
-            <PinchGestureHandler
-              key={index}
-              onGestureEvent={onPinchGestureEvent}
-              onHandlerStateChange={onPinchHandlerStateChange}>
-              <View style={[styles.profilecontainer]}>
-                {media.media_type == '1' ? (
-                  <View>
-                    <Image
-                      source={{uri: media.media_path}}
-                      style={{
-                        width: '100%',
-                        aspectRatio: 1,
-                        transform: [{scale}, {translateX}, {translateY}],
-                      }}
-                      resizeMode="contain"
-                    />
-                    {/* <TouchableOpacity
-                      style={styles.expandbutton}
-                      onPress={() =>
-                        setShowDetailFeed({
-                          show: true,
-                          data: item,
-                        })
-                      }>
-                      <FontAwesome5
-                        name={'expand'}
-                        size={18}
-                        color={colors.profile.edit}
-                      />
-                    </TouchableOpacity> */}
-                  </View>
-                ) : (
-                  <Pressable onPress={handlePlayPausein}>
-                    <Video
-                      source={{uri: media.media_path}}
-                      style={{
-                        // height: 250,
-                        aspectRatio: 16 / 9,
-                        width: '100%',
-                        transform: [{scale}],
-                      }}
-                      resizeMode="contain"
-                      // poster="https://www.w3schools.com/w3images/lights.jpg"
-                      // posterResizeMode="cover"
-                      muted={index !== currentHorIndex ? true : isMuted}
-                      paused={
-                        !(!isPaused && viewableItems.includes(id.toString()))
-                      }
-                      repeat={true}
-                      onBuffer={handleBuffer}
-                      onLoadStart={handleLoadStart}
-                      onLoad={handleLoad}
-                    />
+      <PinchGestureHandler
+        onGestureEvent={onPinchGestureEvent}
+        onHandlerStateChange={onPinchHandlerStateChange}>
+        <View style={[styles.profilecontainer]}>
+          {media_type == '1' ? (
+            <View>
+              <Image
+                source={{uri: media_path}}
+                style={{
+                  width: '100%',
+                  aspectRatio: 1,
+                  transform: [{scale}, {translateX}, {translateY}],
+                }}
+                resizeMode="contain"
+              />
+              <TouchableOpacity
+                style={styles.expandbutton}
+                onPress={() =>
+                  setShowDetailFeed({
+                    show: true,
+                    data: item,
+                  })
+                }>
+                <FontAwesome5
+                  name={'expand'}
+                  size={18}
+                  color={colors.profile.edit}
+                />
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <Pressable onPress={handlePlayPausein}>
+              <Video
+                source={{uri: media_path}}
+                style={{
+                  // height: 250,
+                  aspectRatio: 16 / 9,
+                  width: '100%',
+                  transform: [{scale}],
+                }}
+                resizeMode="contain"
+                // poster="https://www.w3schools.com/w3images/lights.jpg"
+                // posterResizeMode="cover"
+                muted={isMuted}
+                paused={!(!isPaused && viewableItems.includes(id.toString()))}
+                repeat={true}
+                onBuffer={handleBuffer}
+                onLoadStart={handleLoadStart}
+                onLoad={handleLoad}
+              />
 
-                    {isLoading && (
-                      <ActivityIndicator
-                        size="large"
-                        color={colors.profile.edit}
-                        style={{
-                          position: 'absolute',
-                          top: '40%',
-                          left: '45%',
-                          backgroundColor: 'white',
-                          padding: 2,
-                          borderRadius: 20,
-                        }}
-                      />
-                    )}
-
-                    {!isLoading &&
-                      isPaused &&
-                      viewableItems.includes(id.toString()) && (
-                        <TouchableOpacity
-                          onPress={handlePlayPausein}
-                          style={styles.pausebutton}>
-                          <MaterialIcons
-                            name={'play-arrow'}
-                            size={28}
-                            color={colors.profile.edit}
-                          />
-                        </TouchableOpacity>
-                      )}
-
-                    <TouchableOpacity
-                      onPress={handleMuteUnmute}
-                      style={styles.mutebutton}>
-                      <MaterialIcons
-                        name={isMuted ? 'volume-off' : 'volume-up'}
-                        size={24}
-                        color={colors.profile.edit}
-                      />
-                    </TouchableOpacity>
-
-                    {/* <TouchableOpacity
-                      style={styles.expandbutton}
-                      onPress={() =>
-                        setShowDetailFeed({
-                          show: true,
-                          data: item,
-                        })
-                      }>
-                      <FontAwesome5
-                        name={'expand'}
-                        size={18}
-                        color={colors.profile.edit}
-                      />
-                    </TouchableOpacity> */}
-                  </Pressable>
-                )}
-              </View>
-            </PinchGestureHandler>
-          );
-        })}
-      </ScrollView>
-
-      {item.post_media.length > 1 && (
-        <View style={styles.scrolldotcontainer}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 5,
-              backgroundColor: 'rgba(0,0,0,0.3)',
-              padding: 5,
-              borderRadius: 20,
-            }}>
-            {item.post_media.map((media, index) => {
-              return (
-                <View
-                  key={index}
+              {isLoading && (
+                <ActivityIndicator
+                  size="large"
+                  color={colors.profile.edit}
                   style={{
-                    width: 8,
-                    height: 8,
-                    backgroundColor:
-                      index === currentHorIndex ? 'white' : colors.profile.edit,
-                    borderRadius: 8,
-                    opacity: 0.8,
-                  }}></View>
-              );
-            })}
-          </View>
-        </View>
-      )}
+                    position: 'absolute',
+                    top: '40%',
+                    left: '45%',
+                    backgroundColor: 'white',
+                    padding: 2,
+                    borderRadius: 20,
+                  }}
+                />
+              )}
 
+              {!isLoading &&
+                isPaused &&
+                viewableItems.includes(id.toString()) && (
+                  <TouchableOpacity
+                    onPress={handlePlayPausein}
+                    style={styles.pausebutton}>
+                    <MaterialIcons
+                      name={'play-arrow'}
+                      size={28}
+                      color={colors.profile.edit}
+                    />
+                  </TouchableOpacity>
+                )}
+
+              <TouchableOpacity
+                onPress={handleMuteUnmute}
+                style={styles.mutebutton}>
+                <MaterialIcons
+                  name={isMuted ? 'volume-off' : 'volume-up'}
+                  size={24}
+                  color={colors.profile.edit}
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.expandbutton}
+                onPress={() =>
+                  setShowDetailFeed({
+                    show: true,
+                    data: item,
+                  })
+                }>
+                <FontAwesome5
+                  name={'expand'}
+                  size={18}
+                  color={colors.profile.edit}
+                />
+              </TouchableOpacity>
+            </Pressable>
+          )}
+        </View>
+      </PinchGestureHandler>
       <View style={styles.actioncontainer}>
         <TouchableOpacity onPress={handlelike}>
           <AntDesign
@@ -415,15 +359,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
     margin: 5,
-    width: windowWidth - 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  scrolldotcontainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 5,
   },
   actioncontainer: {
     flexDirection: 'row',

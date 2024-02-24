@@ -13,6 +13,7 @@ import SingleUser from '../Components/Discover/SingleUser';
 import Geolocation from '@react-native-community/geolocation';
 import NoData from '../Components/Common/NoData';
 import {useSelector} from 'react-redux';
+import socket from '../Socket/Socket';
 import {
   useLocationUpdate,
   useFetchDiscoverProfile,
@@ -134,6 +135,11 @@ const Discover = () => {
       handlelocation();
     }
   }, [locationupdated]);
+
+  useEffect(() => {
+    console.log('socket in discover', socket.connected);
+    socket.emit('register', myuserid);
+  }, []);
 
   if (isDiscoverPending) {
     return <Loading />;

@@ -41,6 +41,10 @@ const CallHandler = ({children}) => {
         ringtone.current.play();
         const timeoutId = setTimeout(handleReject, 15000);
         setRejectTimeoutId(timeoutId);
+      } else if (data.callaction === 'incoming-rejected') {
+        console.log('incoming-rejected :', data);
+        setModalVisible(false);
+        ringtone.current.stop();
       }
     };
 
@@ -72,7 +76,7 @@ const CallHandler = ({children}) => {
   const handleReject = data => {
     console.log(data);
     ringtone.current.stop();
-    socket.emit('call', {...data, callaction: 'rejected'});
+    socket.emit('call', {...data, callaction: 'rejected', by: '123'});
     setModalVisible(false);
     console.log('Call rejected');
     // setCallData(null);

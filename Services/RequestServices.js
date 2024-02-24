@@ -44,6 +44,21 @@ export async function fetchFriends(token) {
     },
   });
   if (!response.ok) {
+    console.log('Error g', response.json());
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
+}
+
+export async function fetchFriendRequests(token) {
+  const response = await fetch(`${url}/friend-request/fetch`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
     console.log('Error g', response);
     throw new Error('Network response was not ok');
   }
