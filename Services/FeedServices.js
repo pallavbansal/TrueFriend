@@ -104,3 +104,53 @@ export async function dislikePost(token, postid) {
   }
   return response.json();
 }
+
+export async function getPostComments(token, postid, page) {
+  const response = await fetch(
+    `${url}/comment/fetch?post_id=${postid}&page=${page}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  if (!response.ok) {
+    console.log('Error g', response);
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
+}
+
+export async function createPostComment(token, data) {
+  const response = await fetch(`${url}/comment/create`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    console.log('Error g', response);
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
+}
+
+export async function createCommentReply(token, data) {
+  const response = await fetch(`${url}/comment/reply`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    console.log('Error g', response);
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
+}

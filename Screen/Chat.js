@@ -33,23 +33,16 @@ const Chat = ({route}) => {
   useEffect(() => {
     const handleMessage = msg => {
       console.log('msg in chat :', msg, myuserid);
-      // if (
-      //   (chattype == 'group' && msg.receiver_id != grouproomid) ||
-      //   (chattype == 'single' && msg.receiver_id != myuserid)
-      // )
-      //   return;
-      // setMessageData(prev => [...prev, msg]);
-
-      if (chattype == 'group' && msg.receiver_id == grouproomid) {
+      if (chattype == 'GROUP' && msg.receiver_id == grouproomid) {
         setMessageData(prev => [...prev, msg]);
       } else if (
-        chattype == 'single' &&
+        chattype == 'SINGLE' &&
         msg.receiver_id == myuserid &&
         msg.sender_id == userid
       ) {
         setMessageData(prev => [...prev, msg]);
       } else if (
-        chattype == 'single' &&
+        chattype == 'SINGLE' &&
         msg.sender_id == myuserid &&
         msg.receiver_id == userid
       ) {

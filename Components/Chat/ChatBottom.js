@@ -31,7 +31,7 @@ const ChatBottom = ({
   const {mutate, isPending, error, reset} = useCreateChat();
   const tempdata = {
     sender_id: senderid,
-    receiver_id: chattype == 'group' ? grouproomid : receiverid,
+    receiver_id: chattype == 'GROUP' ? grouproomid : receiverid,
     sender: {
       name: myname,
     },
