@@ -7,8 +7,11 @@ import {colors} from '../../Styles/ColorData';
 import socket from '../../Socket/Socket';
 import {useSelector} from 'react-redux';
 import {getToken, createMeeting} from '../../Utils/Streamapi';
+// {"email": "synyru@closetab.email", "id": 56, "name": "Jhon",
+// "profile_picture": "https://wooing.boxinallsoftech.com/public/uploads/profile/82578_1706872877_stable-diffusion-xl.jpg"}
 
 const SingleFriend = ({data}) => {
+  console.log(data);
   const mydata = useSelector(state => state.Auth.userinitaldata);
   const navigation = useNavigation();
   const isCreator = true;
@@ -17,7 +20,7 @@ const SingleFriend = ({data}) => {
     navigation.navigate('Chat', {
       userid: data.id,
       name: data.name,
-      imageUrl: data.imageUrl,
+      imageUrl: data.profile_picture,
       type: data.type,
       grouproomid: data.grouproomid,
     });
@@ -57,21 +60,31 @@ const SingleFriend = ({data}) => {
     socket.emit('call', finaldata);
   };
 
+  const handleProfileById = () => {
+    if (data.type == 'SINGLE') {
+      return navigation.navigate('ProfileById', {
+        userid: data.id,
+      });
+    }
+  };
+
   return (
     <View>
       <View style={styles.fricontainer}>
-        {data.imageUrl ? (
+        {data.profile_picture ? (
           <View>
-            <Image
-              source={{uri: data.imageUrl}}
-              style={{
-                height: 65,
-                width: 65,
-                borderRadius: 60,
-                borderColor: 'white',
-                borderWidth: 2,
-              }}
-            />
+            <TouchableOpacity onPress={handleProfileById}>
+              <Image
+                source={{uri: data.profile_picture}}
+                style={{
+                  height: 65,
+                  width: 65,
+                  borderRadius: 60,
+                  borderColor: 'white',
+                  borderWidth: 2,
+                }}
+              />
+            </TouchableOpacity>
           </View>
         ) : (
           <View
@@ -104,7 +117,7 @@ const SingleFriend = ({data}) => {
               </Text>
             </TouchableOpacity>
 
-            {data.type == 'single' && (
+            {data.type == 'SINGLE' && (
               <TouchableOpacity style={styles.callbutton} onPress={handleCall}>
                 <Text
                   style={{

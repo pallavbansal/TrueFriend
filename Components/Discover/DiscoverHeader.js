@@ -33,6 +33,11 @@ const DiscoverHeader = () => {
       routes: [{name: 'Login'}],
     });
   };
+
+  const handleprofile = () => {
+    return navigation.navigate('Profile');
+  };
+
   if (isPending) {
     return <Loading />;
   }
@@ -41,7 +46,9 @@ const DiscoverHeader = () => {
   return (
     <View style={styles.headercontainer}>
       <View style={styles.headertopcontainer}>
-        <View style={styles.headerimagecontainer}>
+        <TouchableOpacity
+          style={styles.headerimagecontainer}
+          onPress={handleprofile}>
           <Image
             style={{
               width: 75,
@@ -54,7 +61,7 @@ const DiscoverHeader = () => {
               uri: UserProfileData.data.profile.profile_picture,
             }}
           />
-        </View>
+        </TouchableOpacity>
         <View style={styles.headerdetailcontainer}>
           <Text style={{color: 'white', fontSize: 20, fontWeight: 900}}>
             {UserProfileData.data.profile?.name}

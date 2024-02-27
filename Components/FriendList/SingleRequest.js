@@ -13,34 +13,44 @@ const SingleRequest = ({data, setfilteredrequestdata}) => {
   const {mutate, isPending, error, reset} = useUpdateRequest();
 
   const acceptRequest = () => {
-    console.log('accept', data.friend_id);
     const finaldata = {
-      friend_request_id: data.friend_id,
+      friend_request_id: data.friend_request_id,
       status: 'ACCEPTED',
     };
-    // mutate(
-    //   {data: finaldata},
-    //   {
-    //     onSuccess: data => {
-    //       console.log('Request success accept', data);
-    //       setfilteredrequestdata(prev => {
-    //         return prev.filter(item => item.friend_id !== data.friend_id);
-    //       });
-    //     },
-    //   },
-    // );
+    mutate(
+      {data: finaldata},
+      {
+        onSuccess: data => {
+          console.log('Request success accept', data);
+          setfilteredrequestdata(prev => {
+            return prev.filter(item => item.friend_id !== data.friend_id);
+          });
+        },
+      },
+    );
   };
 
   const deleteRequest = () => {
-    console.log('delete', data.friend_id);
-    setfilteredrequestdata(prev => {
-      return prev.filter(item => item.friend_id !== data.friend_id);
-    });
+    const finaldata = {
+      friend_request_id: data.friend_request_id,
+      status: 'CANCELLED',
+    };
+    mutate(
+      {data: finaldata},
+      {
+        onSuccess: data => {
+          console.log('Request success delete', data);
+          setfilteredrequestdata(prev => {
+            return prev.filter(item => item.friend_id !== data.friend_id);
+          });
+        },
+      },
+    );
   };
 
   const handleprofile = () => {
     console.log('handleprofile', data);
-    if (data.type != 'group') {
+    if (data.type != 'GROUP') {
       return navigation.navigate('ProfileById', {userid: data.friend_id});
     }
   };
@@ -102,7 +112,7 @@ const SingleRequest = ({data, setfilteredrequestdata}) => {
           </View>
         </View>
       </View>
-      {data.type == 'group' ? (
+      {data.type == 'GROUP' ? (
         <View style={styles.likecontainer}>
           <TouchableOpacity>
             <Entypo name="users" size={18} color={colors.arrow.secondary} />

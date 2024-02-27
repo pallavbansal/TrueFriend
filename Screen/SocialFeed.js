@@ -73,7 +73,7 @@ const SocialFeed = () => {
   return (
     <GradientScreen>
       <View style={styles.container}>
-        <FeedHeader />
+        {/* <FeedHeader /> */}
         <View style={styles.feedscontainer}>
           <FlatList
             data={allPosts}

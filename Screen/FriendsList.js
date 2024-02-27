@@ -22,77 +22,78 @@ import SelectFriend from '../Components/FriendList/SelectFriend';
 import socket from '../Socket/Socket';
 import {useSelector} from 'react-redux';
 import Toast from 'react-native-toast-message';
+import FriendsListSkeleton from '../Layouts/Skeletions/FriendsListSkeleton';
 import Loading from './Loading';
 import {
   useFetchFriends,
   useFetchFriendRequests,
 } from '../Hooks/Query/RequestQuery';
 
-const friendsdata = [
-  {
-    id: 7,
-    name: 'Jhon Doe',
-    type: 'single',
-    liked: true,
-    imageUrl:
-      'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    unseenmsg: 0,
-  },
-  {
-    id: 44,
-    name: 'Vivek',
-    type: 'single',
-    imageUrl:
-      'https://images.unsplash.com/photo-1613521140785-e85e427f8002?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    unseenmsg: 0,
-  },
-  {
-    id: 45,
-    name: 'Vivek 2',
-    type: 'single',
-    liked: true,
-    imageUrl:
-      'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    unseenmsg: 0,
-  },
-  {
-    id: 56,
-    name: 'Jhon',
-    type: 'single',
-    imageUrl:
-      'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    liked: true,
-    unseenmsg: 0,
-  },
-  {
-    id: 200,
-    name: 'Friends Group',
-    type: 'group',
-    grouproomid: '123',
-    imageUrl:
-      'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    unseenmsg: 0,
-  },
-];
+// const friendsdata = [
+//   {
+//     id: 7,
+//     name: 'Jhon Doe',
+//     type: 'SINGLE',
+//     liked: true,
+//     imageUrl:
+//       'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+//     unseenmsg: 0,
+//   },
+//   {
+//     id: 44,
+//     name: 'Vivek',
+//     type: 'SINGLE',
+//     imageUrl:
+//       'https://images.unsplash.com/photo-1613521140785-e85e427f8002?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+//     unseenmsg: 0,
+//   },
+//   {
+//     id: 45,
+//     name: 'Vivek 2',
+//     type: 'SINGLE',
+//     liked: true,
+//     imageUrl:
+//       'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+//     unseenmsg: 0,
+//   },
+//   {
+//     id: 56,
+//     name: 'Jhon',
+//     type: 'SINGLE',
+//     imageUrl:
+//       'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+//     liked: true,
+//     unseenmsg: 0,
+//   },
+//   {
+//     id: 200,
+//     name: 'Friends Group',
+//     type: 'GROUP',
+//     grouproomid: '123',
+//     imageUrl:
+//       'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+//     unseenmsg: 0,
+//   },
+// ];
 // const requestdata = [
 //   {
 //     id: 7,
 //     name: 'Jhon Doe',
-//     type: 'single',
+//     type: 'SINGLE',
 //     imageUrl:
 //       'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
 //   },
 //   {
 //     id: 44,
 //     name: 'Vivek',
-//     type: 'single',
+//     type: 'SINGLE',
 //     imageUrl:
 //       'https://images.unsplash.com/photo-1613521140785-e85e427f8002?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
 //   },
 //   {
 //     id: 45,
 //     name: 'Collage Friends',
-//     type: 'group',
+//     type: 'GROUP',
 //     imageUrl:
 //       'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D',
 //   },
@@ -104,17 +105,17 @@ const FriendsList = () => {
   const [selectedoptiontype, setselectedoptiontype] = useState('friends');
   const [showgroupmodal, setshowgroupmodal] = useState(false);
   const [grouplist, setgrouplist] = useState([]);
-  const [filteredfriendsdata, setfilteredfriendsdata] = useState(friendsdata);
+  const [filteredfriendsdata, setfilteredfriendsdata] = useState([]);
   const [filteredrequestdata, setfilteredrequestdata] = useState([]);
   const [searchfilter, setsearchfilter] = useState('');
   const [socketconnected, setsocketconnected] = useState(true);
 
-  // const {
-  //   data: friendsdata2,
-  //   isPending: friendsdatapending,
-  //   error: friendserror,
-  //   isError: friendsisError,
-  // } = useFetchFriends();
+  const {
+    data: friendsdata2,
+    isPending: friendsdatapending,
+    error: friendserror,
+    isError: friendsisError,
+  } = useFetchFriends();
 
   const {
     data: requestdata2,
@@ -130,15 +131,21 @@ const FriendsList = () => {
   }, [requestdata2]);
 
   useEffect(() => {
-    if (selectedoptiontype === 'friends') {
+    if (friendsdata2?.data?.friends) {
+      setfilteredfriendsdata(friendsdata2.data.friends);
+    }
+  }, [friendsdata2]);
+
+  useEffect(() => {
+    if (selectedoptiontype === 'friends' && friendsdata2?.data?.friends) {
       if (searchfilter) {
         setfilteredfriendsdata(
-          friendsdata.filter(item =>
+          friendsdata2.filter(item =>
             item.name.toLowerCase().includes(searchfilter.toLowerCase()),
           ),
         );
       } else {
-        setfilteredfriendsdata(friendsdata);
+        setfilteredfriendsdata(friendsdata2.data.friends);
       }
     }
     if (selectedoptiontype === 'requests' && requestdata2?.data?.friends) {
@@ -162,27 +169,29 @@ const FriendsList = () => {
   useEffect(() => {
     if (socket.connected) {
       setsocketconnected(true);
-      friendsdata.map(item => {
-        if (item.type === 'group') {
-          socket.emit('join room', item.grouproomid);
-        }
-      });
+      if (friendsdata2?.data?.friends) {
+        friendsdata2.data.friends.map(item => {
+          if (item.type === 'GROUP') {
+            socket.emit('join room', item.grouproomid);
+          }
+        });
+      }
     } else {
       console.log('Socket not connected');
       setsocketconnected(false);
     }
-  }, []);
+  }, [friendsdata2]);
 
   useEffect(() => {
     const handleMessage = msg => {
       console.log('msg in friend list', msg);
       setfilteredfriendsdata(prevData =>
         prevData.map(item => {
-          if (item.type === 'single' && msg.sender_id === item.id) {
+          if (item.type === 'SINGLE' && msg.sender_id === item.id) {
             return {...item, unseenmsg: item.unseenmsg + 1};
           }
           if (
-            item.type === 'group' &&
+            item.type === 'GROUP' &&
             msg.receiver_id === item.grouproomid &&
             msg.sender_id !== myuserid
           ) {
@@ -198,22 +207,23 @@ const FriendsList = () => {
     };
   }, []);
 
-  // if (!socketconnected) {
-  //   setTimeout(() => {
-  //     navigation.goBack();
-  //     Toast.show({
-  //       type: 'error',
-  //       text1: 'Error',
-  //       text2: 'Network Error, Please try again later.',
-  //       visibilityTime: 2000,
-  //     });
-  //   }, 2000);
-  //   return <Loading />;
-  // }
-
-  if (requestdatapending) {
+  if (!socketconnected) {
+    setTimeout(() => {
+      navigation.navigate('Discover');
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Network Error, Please try again later.',
+        visibilityTime: 2000,
+      });
+    }, 2000);
+    return <FriendsListSkeleton />;
+  }
+  if (requestdatapending || friendsdatapending) {
     return <Loading />;
   }
+
+  console.log('friendsdata2', friendsdata2.data.friends);
 
   return (
     <GradientScreen>
@@ -388,7 +398,9 @@ const FriendsList = () => {
                   flex: 1,
                 }}>
                 <FlatList
-                  data={friendsdata.filter(item => item.type === 'single')}
+                  data={friendsdata2.data.friends.filter(
+                    item => item.type === 'SINGLE',
+                  )}
                   keyExtractor={item => item.id.toString()}
                   renderItem={({item, index}) => (
                     <SelectFriend

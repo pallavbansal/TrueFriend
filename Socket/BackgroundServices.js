@@ -12,7 +12,7 @@ const friendsdata = [
   {
     id: 7,
     name: 'Jhon Doe',
-    type: 'single',
+    type: 'SINGLE',
     liked: true,
     imageUrl:
       'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
@@ -21,7 +21,7 @@ const friendsdata = [
   {
     id: 44,
     name: 'Vivek',
-    type: 'single',
+    type: 'SINGLE',
     imageUrl:
       'https://images.unsplash.com/photo-1613521140785-e85e427f8002?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     unseenmsg: 0,
@@ -29,7 +29,7 @@ const friendsdata = [
   {
     id: 45,
     name: 'Vivek 2',
-    type: 'single',
+    type: 'SINGLE',
     liked: true,
     imageUrl:
       'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
@@ -38,7 +38,7 @@ const friendsdata = [
   {
     id: 56,
     name: 'Jhon',
-    type: 'single',
+    type: 'SINGLE',
     imageUrl:
       'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     liked: true,
@@ -47,7 +47,7 @@ const friendsdata = [
   {
     id: 200,
     name: 'Friends Group',
-    type: 'group',
+    type: 'GROUP',
     grouproomid: '123',
     imageUrl:
       'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
@@ -60,7 +60,7 @@ const connectToSocket = async () => {
   socket.on('connect', () => {
     console.log('Socket connection opened for background service');
     friendsdata.map(item => {
-      if (item.type === 'group') {
+      if (item.type === 'GROUP') {
         socket.emit('join room', item.grouproomid);
       }
     });

@@ -1,107 +1,90 @@
-import {View, Text, StyleSheet, TextInput, FlatList} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  FlatList,
+  ScrollView,
+} from 'react-native';
 import GradientInput from '../Common/GradientInput';
+import GradientScreen from '../../Layouts/GradientScreen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import SingleComment from './SingleComment';
 import {colors} from '../../Styles/ColorData';
-
-const Data = [
-  {
-    id: 1,
-    name: 'John Doe',
-    comment: 'Nice Post',
-    image_url: 'https://picsum.photos/id/237/200/300',
-  },
-  {
-    id: 2,
-    name: 'Peter parker',
-    comment:
-      'Hey, I like this post.Hey, I like this post dnidnod dnnfk Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi.',
-    image_url: 'https://picsum.photos/id/238/200/300',
-  },
-  {
-    id: 3,
-    name: 'John Doe',
-    comment:
-      'Nice Post Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-    image_url: 'https://picsum.photos/id/239/200/300',
-  },
-  {
-    id: 4,
-    name: 'Peter parker',
-    comment: 'Hey, I like this post',
-    image_url: 'https://picsum.photos/id/240/200/300',
-  },
-  {
-    id: 5,
-    name: 'John Doe',
-    comment: 'Nice Post',
-    image_url: 'https://picsum.photos/id/241/200/300',
-  },
-  {
-    id: 6,
-    name: 'Peter parker',
-    comment: 'Hey, I like this post',
-    image_url: 'https://picsum.photos/id/242/200/300',
-  },
-  {
-    id: 7,
-    name: 'John Doe',
-    comment: 'Nice Post',
-    image_url: 'https://picsum.photos/id/237/200/300',
-  },
-  {
-    id: 8,
-    name: 'Peter parker',
-    comment: 'Hey, I like this post',
-    image_url: 'https://picsum.photos/id/238/200/300',
-  },
-  {
-    id: 9,
-    name: 'John Doe',
-    comment: 'Nice Post',
-    image_url: 'https://picsum.photos/id/239/200/300',
-  },
-  {
-    id: 10,
-    name: 'Peter parker',
-    comment: 'Hey, I like this post',
-    image_url: 'https://picsum.photos/id/240/200/300',
-  },
-  {
-    id: 11,
-    name: 'John Doe',
-    comment: 'Nice Post',
-    image_url: 'https://picsum.photos/id/241/200/300',
-  },
-  {
-    id: 12,
-    name: 'Peter parker',
-    comment: 'Hey, I like this post',
-    image_url: 'https://picsum.photos/id/242/200/300',
-  },
-];
+import {
+  useFetchPostComments,
+  useCreatePostComment,
+} from '../../Hooks/Query/FeedQuery';
+import {useSelector} from 'react-redux';
+import Loading from '../../Screen/Loading';
+import GradientText from '../Common/GradientText';
 
 const CommentModal = ({feed}) => {
-  console.log(feed);
-  const [CommentsData, setCommentsData] = useState(Data);
+  const userinitaldata = useSelector(state => state.Auth.userinitaldata);
+  const {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isPending,
+    isFetching,
+  } = useFetchPostComments(feed.id);
+  const {mutate, reset} = useCreatePostComment();
+  const [CommentsData2, setCommentsData2] = useState([]);
   const [commentinput, setCommentInput] = useState('');
 
   function handleaddcomment() {
     if (commentinput) {
-      setCommentsData(prev => {
-        return [
-          {
-            id: prev.length + 1,
-            name: 'John Doe',
-            comment: commentinput,
-            image_url: 'https://picsum.photos/id/237/200/300',
+      const finalData = {
+        post_id: feed.id,
+        content: commentinput,
+      };
+      mutate(
+        {data: finalData},
+        {
+          onSuccess: data => {
+            if (data.status_code == '1') {
+              setCommentsData2(prev => {
+                return [
+                  {
+                    id: prev.length + 1,
+                    replies: [],
+                    content: commentinput,
+                    created_at: new Date().toISOString(),
+                    user: {
+                      id: userinitaldata.id,
+                      name: userinitaldata.name,
+                      profile_picture: userinitaldata.profile_picture,
+                    },
+                  },
+                  ...prev,
+                ];
+              });
+            }
           },
-          ...prev,
-        ];
-      });
+        },
+      );
       setCommentInput('');
     }
+  }
+
+  useEffect(() => {
+    if (data) {
+      const newData = data.pages.flatMap(page => page.data.comments.data);
+      setCommentsData2(prevData => {
+        let combinedData = [...prevData, ...newData];
+        return combinedData.filter(
+          (value, index, self) =>
+            self.findIndex(v => v.id === value.id) === index,
+        );
+      });
+    }
+  }, [data]);
+
+  if (isPending) {
+    return <Loading />;
   }
 
   return (
@@ -137,14 +120,40 @@ const CommentModal = ({feed}) => {
       </View>
       <View style={{paddingBottom: 100, paddingHorizontal: 10}}>
         <FlatList
-          data={CommentsData}
+          data={CommentsData2}
           keyExtractor={item => item.id.toString()}
           renderItem={({item}) => <SingleComment data={item} />}
           showsVerticalScrollIndicator={false}
           numColumns={1}
           contentContainerStyle={{paddingBottom: 100}}
+          onEndReachedThreshold={0.5}
+          onEndReached={fetchNextPage}
+          removeClippedSubviews={true} // Unloads offscreen items
+          initialNumToRender={10}
+          updateCellsBatchingPeriod={30}
+          maxToRenderPerBatch={10}
         />
       </View>
+      {isFetching || isFetchingNextPage ? (
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 60,
+            width: '100%',
+            backgroundColor: 'transparent',
+            alignItems: 'center',
+          }}>
+          <View
+            style={{
+              paddingHorizontal: 20,
+              paddingVertical: 5,
+              borderRadius: 20,
+              backgroundColor: colors.text.primary,
+            }}>
+            <GradientText style={styles.headingtext2}>Loading</GradientText>
+          </View>
+        </View>
+      ) : null}
     </View>
   );
 };
@@ -173,5 +182,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
+  },
+  headingtext2: {
+    fontFamily: 'Lexend',
+    color: colors.login.headingtext2,
+    fontWeight: '900',
+    fontSize: 14,
+    lineHeight: 22.4,
   },
 });

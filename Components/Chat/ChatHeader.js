@@ -26,7 +26,7 @@ const ChatHeader = ({name, imageUrl, userid, chattype}) => {
   });
 
   useEffect(() => {
-    if (chattype == 'group') {
+    if (chattype == 'GROUP') {
       setfilterdata({
         items: [
           {
@@ -41,7 +41,7 @@ const ChatHeader = ({name, imageUrl, userid, chattype}) => {
         ],
       });
     }
-    if (chattype == 'single') {
+    if (chattype == 'SINGLE') {
       setfilterdata({
         items: [
           {
@@ -175,12 +175,12 @@ const ChatHeader = ({name, imageUrl, userid, chattype}) => {
             gap: 10,
             marginLeft: 'auto',
           }}>
-          {chattype == 'single' && (
+          {chattype == 'SINGLE' && (
             <TouchableOpacity onPress={handleaudiocall}>
               <Ionicons name="call" size={24} color="white" />
             </TouchableOpacity>
           )}
-          {chattype == 'single' && (
+          {chattype == 'SINGLE' && (
             <TouchableOpacity onPress={handlevideocall}>
               <FontAwesome5 name="video" size={24} color="white" />
             </TouchableOpacity>

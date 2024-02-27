@@ -12,7 +12,6 @@ import React, {useState} from 'react';
 import {colors} from '../../Styles/ColorData';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Video from 'react-native-video';
 import {ActivityIndicator} from 'react-native';
@@ -20,6 +19,8 @@ import {PinchGestureHandler, State} from 'react-native-gesture-handler';
 import {useLikePost, useDislikePost} from '../../Hooks/Query/FeedQuery';
 import CommentModal from './CommentModal';
 import {useNavigation} from '@react-navigation/native';
+import ProfileNavigator from '../Common/ProfileNavigator';
+
 import {Dimensions} from 'react-native';
 const windowWidth = Dimensions.get('window').width;
 
@@ -34,6 +35,7 @@ const SingleFeedProfile = ({
   setShowDetailFeed,
 }) => {
   // console.log(viewableItems, 'viewableItems');
+  // console.log('item', item);
   const navigation = useNavigation();
   const {id, caption} = item;
   const {mutate: likePost} = useLikePost();
@@ -154,13 +156,6 @@ const SingleFeedProfile = ({
     }
   };
 
-  const handleProfileById = () => {
-    console.log('item.user.id', item.user.id);
-    return navigation.navigate('ProfileById', {
-      userid: item.user.id,
-    });
-  };
-
   const handleScroll = event => {
     const scrollPosition = event.nativeEvent.contentOffset.x;
     const currentIndex = Math.round(scrollPosition / windowWidth);
@@ -171,7 +166,7 @@ const SingleFeedProfile = ({
     <View style={styles.container}>
       <View style={styles.topcontainer}>
         <View>
-          <TouchableOpacity onPress={handleProfileById}>
+          <ProfileNavigator id={item.user.id}>
             <Image
               source={{uri: item.user.profile_picture}}
               style={{
@@ -182,10 +177,12 @@ const SingleFeedProfile = ({
                 borderWidth: 2,
               }}
             />
-          </TouchableOpacity>
+          </ProfileNavigator>
         </View>
         <View>
-          <Text style={styles.headingtext2}>{item.user.name}</Text>
+          <ProfileNavigator id={item.user.id}>
+            <Text style={styles.headingtext2}>{item.user.name}</Text>
+          </ProfileNavigator>
           <Text style={styles.headingtext3}>{caption}</Text>
         </View>
       </View>
@@ -318,6 +315,8 @@ const SingleFeedProfile = ({
         <View style={styles.scrolldotcontainer}>
           <View
             style={{
+              position: 'absolute',
+              top: 10,
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
@@ -366,16 +365,6 @@ const SingleFeedProfile = ({
             color={colors.socialfeed.actionicons}
           />
         </TouchableOpacity>
-        {/* <TouchableOpacity
-          style={{
-            marginLeft: 'auto',
-          }}>
-          <AntDesign
-            name="download"
-            size={24}
-            color={colors.socialfeed.actionicons}
-          />
-        </TouchableOpacity> */}
       </View>
       <View style={styles.statscontainer}>
         <Text style={styles.headingtext4}>{item.like_count} Likes</Text>
@@ -482,9 +471,3 @@ const styles = StyleSheet.create({
     right: 7,
   },
 });
-
-// <Image
-//   source={{uri: media_path}}
-//   style={{height: 250, width: '100%'}}
-//   resizeMode="contain"
-// />
