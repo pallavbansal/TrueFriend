@@ -11,7 +11,7 @@ export async function profileCreation(data, token) {
     body: JSON.stringify(data),
   });
   if (!response.ok) {
-    console.log('Error g', response);
+    console.log('Error profilecreation', response);
     throw new Error('Network response was not ok');
   }
   return response.json();
@@ -26,7 +26,7 @@ export async function fetchProfile(token) {
     },
   });
   if (!response.ok) {
-    console.log('Error g', response);
+    console.log('Error fetchprofile', response);
     throw new Error('Network response was not ok');
   }
   return response.json();
@@ -44,7 +44,7 @@ export async function fetchProfileById(id, token) {
     },
   );
   if (!response.ok) {
-    console.log('Error g', response);
+    console.log('Error fetchprofilebyid', response);
     throw new Error('Network response was not ok');
   }
   return response.json();
@@ -79,6 +79,7 @@ export async function updateProfile(data, token) {
     });
 
     if (!response.ok) {
+      console.log('Error updateprofile', response);
       throw new Error('Registration failed');
     }
     console.log('response', response);

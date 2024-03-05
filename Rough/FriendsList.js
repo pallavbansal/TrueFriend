@@ -25,7 +25,6 @@ import Loading from './Loading';
 import {
   useFetchFriends,
   useFetchFriendRequests,
-  useFetchChattingFriends,
 } from '../Hooks/Query/RequestQuery';
 
 // const friendsdata = [
@@ -98,37 +97,31 @@ import {
 //   },
 // ];
 
-// const tempgroupdata = [
-//   {
-//     id: 3,
-//     name: 'Test Group ',
-//     type: 'GROUP',
-//     grouproomid: 3,
-//   },
-//   {
-//     id: 44,
-//     name: 'Vivek',
-//     email: 'Testboxinall@gmail.com',
-//     profile_picture:
-//       'https://wooing.boxinallsoftech.com/public/uploads/profile/93495_1706851876_Screenshot_2024-01-25-11-07-38-00_325fbdb1dc4eedea0ce3f5f060f574f6.jpg',
-//     type: 'SINGLE',
-//   },
-// ];
+const tempgroupdata = [
+  {
+    id: 3,
+    name: 'Test Group ',
+    type: 'GROUP',
+    grouproomid: 3,
+  },
+  {
+    id: 44,
+    name: 'Vivek',
+    email: 'Testboxinall@gmail.com',
+    profile_picture:
+      'https://wooing.boxinallsoftech.com/public/uploads/profile/93495_1706851876_Screenshot_2024-01-25-11-07-38-00_325fbdb1dc4eedea0ce3f5f060f574f6.jpg',
+    type: 'SINGLE',
+  },
+];
 
 const FriendsList = () => {
   const navigation = useNavigation();
   const myuserid = useSelector(state => state.Auth.userid);
-  const [selectedoptiontype, setselectedoptiontype] = useState('chats');
+  const [selectedoptiontype, setselectedoptiontype] = useState('friends');
   const [showgroupmodal, setshowgroupmodal] = useState(false);
-  const [filteredchattingfriendsdata, setfilteredchattingfriendsdata] =
-    useState([]);
   const [filteredfriendsdata, setfilteredfriendsdata] = useState([]);
   const [filteredrequestdata, setfilteredrequestdata] = useState([]);
   const [searchfilter, setsearchfilter] = useState('');
-  const [activechat, setactivechat] = useState({
-    type: '',
-    id: '',
-  });
   const [socketconnected, setsocketconnected] = useState(true);
 
   const {
@@ -145,13 +138,6 @@ const FriendsList = () => {
     isError: requestisError,
   } = useFetchFriendRequests();
 
-  const {
-    data: chattingfriendsdata,
-    isPending: chattingfriendspending,
-    error: chattingfriendserror,
-    isError: chattingfriendsisError,
-  } = useFetchChattingFriends();
-
   useEffect(() => {
     if (requestdata2?.data?.friends) {
       setfilteredrequestdata(requestdata2.data.friends);
@@ -165,16 +151,10 @@ const FriendsList = () => {
   }, [friendsdata2]);
 
   useEffect(() => {
-    if (chattingfriendsdata) {
-      setfilteredchattingfriendsdata(chattingfriendsdata);
-    }
-  }, [chattingfriendsdata]);
-
-  useEffect(() => {
     if (selectedoptiontype === 'friends' && friendsdata2?.data?.friends) {
       if (searchfilter) {
         setfilteredfriendsdata(
-          friendsdata2.data.friends.filter(item =>
+          friendsdata2.filter(item =>
             item.name.toLowerCase().includes(searchfilter.toLowerCase()),
           ),
         );
@@ -193,40 +173,43 @@ const FriendsList = () => {
         setfilteredrequestdata(requestdata2.data.friends);
       }
     }
-    if (selectedoptiontype === 'chats' && chattingfriendsdata) {
-      if (searchfilter) {
-        setfilteredchattingfriendsdata(
-          chattingfriendsdata.filter(item =>
-            item.name.toLowerCase().includes(searchfilter.toLowerCase()),
-          ),
-        );
-      } else {
-        setfilteredchattingfriendsdata(chattingfriendsdata);
-      }
-    }
   }, [searchfilter, selectedoptiontype]);
+
+  // useEffect(() => {
+  //   if (socket.connected) {
+  //     setsocketconnected(true);
+  //     if (friendsdata2?.data?.friends) {
+  //       friendsdata2.data.friends.map(item => {
+  //         if (item.type === 'GROUP') {
+  //           socket.emit('join room', item.grouproomid);
+  //         }
+  //       });
+  //     }
+  //   } else {
+  //     console.log('Socket not connected');
+  //     setsocketconnected(false);
+  //   }
+  // }, [friendsdata2]);
 
   useEffect(() => {
     if (socket.connected) {
       setsocketconnected(true);
-      if (chattingfriendsdata) {
-        chattingfriendsdata.map(item => {
-          if (item.type === 'GROUP') {
-            socket.emit('join room', item.grouproomid);
-          }
-        });
-      }
+      tempgroupdata.map(item => {
+        if (item.type === 'GROUP') {
+          console.log('joining group', item.id);
+          socket.emit('join room', item.id);
+        }
+      });
+    } else {
+      console.log('Socket not connected');
+      setsocketconnected(false);
     }
-  }, [chattingfriendsdata]);
+  }, [friendsdata2]);
 
   useEffect(() => {
     const handleMessage = msg => {
-      console.log('msg in friend list', msg, activechat);
-      if (msg.sender_id === myuserid) return;
-      if (msg.type === activechat.type && msg.sender_id === activechat.id)
-        return;
-
-      setfilteredchattingfriendsdata(prevData =>
+      console.log('msg in friend list', msg);
+      setfilteredfriendsdata(prevData =>
         prevData.map(item => {
           if (item.type === 'SINGLE' && msg.sender_id === item.id) {
             return {...item, unseenmsg: item.unseenmsg + 1};
@@ -257,14 +240,6 @@ const FriendsList = () => {
     });
   }, []);
 
-  const handleChatClick = data => {
-    console.log('data in handle chat', data);
-    setactivechat({
-      type: data.type,
-      id: data.userid,
-    });
-  };
-
   // if (!socketconnected) {
   //   setTimeout(() => {
   //     navigation.navigate('Discover');
@@ -278,13 +253,12 @@ const FriendsList = () => {
   //   return <FriendsListSkeleton />;
   // }
 
-  if (requestdatapending || friendsdatapending || chattingfriendspending) {
+  if (requestdatapending || friendsdatapending) {
     return <Loading />;
   }
 
   // console.log('friendsdata2', friendsdata2.data.friends);
   // console.log('requestdata2', requestdata2.data.friends);
-  // console.log('chattingfriendsdata', chattingfriendsdata);
 
   return (
     <GradientScreen>
@@ -339,10 +313,8 @@ const FriendsList = () => {
               <TextInput
                 placeholder={
                   selectedoptiontype === 'friends'
-                    ? 'Search All Friends'
-                    : selectedoptiontype === 'requests'
-                    ? 'Search Requests'
-                    : 'Search Chats'
+                    ? 'Search Friends & Groups'
+                    : 'Search Requests'
                 }
                 keyboardType="email-address"
                 placeholderTextColor={colors.login.headingtext2}
@@ -355,20 +327,6 @@ const FriendsList = () => {
           </GradientInput>
         </View>
         <View style={styles.optionscontainer}>
-          <TouchableOpacity onPress={() => setselectedoptiontype('chats')}>
-            <Text
-              style={[
-                styles.optiontext,
-                {
-                  color:
-                    selectedoptiontype === 'chats'
-                      ? colors.arrow.tertiary
-                      : colors.arrow.primary,
-                },
-              ]}>
-              Chats
-            </Text>
-          </TouchableOpacity>
           <TouchableOpacity onPress={() => setselectedoptiontype('friends')}>
             <Text
               style={[
@@ -404,15 +362,11 @@ const FriendsList = () => {
             filteredfriendsdata.filter(item => item.id !== myuserid).length >
             0 ? (
               <FlatList
-                data={filteredfriendsdata.filter(item => item.id !== myuserid)}
+                // data={filteredfriendsdata.filter(item => item.id !== myuserid)}
+                data={tempgroupdata}
                 keyExtractor={item => item.id.toString()}
                 renderItem={({item, index}) => (
-                  <SingleFriend
-                    data={item}
-                    index={index}
-                    hideunseen={true}
-                    handleChatClick={handleChatClick}
-                  />
+                  <SingleFriend data={item} index={index} />
                 )}
                 onEndReachedThreshold={0.1}
                 showsVerticalScrollIndicator={false}
@@ -431,67 +385,34 @@ const FriendsList = () => {
                 No Friends Found
               </Text>
             )
-          ) : selectedoptiontype === 'requests' ? (
-            filteredrequestdata.length > 0 ? (
-              <FlatList
-                data={filteredrequestdata}
-                keyExtractor={item => item.friend_id.toString()}
-                renderItem={({item, index}) => (
-                  <SingleRequest
-                    data={item}
-                    index={index}
-                    setfilteredrequestdata={setfilteredrequestdata}
-                  />
-                )}
-                onEndReachedThreshold={0.1}
-                showsVerticalScrollIndicator={false}
-                numColumns={1}
-                contentContainerStyle={{paddingBottom: 250}}
-              />
-            ) : (
-              <Text
-                style={{
-                  color: colors.login.headingtext2,
-                  marginTop: 80,
-                  fontSize: 20,
-                  fontWeight: '900',
-                  textAlign: 'center',
-                }}>
-                No Requests Found
-              </Text>
-            )
-          ) : selectedoptiontype === 'chats' ? (
-            filteredchattingfriendsdata.length > 0 ? (
-              <FlatList
-                data={filteredchattingfriendsdata}
-                keyExtractor={(item, index) => index.toString()}
-                // keyExtractor={item => item.id.toString()}
-                renderItem={({item, index}) => (
-                  <SingleFriend
-                    data={item}
-                    index={index}
-                    hideunseen={false}
-                    handleChatClick={handleChatClick}
-                  />
-                )}
-                onEndReachedThreshold={0.1}
-                showsVerticalScrollIndicator={false}
-                numColumns={1}
-                contentContainerStyle={{paddingBottom: 250}}
-              />
-            ) : (
-              <Text
-                style={{
-                  color: colors.login.headingtext2,
-                  marginTop: 80,
-                  fontSize: 20,
-                  fontWeight: '900',
-                  textAlign: 'center',
-                }}>
-                No Chats Found
-              </Text>
-            )
-          ) : null}
+          ) : filteredrequestdata.length > 0 ? (
+            <FlatList
+              data={filteredrequestdata}
+              keyExtractor={item => item.friend_id.toString()}
+              renderItem={({item, index}) => (
+                <SingleRequest
+                  data={item}
+                  index={index}
+                  setfilteredrequestdata={setfilteredrequestdata}
+                />
+              )}
+              onEndReachedThreshold={0.1}
+              showsVerticalScrollIndicator={false}
+              numColumns={1}
+              contentContainerStyle={{paddingBottom: 250}}
+            />
+          ) : (
+            <Text
+              style={{
+                color: colors.login.headingtext2,
+                marginTop: 80,
+                fontSize: 20,
+                fontWeight: '900',
+                textAlign: 'center',
+              }}>
+              No Requests Found
+            </Text>
+          )}
         </View>
         <CreateGroupModal
           showgroupmodal={showgroupmodal}

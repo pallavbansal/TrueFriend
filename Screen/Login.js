@@ -67,7 +67,10 @@ const Login = () => {
               }),
             );
             setLoginInputs({email: '', password: ''});
-            socket.emit('register', data.data.user.id);
+            socket.on('connect', () => {
+              console.log('connected to socket server in login.js');
+              socket.emit('register', data.data.user.id);
+            });
             if (data.data.profile_filled == 0) {
               return navigation.navigate('ProfileCreation');
             }

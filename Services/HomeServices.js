@@ -11,7 +11,7 @@ export async function locationUpdate(data, token) {
     body: JSON.stringify(data),
   });
   if (!response.ok) {
-    console.log('Error g', response);
+    console.log('Error locationupdate', response);
     throw new Error('Network response was not ok');
   }
   return response.json();
@@ -30,7 +30,7 @@ export async function getDiscoverProfiles(token, distance) {
     },
   );
   if (!response.ok) {
-    console.log('Error g', response);
+    console.log('Error getdiscoverprofiles', response);
     throw new Error('Network response was not ok');
   }
   return response.json();

@@ -11,15 +11,13 @@ import ReportUser from './ReportUser';
 import {useNavigation} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 import socket from '../../Socket/Socket';
+import ProfileNavigator from '../Common/ProfileNavigator';
 
 const ChatHeader = ({name, imageUrl, userid, chattype}) => {
   const mydata = useSelector(state => state.Auth.userinitaldata);
-  console.log('mydata', mydata);
   const navigation = useNavigation();
   const [optionsdialog, setoptionsdialog] = useState(false);
   const [reportdialog, setreportdialog] = useState(false);
-  // const [token, setToken] = useState('');
-  // const [meetingId, setMeetingId] = useState('');
   const isCreator = true;
   const [filterdata, setfilterdata] = useState({
     items: [],
@@ -54,18 +52,6 @@ const ChatHeader = ({name, imageUrl, userid, chattype}) => {
       });
     }
   }, [chattype]);
-
-  // useEffect(() => {
-  //   async function fetchData() {
-  //     const token = await getToken();
-  //     setToken(token);
-  //     if (isCreator) {
-  //       const _meetingId = await createMeeting({token});
-  //       setMeetingId(_meetingId);
-  //     }
-  //   }
-  //   fetchData();
-  // }, [navigation]);
 
   const handlerreportdialog = () => {
     setreportdialog(!reportdialog);
@@ -149,22 +135,45 @@ const ChatHeader = ({name, imageUrl, userid, chattype}) => {
     socket.emit('call', finaldata);
   };
 
+  const handlenavigate = () => {
+    return navigation.navigate('GroupProfile', {
+      groupid: userid,
+    });
+  };
+
   return (
     <>
       <LinearGradient
         colors={colors.gradients.buttongradient}
         style={styles.headercontainer}>
         <View>
-          <Image
-            source={{uri: imageUrl}}
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 20,
-              borderWidth: 1,
-              borderColor: 'white',
-            }}
-          />
+          {chattype == 'SINGLE' ? (
+            <ProfileNavigator id={userid}>
+              <Image
+                source={{uri: imageUrl}}
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  borderWidth: 1,
+                  borderColor: 'white',
+                }}
+              />
+            </ProfileNavigator>
+          ) : (
+            <TouchableOpacity onPress={handlenavigate}>
+              <Image
+                source={{uri: imageUrl}}
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  borderWidth: 1,
+                  borderColor: 'white',
+                }}
+              />
+            </TouchableOpacity>
+          )}
         </View>
         <View>
           <Text style={styles.headingtext2}>{name}</Text>

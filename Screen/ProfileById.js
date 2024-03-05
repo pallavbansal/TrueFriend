@@ -15,7 +15,9 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import SingleMedia from '../Components/Profile/SingleMedia';
 import ProfileTop from '../Components/Profile/ProfileTop';
 import DetailMedia from '../Components/Profile/DetailMedia';
+import {useSendRequest} from '../Hooks/Query/RequestQuery';
 import Loading from './Loading';
+import Toast from 'react-native-toast-message';
 
 const ProfileById = ({route}) => {
   const {userid} = route.params;
@@ -34,6 +36,7 @@ const ProfileById = ({route}) => {
     show: false,
     data: null,
   });
+  const {mutate: sendrequest} = useSendRequest();
   const [picturedata2, setpicturedata2] = useState([]);
   const [videodata2, setvideodata2] = useState([]);
 
@@ -63,6 +66,26 @@ const ProfileById = ({route}) => {
   // acceptrequest,sendrequest,rejectrequest
   function requestaction(option) {
     console.log('requestaction', option);
+    if (option === 'sendrequest') {
+      const finaldata = {
+        receiver_id: userid,
+      };
+      sendrequest(
+        {data: finaldata},
+        {
+          onSuccess: data => {
+            console.log('Request success', data);
+            setrequest_status('Sent');
+            Toast.show({
+              type: 'success',
+              text1: 'Request Sent',
+              visibilityTime: 2000,
+              autoHide: true,
+            });
+          },
+        },
+      );
+    }
   }
 
   if (isPending) {

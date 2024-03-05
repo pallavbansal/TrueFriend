@@ -35,7 +35,7 @@ const NoInterent = () => {
             fontWeight: 'bold',
             color: colors.socialfeed.actionicons,
           }}>
-          No internet connection is found. Check your connection or try again.
+          No internet connection found. Check your connection or try again.
         </Text>
 
         <TouchableOpacity onPress={refresh} style={{marginTop: 150}}>

@@ -50,7 +50,7 @@ export async function CreatePost(data, token) {
   });
 
   if (!response.ok) {
-    console.log('Create Post Error 1', response);
+    console.log('Error createPost', response);
     throw new Error('Network response was not ok');
   }
 
@@ -67,7 +67,7 @@ export async function getSocialFeedPosts(token, page) {
     },
   });
   if (!response.ok) {
-    console.log('Error g', response);
+    console.log('Error getSocialFeedPosts', response);
     throw new Error('Network response was not ok');
   }
   return response.json();
@@ -83,7 +83,7 @@ export async function likePost(token, postid) {
     body: JSON.stringify({post_id: postid}),
   });
   if (!response.ok) {
-    console.log('Error g', response);
+    console.log('Error likepost', response);
     throw new Error('Network response was not ok');
   }
   return response.json();
@@ -99,7 +99,7 @@ export async function dislikePost(token, postid) {
     body: JSON.stringify({post_id: postid}),
   });
   if (!response.ok) {
-    console.log('Error g', response);
+    console.log('Error dislikepost', response);
     throw new Error('Network response was not ok');
   }
   return response.json();
@@ -117,7 +117,7 @@ export async function getPostComments(token, postid, page) {
     },
   );
   if (!response.ok) {
-    console.log('Error g', response);
+    console.log('Error getpostcomments', response);
     throw new Error('Network response was not ok');
   }
   return response.json();
@@ -133,7 +133,7 @@ export async function createPostComment(token, data) {
     body: JSON.stringify(data),
   });
   if (!response.ok) {
-    console.log('Error g', response);
+    console.log('Error createpostcomment', response);
     throw new Error('Network response was not ok');
   }
   return response.json();
@@ -149,7 +149,7 @@ export async function createCommentReply(token, data) {
     body: JSON.stringify(data),
   });
   if (!response.ok) {
-    console.log('Error g', response);
+    console.log('Error createcommentreply', response);
     throw new Error('Network response was not ok');
   }
   return response.json();

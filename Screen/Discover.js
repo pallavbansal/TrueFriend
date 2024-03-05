@@ -67,8 +67,15 @@ const Discover = () => {
   }, [locationupdated]);
 
   useEffect(() => {
-    console.log('socket in discover', socket.connected);
-    socket.emit('register', myuserid);
+    console.log('trying to connect to socket server in discover.js');
+    socket.on('connect', () => {
+      console.log('connected to socket server in discover.js');
+      console.log('socket id:', socket.id, socket.connected);
+      socket.emit('register', myuserid);
+    });
+    // return () => {
+    //   socket.off('connect');
+    // };
   }, []);
 
   if (isDiscoverPending) {
@@ -228,8 +235,6 @@ const Discover = () => {
               padding: 6,
               borderRadius: 48,
               backgroundColor: colors.text.primarylight,
-              // backgroundColor: 'black',
-              // backgroundColor: colors.arrow.primary,
               elevation: 50,
             }}>
             <TouchableOpacity

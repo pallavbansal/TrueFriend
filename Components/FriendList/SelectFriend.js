@@ -4,7 +4,7 @@ import {colors} from '../../Styles/ColorData';
 
 import {CheckBox} from 'react-native-elements';
 
-const SelectFriend = ({data, grouplist, setgrouplist}) => {
+const SelectFriend = ({data, setgrouplist}) => {
   const [isSelected, setIsSelected] = useState(false);
 
   const handleCheckbox = () => {
@@ -29,7 +29,7 @@ const SelectFriend = ({data, grouplist, setgrouplist}) => {
         />
         <View>
           <Image
-            source={{uri: data.imageUrl}}
+            source={{uri: data.profile_picture}}
             style={{
               height: 50,
               width: 50,

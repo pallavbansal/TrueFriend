@@ -1,14 +1,15 @@
 import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import React from 'react';
-import AntDesign from 'react-native-vector-icons/AntDesign';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {colors} from '../../Styles/ColorData';
 import {useUpdateRequest} from '../../Hooks/Query/RequestQuery';
 import {useNavigation} from '@react-navigation/native';
+import {useQueryClient} from '@tanstack/react-query';
+import Toast from 'react-native-toast-message';
 
 const SingleRequest = ({data, setfilteredrequestdata}) => {
-  console.log('data', data);
+  const queryClient = useQueryClient();
   const navigation = useNavigation();
   const {mutate, isPending, error, reset} = useUpdateRequest();
 
@@ -22,9 +23,12 @@ const SingleRequest = ({data, setfilteredrequestdata}) => {
       {
         onSuccess: data => {
           console.log('Request success accept', data);
-          setfilteredrequestdata(prev => {
-            return prev.filter(item => item.friend_id !== data.friend_id);
+          Toast.show({
+            type: 'success',
+            text1: 'Request Accepted',
           });
+          queryClient.invalidateQueries({queryKey: ['fetchFriendRequests']});
+          queryClient.invalidateQueries({queryKey: ['fetchFriends']});
         },
       },
     );
@@ -40,9 +44,12 @@ const SingleRequest = ({data, setfilteredrequestdata}) => {
       {
         onSuccess: data => {
           console.log('Request success delete', data);
-          setfilteredrequestdata(prev => {
-            return prev.filter(item => item.friend_id !== data.friend_id);
+          Toast.show({
+            type: 'success',
+            text1: 'Request Deleted',
           });
+          queryClient.invalidateQueries({queryKey: ['fetchFriendRequests']});
+          queryClient.invalidateQueries({queryKey: ['fetchFriends']});
         },
       },
     );
