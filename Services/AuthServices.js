@@ -8,6 +8,7 @@ export async function login(data) {
     body: JSON.stringify(data),
   });
   if (!response.ok) {
+    console.log('Error login', response);
     throw new Error('Invalid Credentials');
   }
   console.log('response', response);
@@ -22,6 +23,7 @@ export async function verify(data) {
   });
 
   if (!response.ok) {
+    console.log('Error verify', response);
     throw new Error('Network response was not ok');
   }
 
@@ -35,6 +37,7 @@ export async function forgotPassword(data) {
     body: JSON.stringify(data),
   });
   if (!response.ok) {
+    console.log('Error forgotpassword', response);
     throw new Error('Network response was not ok');
   }
   return response.json();
@@ -62,6 +65,7 @@ export async function register(data) {
     });
 
     if (!response.ok) {
+      console.log('Error register', response);
       throw new Error('Registration failed');
     }
     return response.json();

@@ -7,23 +7,22 @@ import {colors} from '../../Styles/ColorData';
 import socket from '../../Socket/Socket';
 import {useSelector} from 'react-redux';
 import {getToken, createMeeting} from '../../Utils/Streamapi';
-// {"email": "synyru@closetab.email", "id": 56, "name": "Jhon",
-// "profile_picture": "https://wooing.boxinallsoftech.com/public/uploads/profile/82578_1706872877_stable-diffusion-xl.jpg"}
 
-const SingleFriend = ({data}) => {
-  console.log(data);
+const SingleFriend = ({data, hideunseen, handleChatClick}) => {
   const mydata = useSelector(state => state.Auth.userinitaldata);
   const navigation = useNavigation();
   const isCreator = true;
 
   const handleChat = () => {
-    navigation.navigate('Chat', {
+    const finaldata = {
       userid: data.id,
       name: data.name,
       imageUrl: data.profile_picture,
       type: data.type,
       grouproomid: data.grouproomid,
-    });
+    };
+    handleChatClick(finaldata);
+    navigation.navigate('Chat', finaldata);
   };
 
   const handleCall = async () => {
@@ -60,10 +59,19 @@ const SingleFriend = ({data}) => {
     socket.emit('call', finaldata);
   };
 
-  const handleProfileById = () => {
+  const handlenavigate = () => {
     if (data.type == 'SINGLE') {
-      return navigation.navigate('ProfileById', {
-        userid: data.id,
+      if (data.id == mydata.id) {
+        return navigation.navigate('Profile');
+      } else {
+        return navigation.navigate('ProfileById', {
+          userid: data.id,
+        });
+      }
+    }
+    if (data.type == 'GROUP') {
+      return navigation.navigate('GroupProfile', {
+        groupid: data.id,
       });
     }
   };
@@ -73,7 +81,7 @@ const SingleFriend = ({data}) => {
       <View style={styles.fricontainer}>
         {data.profile_picture ? (
           <View>
-            <TouchableOpacity onPress={handleProfileById}>
+            <TouchableOpacity onPress={handlenavigate}>
               <Image
                 source={{uri: data.profile_picture}}
                 style={{
@@ -87,15 +95,17 @@ const SingleFriend = ({data}) => {
             </TouchableOpacity>
           </View>
         ) : (
-          <View
-            style={[
-              styles.iconcontainer,
-              {
-                backgroundColor: '#8D49EE',
-              },
-            ]}>
-            <FontAwesome5 name="user-friends" size={28} color="white" />
-          </View>
+          <TouchableOpacity onPress={handlenavigate}>
+            <View
+              style={[
+                styles.iconcontainer,
+                {
+                  backgroundColor: '#8D49EE',
+                },
+              ]}>
+              <FontAwesome5 name="user-friends" size={28} color="white" />
+            </View>
+          </TouchableOpacity>
         )}
         <View style={{flex: 1}}>
           <Text style={styles.text1}>{data.name}</Text>
@@ -129,7 +139,7 @@ const SingleFriend = ({data}) => {
               </TouchableOpacity>
             )}
 
-            {data.unseenmsg > 0 && (
+            {data.unseenmsg > 0 && hideunseen == false && (
               <View
                 style={{
                   marginLeft: 'auto',

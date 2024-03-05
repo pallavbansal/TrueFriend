@@ -11,7 +11,7 @@ export async function sendRequest(data, token) {
     body: JSON.stringify(data),
   });
   if (!response.ok) {
-    console.log('Error g', response);
+    console.log('Error sendRequest', response);
     throw new Error('Network response was not ok');
   }
   return response.json();
@@ -29,7 +29,7 @@ export async function updateRequest(data, token) {
     body: JSON.stringify(data),
   });
   if (!response.ok) {
-    console.log('Error g', response);
+    console.log('Error updateRequest', response);
     throw new Error('Network response was not ok');
   }
   return response.json();
@@ -44,7 +44,7 @@ export async function fetchFriends(token) {
     },
   });
   if (!response.ok) {
-    console.log('Error g', response.json());
+    console.log('Error fetchFriends', response.json());
     throw new Error('Network response was not ok');
   }
   return response.json();
@@ -59,7 +59,22 @@ export async function fetchFriendRequests(token) {
     },
   });
   if (!response.ok) {
-    console.log('Error g', response);
+    console.log('Error fetchFriendRequests', response);
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
+}
+
+export async function fetchChattingFriends(token) {
+  const response = await fetch(`${url}/chat/fetch-chats`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    console.log('Error fetchChattingFriends', response);
     throw new Error('Network response was not ok');
   }
   return response.json();

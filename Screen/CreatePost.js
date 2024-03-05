@@ -6,6 +6,7 @@ import {
   TextInput,
   Image,
   ScrollView,
+  FlatList,
 } from 'react-native';
 import GradientScreen from '../Layouts/GradientScreen';
 import GradientButton from '../Components/Common/GradientButton';
@@ -19,14 +20,13 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation} from '@react-navigation/native';
 import MultipleImagePicker from '@baronha/react-native-multiple-image-picker';
 import {useCreatePost} from '../Hooks/Query/FeedQuery';
-// import ImageResizer from 'react-native-image-resizer';s
 
 const CreatePost = () => {
   const navigation = useNavigation();
   const {mutate, isPending, error, reset} = useCreatePost();
   const [postinputs, setPostInputs] = useState({
     caption: '',
-    Image: {},
+    Image: [],
     valid: false,
     showerror: false,
     error: 'Some fields are missing or invalid. Please check again.',
@@ -46,9 +46,6 @@ const CreatePost = () => {
       return;
     }
     const formdata = {
-      // caption: postinputs.caption,
-      // media_type: postinputs.Image.type === 'image' ? 1 : 2,
-      // media: postinputs.Image,
       caption: postinputs.caption,
       media: postinputs.Image,
       media_type: postinputs.Image.map(item => (item.type === 'image' ? 1 : 2)),
@@ -74,10 +71,9 @@ const CreatePost = () => {
       const response = await MultipleImagePicker.openPicker({
         mediaType: 'all',
         maxSelectedAssets: 5,
+        maxVideoDuration: 300, // seconds
       });
       if (response && response.length > 0) {
-        // console.log('response-----------', response[0]);
-        // setPostInputs({...postinputs, Image: response[0]});
         console.log('response-----------', response);
         setPostInputs({...postinputs, Image: response});
       }
@@ -86,36 +82,12 @@ const CreatePost = () => {
     }
   };
 
-  // const handleImageUpload = async () => {
-  //   try {
-  //     const response = await MultipleImagePicker.openPicker({
-  //       mediaType: 'all',
-  //       maxSelectedAssets: 1,
-  //     });
-  //     if (response && response.length > 0) {
-  //       console.log('response', response[0]);
+  const handleDeleteImage = index => {
+    let newImages = postinputs.Image.filter((item, i) => i !== index);
+    setPostInputs({...postinputs, Image: newImages});
+  };
 
-  //       // Resize the image
-  //       const resizedImage = await ImageResizer.createResizedImage(
-  //         response[0].path, // path to the image
-  //         1024, // new width
-  //         1024, // new height
-  //         'JPEG', // format
-  //         80, // quality
-  //       );
-
-  //       // Create a new object with the new URI
-  //       const newResponse = {
-  //         ...response[0],
-  //         uri: resizedImage.uri,
-  //       };
-
-  //       setPostInputs({...postinputs, Image: newResponse});
-  //     }
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  // };
+  console.log('postinputs', postinputs.Image);
 
   return (
     <GradientScreen>
@@ -146,18 +118,55 @@ const CreatePost = () => {
             colors={colors.gradients.buttongradient}
             style={styles.gradientsouter}>
             <View style={styles.gradientinner}>
-              {postinputs.Image?.path && (
-                <Image
-                  source={{uri: postinputs.Image.path}}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    borderRadius: 18,
-                    position: 'absolute',
-                  }}
+              {postinputs.Image.length > 0 && (
+                <FlatList
+                  data={postinputs.Image}
+                  keyExtractor={(item, index) => index.toString()}
+                  renderItem={({item, index}) => (
+                    <View>
+                      <Image
+                        source={{uri: item.path}}
+                        style={{
+                          height: 290,
+                          borderRadius: 13,
+                          aspectRatio: 1,
+                          margin: 5,
+                        }}
+                        resizeMode="contain"
+                      />
+                      {item.type === 'video' ? (
+                        <View style={styles.button}>
+                          <MaterialIcons
+                            name="videocam"
+                            size={28}
+                            color={colors.profile.edit}
+                          />
+                        </View>
+                      ) : (
+                        <View style={styles.button}>
+                          <MaterialIcons
+                            name="image"
+                            size={28}
+                            color={colors.profile.edit}
+                          />
+                        </View>
+                      )}
+                      <TouchableOpacity
+                        style={styles.deletebutton}
+                        onPress={() => handleDeleteImage(index)}>
+                        <MaterialIcons
+                          name="delete"
+                          size={28}
+                          color={colors.profile.edit}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                  horizontal={true}
                 />
               )}
-              {!postinputs.Image?.path && (
+
+              {postinputs.Image.length == 0 && (
                 <TouchableOpacity onPress={handleImageUpload}>
                   <MaterialCommunityIcons
                     name="file-upload"
@@ -172,7 +181,7 @@ const CreatePost = () => {
             </View>
           </LinearGradient>
 
-          {postinputs.Image?.path && (
+          {postinputs.Image.length > 0 && (
             <TouchableOpacity onPress={handleImageUpload}>
               <GradientText style={styles.headingtext2}>
                 Change Media
@@ -324,5 +333,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
+  },
+  button: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 5,
+    position: 'absolute',
+    top: 10,
+    right: 10,
+  },
+  deletebutton: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 5,
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
   },
 });

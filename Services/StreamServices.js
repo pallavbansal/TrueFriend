@@ -10,6 +10,7 @@ export async function createStream(data, token) {
     body: JSON.stringify(data),
   });
   if (!response.ok) {
+    console.log('Error createstream', response);
     throw new Error('Network response was not ok');
   }
   return response.json();
@@ -24,6 +25,7 @@ export async function getStreamMeetingId(data, token) {
     body: JSON.stringify(data),
   });
   if (!response.ok) {
+    console.log('Error getstreammeetingid', response);
     throw new Error('Network response was not ok');
   }
   return response.json();
@@ -38,6 +40,7 @@ export async function endStream(token) {
     },
   });
   if (!response.ok) {
+    console.log('Error endstream', response);
     throw new Error('Network response was not ok');
   }
   return response.json();

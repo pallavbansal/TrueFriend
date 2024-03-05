@@ -27,6 +27,7 @@ import {
   Recharge,
   Splash,
   Chat,
+  GroupProfile,
   Temp,
   CreatePost,
   StartStream,
@@ -84,6 +85,11 @@ const MainNavigator = () => {
         <Stack.Screen
           name="Chat"
           component={Chat}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="GroupProfile"
+          component={GroupProfile}
           options={{headerShown: false}}
         />
         <Stack.Screen

@@ -135,7 +135,7 @@ const SocialFeed = () => {
             padding: 6,
             borderRadius: 48,
             backgroundColor: colors.text.primarylight,
-            elevation: 10,
+            elevation: 50,
           }}>
           <TouchableOpacity
             style={{

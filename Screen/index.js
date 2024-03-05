@@ -20,6 +20,7 @@ import CreatePost from './CreatePost';
 import WatchStream from './WatchStream';
 import Call from './Call';
 import ProfileById from './ProfileById';
+import GroupProfile from './GroupProfile';
 
 export {
   Discover,
@@ -39,6 +40,7 @@ export {
   Recharge,
   Splash,
   Chat,
+  GroupProfile,
   Temp,
   CreatePost,
   StartStream,

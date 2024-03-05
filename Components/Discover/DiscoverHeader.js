@@ -27,7 +27,7 @@ const DiscoverHeader = () => {
   };
   const handleLogout = () => {
     dispatch(LogoutRed());
-    socket.disconnect();
+    // socket.disconnect();
     return navigation.reset({
       index: 0,
       routes: [{name: 'Login'}],
@@ -41,7 +41,6 @@ const DiscoverHeader = () => {
   if (isPending) {
     return <Loading />;
   }
-  console.log('UserProfileData', UserProfileData);
 
   return (
     <View style={styles.headercontainer}>

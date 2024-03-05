@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Pressable,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../../Styles/ColorData';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -25,6 +25,10 @@ const list = [
 
 const ReportUser = ({close}) => {
   const navigation = useNavigation();
+  const [selected, setselected] = useState({
+    index: null,
+    value: '',
+  });
   const handleclose = () => {
     close();
   };
@@ -33,67 +37,99 @@ const ReportUser = ({close}) => {
     return navigation.navigate('UploadScreenshot');
   };
 
+  const handleselect = (index, value) => {
+    setselected({
+      index: index,
+      value: value,
+    });
+  };
+
   return (
     <Pressable style={styles.container} onPress={handleclose}>
       <LinearGradient
         colors={colors.gradients.buttongradient}
         style={styles.reportcontainer}>
-        <Pressable style={styles.reportinsidecontainer}>
-          <View style={styles.headercontainer}>
-            <MaterialIcons
-              name="report-gmailerrorred"
-              size={36}
-              color={colors.text.primary}
-            />
-            <Text style={styles.headingtext}>Report User</Text>
-          </View>
-          <View style={styles.textcontainer}>
-            <Text style={styles.headingtext3}>
-              Why are you reporting this person?
-            </Text>
-            <Text style={styles.headingtext3}>
-              Your report is anonymous, except if you’re reporting an
-              intellectual property infringement.
-            </Text>
-          </View>
-          <View style={styles.listcontainer}>
-            {list.map((item, index) => (
+        <Pressable>
+          <View style={styles.reportinsidecontainer}>
+            <View style={styles.headercontainer}>
+              <MaterialIcons
+                name="report-gmailerrorred"
+                size={36}
+                color={colors.text.primary}
+              />
+              <Text style={styles.headingtext}>Report User</Text>
+            </View>
+            <View style={styles.textcontainer}>
+              <Text style={styles.headingtext2}>
+                Why are you reporting this person?
+              </Text>
+              <Text style={styles.headingtext3}>
+                Your report is anonymous, except if you’re reporting an
+                intellectual property infringement.
+              </Text>
+            </View>
+            <View style={styles.listcontainer}>
+              {list.map((item, index) => (
+                <TouchableOpacity
+                  onPress={() => handleselect(index, item)}
+                  key={index}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 10,
+                  }}>
+                  <Text
+                    style={[
+                      styles.headingtext2,
+                      {
+                        color:
+                          selected.index === index
+                            ? colors.arrow.primary
+                            : colors.text.primary,
+                      },
+                    ]}>
+                    {item}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            <View style={styles.uploadcontainer}>
               <TouchableOpacity
-                key={index}
+                onPress={handleattach}
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
-                  gap: 10,
-                }}>
-                <Text style={styles.headingtext2}>{item}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-          <View style={styles.uploadcontainer}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 5,
-                width: '90%',
-                borderRadius: 20,
-                paddingHorizontal: 10,
-                borderWidth: 1,
-                borderColor: colors.text.primary,
-              }}>
-              <TextInput
-                placeholder="Upload Screenshots"
-                placeholderTextColor={colors.text.primary}
-                cursorColor={colors.text.primary}
-                style={{
-                  color: colors.text.primary,
-                  fontWeight: '900',
-                  flex: 1,
+                  gap: 5,
+                  width: '90%',
                   borderRadius: 20,
-                  margin: 5,
-                }}
-              />
-              <TouchableOpacity onPress={handleattach}>
+                  paddingHorizontal: 10,
+                  borderWidth: 1,
+                  borderColor: colors.text.primary,
+                }}>
+                {/* <TextInput
+                  placeholder="Upload Screenshots"
+                  placeholderTextColor={colors.text.primary}
+                  cursorColor={colors.text.primary}
+                  style={{
+                    color: colors.text.primary,
+                    fontWeight: '900',
+                    flex: 1,
+                    borderRadius: 20,
+                    margin: 5,
+                  }}
+                /> */}
+                <View
+                  style={{
+                    color: colors.text.primary,
+                    fontWeight: '900',
+                    flex: 1,
+                    borderRadius: 20,
+                    margin: 5,
+                    padding: 10,
+                  }}>
+                  <Text>Upload Screenshots</Text>
+                </View>
+
                 <Entypo
                   name="attachment"
                   size={24}
@@ -135,7 +171,7 @@ const styles = StyleSheet.create({
 
   reportinsidecontainer: {
     alignItems: 'center',
-    gap: 10,
+    gap: 30,
   },
 
   headercontainer: {
@@ -143,9 +179,11 @@ const styles = StyleSheet.create({
   },
   textcontainer: {
     alignItems: 'center',
+    gap: 5,
   },
   listcontainer: {
     marginRight: 'auto',
+    gap: 10,
   },
   uploadcontainer: {
     marginTop: 15,

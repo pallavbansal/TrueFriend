@@ -33,13 +33,6 @@ const Profile = () => {
     if (profiledata) {
       setpicturedata2([]);
       setvideodata2([]);
-      // profiledata.data.profile.media.map(item => {
-      //   if (item.media_type === '1') {
-      //     setpicturedata2(prev => [...prev, item]);
-      //   } else {
-      //     setvideodata2(prev => [...prev, item]);
-      //   }
-      // });
       profiledata.data.profile.media.map(item => {
         item.post_media.map(item2 => {
           if (item2.media_type === '1') {
@@ -66,9 +59,6 @@ const Profile = () => {
     return <Loading />;
   }
 
-  // if (isError) {
-  //   return <Text>Error: {error.message}</Text>;
-  // }
   const finaldata = profiledata.data.profile;
   const Biodata = [
     {
