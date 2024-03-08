@@ -12,7 +12,14 @@ import Loading from './Loading';
 import socket from '../Socket/Socket';
 const Chat = ({route}) => {
   const [MessageData, setMessageData] = useState([]);
-  const {userid, name, imageUrl, type: chattype, grouproomid} = route.params;
+  const {
+    userid,
+    name,
+    imageUrl,
+    type: chattype,
+    grouproomid,
+    chatfetchid,
+  } = route.params;
   const myuserid = useSelector(state => state.Auth.userid);
   const {name: myname} = useSelector(state => state.Auth.userinitaldata);
   const [heightbeforefetch, setheightbeforefetch] = useState(0);
@@ -28,7 +35,22 @@ const Chat = ({route}) => {
     isFetchingNextPage,
     isPending,
     isFetching,
-  } = useFetchChatting(userid);
+  } = useFetchChatting(chatfetchid);
+
+  useEffect(() => {
+    console.log('Connecting to server in chat.js');
+    socket.on('connect', () => {
+      console.log('Connected to server in chat.js');
+      socket.emit('register', myuserid, response => {
+        console.log('Registration response in chat.js:', response);
+      });
+      if (chattype == 'GROUP') {
+        socket.emit('join', grouproomid, response => {
+          console.log('Join response in chat.js:', response);
+        });
+      }
+    });
+  }, []);
 
   useEffect(() => {
     const handleMessage = msg => {

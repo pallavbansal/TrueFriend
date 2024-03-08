@@ -45,3 +45,36 @@ export async function endStream(token) {
   }
   return response.json();
 }
+
+export async function getStream(token, pageParam) {
+  const response = await fetch(`${url}/streaming/fetch?page=${pageParam}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    console.log('Error getstream', response);
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
+}
+
+export async function getAdjacentStream(token, streamId) {
+  const response = await fetch(
+    `${url}/streaming/fetch-adjacent?current_stream_id=${streamId}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  if (!response.ok) {
+    console.log('Error getadjacentstream', response);
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
+}

@@ -15,42 +15,59 @@ import Toast from 'react-native-toast-message';
 const WatchStream = ({route}) => {
   const navigation = useNavigation();
   const [meetingid, setmeetingid] = useState(null);
+  const [otherdata, setotherdata] = useState({});
   const id = route.params.id;
   const token = route.params.token;
-  // const meetingId = route.params.meetingId;
   const micEnabled = false;
   const webcamEnabled = false;
   const name = route.params.name ? route.params.name : 'Test User';
+  const isswiped = route.params.isswiped ? route.params.isswiped : false;
   const mode = 'VIEWER';
   const {isPending, error, mutate, reset} = useGetMeetingId();
-
   useEffect(() => {
-    console.log('-----------------------------');
-    const formdata = {
-      user_id: id,
-    };
-    mutate(
-      {data: formdata},
-      {
-        onSuccess: data => {
-          if (data.status_code == 1) {
-            console.log('meetind id success data', data);
-            console.log(data.data.stream);
-            if (data.data.stream == null) {
+    if (!isswiped) {
+      const formdata = {
+        user_id: id,
+      };
+      console.log('Form Data', formdata);
+      mutate(
+        {data: formdata},
+        {
+          onSuccess: data => {
+            if (data.status_code == 1) {
+              if (data.data.stream == null) {
+                Toast.show({
+                  type: 'info',
+                  text1: 'Stream Ended',
+                  visibilityTime: 1000,
+                });
+                navigation.navigate('Discover');
+              }
+              if (data.data.stream?.meeting_id) {
+                setmeetingid(data.data.stream.meeting_id);
+                setotherdata({
+                  meeting_id: data.data.stream.meeting_id,
+                  stream_id: data.data.stream.id,
+                  stream_status: data.data.stream.status, // "ACTIVE","ENDED"
+                  user: data.data.stream.user,
+                });
+              }
+            }
+            if (data.status_code == 0) {
               Toast.show({
-                type: 'info',
+                type: 'error',
                 text1: 'Stream Ended',
                 visibilityTime: 1000,
               });
               navigation.navigate('Discover');
             }
-            if (data.data.stream?.meeting_id) {
-              setmeetingid(data.data.stream.meeting_id);
-            }
-          }
+          },
         },
-      },
-    );
+      );
+    } else {
+      setmeetingid(route.params.swipedmeetingid);
+      setotherdata(route.params.swipedmeetingotherdata);
+    }
   }, []);
 
   if (meetingid === null || isPending) {
@@ -82,13 +99,18 @@ const WatchStream = ({route}) => {
           token={token}>
           <MeetingConsumer
             {...{
-              onMeetingLeft: () => {
+              onMeetingLeft: data => {
+                console.log('onMeetingLeft', data);
                 navigation.navigate('Discover');
               },
             }}>
             {() => {
               return (
-                <WatchContainer webcamEnabled={webcamEnabled} userid={id} />
+                <WatchContainer
+                  webcamEnabled={webcamEnabled}
+                  userid={id}
+                  streamdata={otherdata}
+                />
               );
             }}
           </MeetingConsumer>

@@ -28,13 +28,7 @@ const ChatHeader = ({name, imageUrl, userid, chattype}) => {
       setfilterdata({
         items: [
           {
-            item: 'Leave Group',
-          },
-          {
             item: 'Report Group',
-          },
-          {
-            item: 'Settings',
           },
         ],
       });
@@ -44,9 +38,6 @@ const ChatHeader = ({name, imageUrl, userid, chattype}) => {
         items: [
           {
             item: 'Report User',
-          },
-          {
-            item: 'Settings',
           },
         ],
       });
@@ -162,16 +153,15 @@ const ChatHeader = ({name, imageUrl, userid, chattype}) => {
             </ProfileNavigator>
           ) : (
             <TouchableOpacity onPress={handlenavigate}>
-              <Image
-                source={{uri: imageUrl}}
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  borderWidth: 1,
-                  borderColor: 'white',
-                }}
-              />
+              <View
+                style={[
+                  styles.iconcontainer,
+                  {
+                    backgroundColor: '#8D49EE',
+                  },
+                ]}>
+                <FontAwesome5 name="user-friends" size={18} color="white" />
+              </View>
             </TouchableOpacity>
           )}
         </View>
@@ -258,5 +248,14 @@ const styles = StyleSheet.create({
     color: colors.login.headingtext2,
     fontSize: 14,
     fontWeight: 'bold',
+  },
+  iconcontainer: {
+    height: 40,
+    width: 40,
+    borderRadius: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'white',
   },
 });

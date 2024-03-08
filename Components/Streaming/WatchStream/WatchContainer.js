@@ -7,7 +7,7 @@ import WaitingToJoinView from '../common/WaitingToJoinView';
 import React from 'react';
 import ViewerContainer from './ViewerContainer';
 
-export default function WatchContainer({webcamEnabled, userid}) {
+export default function WatchContainer({webcamEnabled, userid, streamdata}) {
   const [isJoined, setJoined] = useState(false);
   const mMeeting = useMeeting({});
   const mMeetingRef = useRef();
@@ -37,5 +37,9 @@ export default function WatchContainer({webcamEnabled, userid}) {
     };
   }, []);
 
-  return isJoined ? <ViewerContainer userid={userid} /> : <WaitingToJoinView />;
+  return isJoined ? (
+    <ViewerContainer userid={userid} streamotherdata={streamdata} />
+  ) : (
+    <WaitingToJoinView />
+  );
 }

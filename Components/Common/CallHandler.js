@@ -76,7 +76,7 @@ const CallHandler = ({children}) => {
   const handleReject = data => {
     console.log(data);
     ringtone.current.stop();
-    socket.emit('call', {...data, callaction: 'rejected', by: '123'});
+    socket.emit('call', {...data, callaction: 'rejected'});
     setModalVisible(false);
     console.log('Call rejected');
     // setCallData(null);

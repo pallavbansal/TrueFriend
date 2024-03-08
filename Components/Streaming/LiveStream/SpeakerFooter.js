@@ -22,7 +22,6 @@ const IconContainer = ({backgroundColor, onPress, iconName, iconColor}) => {
 };
 
 const SpeakerFooter = ({
-  leaveMenu,
   localMicOn,
   toggleMic,
   localWebcamOn,
@@ -31,6 +30,7 @@ const SpeakerFooter = ({
   setBottomSheetView,
   bottomSheetRef,
   end,
+  leave,
 }) => {
   return (
     <View style={styles.bottomcontainer}>
@@ -53,6 +53,7 @@ const SpeakerFooter = ({
       />
       <TouchableOpacity
         onPress={end}
+        // onPress={leave}
         style={{
           backgroundColor: 'white',
           borderRadius: 50,

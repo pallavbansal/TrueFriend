@@ -117,30 +117,31 @@ const GroupProfile = ({route}) => {
               style={{marginLeft: 20}}
             />
           </TouchableOpacity>
-
-          <TouchableOpacity
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginRight: 20,
-              gap: 3,
-            }}
-            onPress={() => setshowgroupmodal(true)}>
-            <View
+          {myid == adminid && (
+            <TouchableOpacity
               style={{
-                backgroundColor: '#FF5A90',
-                padding: 5,
-                borderRadius: 50,
-              }}>
-              <AntDesign
-                name="plus"
-                size={24}
-                color="white"
-                style={{fontWeight: '900'}}
-              />
-            </View>
-            <Text style={styles.headingtext2}> Add Members</Text>
-          </TouchableOpacity>
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginRight: 20,
+                gap: 3,
+              }}
+              onPress={() => setshowgroupmodal(true)}>
+              <View
+                style={{
+                  backgroundColor: '#FF5A90',
+                  padding: 5,
+                  borderRadius: 50,
+                }}>
+                <AntDesign
+                  name="plus"
+                  size={24}
+                  color="white"
+                  style={{fontWeight: '900'}}
+                />
+              </View>
+              <Text style={styles.headingtext2}> Add Members</Text>
+            </TouchableOpacity>
+          )}
         </View>
         <View style={styles.statscontainer}>
           <View

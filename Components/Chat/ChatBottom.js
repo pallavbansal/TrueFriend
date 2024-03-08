@@ -71,10 +71,15 @@ const ChatBottom = ({
         ...tempdata,
       };
       const backenddata = {
-        receiver_id: messagedatafinal.receiver_id,
         type: messagedatafinal.type,
         content: messagedatafinal.content,
       };
+      if (chattype === 'SINGLE') {
+        backenddata.receiver_id = messagedatafinal.receiver_id;
+      }
+      if (chattype === 'GROUP') {
+        backenddata.group_id = messagedatafinal.receiver_id;
+      }
       console.log('divider', backenddata);
       mutate(
         {
@@ -110,13 +115,20 @@ const ChatBottom = ({
       ...tempdata,
     };
     const backenddata = {
-      receiver_id: messagedatafinal.receiver_id,
       type: messagedatafinal.type,
       content: messagedatafinal.content,
     };
+    if (chattype === 'SINGLE') {
+      backenddata.receiver_id = messagedatafinal.receiver_id;
+    }
+    if (chattype === 'GROUP') {
+      backenddata.group_id = messagedatafinal.receiver_id;
+    }
     if (messagedatafinal.type == 'PHOTO' || messagedatafinal.type == 'VIDEO') {
       backenddata.media = messagedatafinal.media;
     }
+
+    console.log('backenddata', backenddata);
 
     mutate(
       {
@@ -143,10 +155,10 @@ const ChatBottom = ({
   };
 
   const sendTextMessage = () => {
-    if (typetext.length == 0) {
+    if (media.length == 0 && typetext.length == 0) {
       return;
     }
-    if (media.length == 0) {
+    if (media.length == 0 && typetext.length != 0) {
       const messagedata = {
         type: 'TEXT',
         content: typetext,
