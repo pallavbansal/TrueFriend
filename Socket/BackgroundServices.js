@@ -59,11 +59,7 @@ const myuserid = 56;
 const connectToSocket = async () => {
   socket.on('connect', () => {
     console.log('Socket connection opened for background service');
-    friendsdata.map(item => {
-      if (item.type === 'GROUP') {
-        socket.emit('join room', item.grouproomid);
-      }
-    });
+    socket.emit('register', myuserid);
   });
 
   socket.on('call', data => {
@@ -158,6 +154,7 @@ const socketInBackground = async () => {
 };
 
 const startBackgroundSocketService = async () => {
+  console.log('in start background');
   if (BackgroundService.isRunning()) {
     console.log('Background socket service is already running');
     return;

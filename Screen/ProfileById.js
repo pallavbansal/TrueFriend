@@ -15,9 +15,13 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import SingleMedia from '../Components/Profile/SingleMedia';
 import ProfileTop from '../Components/Profile/ProfileTop';
 import DetailMedia from '../Components/Profile/DetailMedia';
-import {useSendRequest} from '../Hooks/Query/RequestQuery';
+import {
+  useSendRequest,
+  useRequestCurrentStatus,
+} from '../Hooks/Query/RequestQuery';
 import Loading from './Loading';
 import Toast from 'react-native-toast-message';
+import ReLoader from '../Components/Common/ReLoader';
 
 const ProfileById = ({route}) => {
   const {userid} = route.params;
@@ -31,6 +35,12 @@ const ProfileById = ({route}) => {
     data: profiledata,
     isError,
   } = useFetchProfileById(userid);
+  const {
+    isPending: isRequestStatusPending,
+    error: requestStatusError,
+    data: requestStatusdata,
+    isError: isRequestStatusError,
+  } = useRequestCurrentStatus(userid);
   const [selectedmediatype, setselectedmediatype] = useState('pictures');
   const [showdetailmodel, setshowdetailmodel] = useState({
     show: false,
@@ -55,6 +65,24 @@ const ProfileById = ({route}) => {
       });
     }
   }, [profiledata]);
+
+  useEffect(() => {
+    if (requestStatusdata) {
+      if (requestStatusdata.data.friend_request_status === 'FRIENDS') {
+        setrequest_status('Friends');
+      } else if (
+        requestStatusdata.data.friend_request_status === 'REQUEST SENT'
+      ) {
+        setrequest_status('Sent');
+      } else if (
+        requestStatusdata.data.friend_request_status === 'REQUEST RECEIVED'
+      ) {
+        setrequest_status('Received');
+      } else {
+        setrequest_status('Noaction');
+      }
+    }
+  }, [requestStatusdata]);
 
   function closedetailmodel() {
     setshowdetailmodel({
@@ -88,9 +116,11 @@ const ProfileById = ({route}) => {
     }
   }
 
-  if (isPending) {
+  if (isPending || isRequestStatusPending) {
     return <Loading />;
   }
+
+  console.log('request current status', requestStatusdata);
 
   const finaldata = profiledata.data.profile;
   const Biodata = [
@@ -119,216 +149,224 @@ const ProfileById = ({route}) => {
 
   return (
     <GradientScreen>
-      <View style={styles.container}>
-        <View style={styles.imagecontainer}>
-          <ProfileTop
-            finaldata={finaldata}
-            ismyid={false}
-            request_status={request_status}
-            setrequest_status={setrequest_status}
-            requestaction={requestaction}
-          />
-        </View>
-        <View style={styles.biocontainer}>
-          <View>
-            <Text style={styles.headingtext}>{finaldata.name}</Text>
+      <ReLoader queryKeys={['fetchProfileById', 'requestCurrentStatus']}>
+        <View style={styles.container}>
+          <View style={styles.imagecontainer}>
+            <ProfileTop
+              finaldata={finaldata}
+              ismyid={false}
+              request_status={request_status}
+              setrequest_status={setrequest_status}
+              requestaction={requestaction}
+            />
           </View>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <View style={{flexDirection: 'row', gap: 5, alignItems: 'center'}}>
-              <MaterialIcons
-                name="add-call"
-                size={18}
-                color={colors.login.headingtext2}
-              />
-              <Text style={styles.headingtext3}>{finaldata.phone_number}</Text>
+          <View style={styles.biocontainer}>
+            <View>
+              <Text style={styles.headingtext}>{finaldata.name}</Text>
             </View>
-            <View style={{flexDirection: 'row', gap: 5, alignItems: 'center'}}>
-              <MaterialIcons
-                name="email"
-                size={18}
-                color={colors.login.headingtext2}
-              />
-              <Text style={styles.headingtext3}>{finaldata.email}</Text>
-            </View>
-          </View>
-          <View>
-            <Text style={styles.headingtext2}>Short Bio</Text>
-          </View>
-          <View>
-            {finaldata.bio ? (
-              <Text style={styles.headingtext3}>{finaldata.bio}</Text>
-            ) : (
-              <Text style={styles.headingtext3}>No Bio</Text>
-            )}
-          </View>
-        </View>
-        <View style={styles.mediacontainer}>
-          <View style={styles.optionscontainer}>
-            <TouchableOpacity onPress={() => setselectedmediatype('bio')}>
-              <Text
-                style={[
-                  styles.optiontext,
-                  {
-                    color:
-                      selectedmediatype === 'bio'
-                        ? colors.arrow.tertiary
-                        : colors.arrow.primary,
-                  },
-                ]}>
-                Bio
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setselectedmediatype('pictures')}>
-              <Text
-                style={[
-                  styles.optiontext,
-                  {
-                    color:
-                      selectedmediatype === 'pictures'
-                        ? colors.arrow.tertiary
-                        : colors.arrow.primary,
-                  },
-                ]}>
-                Pictures
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setselectedmediatype('videos')}>
-              <Text
-                style={[
-                  styles.optiontext,
-                  {
-                    color:
-                      selectedmediatype === 'videos'
-                        ? colors.arrow.tertiary
-                        : colors.arrow.primary,
-                  },
-                ]}>
-                Videos
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View
-            style={[
-              styles.medialistcontainer,
-              selectedmediatype === 'pictures' && picturedata2.length > 3
-                ? {alignItems: 'center'}
-                : {},
-              selectedmediatype === 'videos' && videodata2.length > 3
-                ? {alignItems: 'center'}
-                : {},
-            ]}>
-            {selectedmediatype === 'bio' && (
+            <View
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
               <View
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  padding: 15,
-                }}>
-                <ScrollView>
-                  {Biodata.map((item, index) => {
-                    const keys = Object.keys(item);
-                    const values = Object.values(item);
-                    return (
-                      <View
-                        key={index}
-                        style={{
-                          marginBottom: 10,
-                          marginHorizontal: 10,
-                        }}>
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                          }}>
-                          <Text style={styles.headingtext3}>{keys[0]}</Text>
-                          <Text style={styles.headingtext3}>{values[0]}</Text>
-                        </View>
-                      </View>
-                    );
-                  })}
-                </ScrollView>
+                style={{flexDirection: 'row', gap: 5, alignItems: 'center'}}>
+                <MaterialIcons
+                  name="add-call"
+                  size={18}
+                  color={colors.login.headingtext2}
+                />
+                <Text style={styles.headingtext3}>
+                  {finaldata.phone_number}
+                </Text>
               </View>
-            )}
-
-            {selectedmediatype === 'pictures' &&
-              (picturedata2.length > 0 ? (
-                <FlatList
-                  data={picturedata2}
-                  keyExtractor={item => item.id.toString()}
-                  renderItem={({item, index}) => (
-                    <TouchableOpacity
-                      onPress={() =>
-                        setshowdetailmodel({
-                          show: true,
-                          data: item,
-                        })
-                      }>
-                      <SingleMedia item={item} index={index} />
-                    </TouchableOpacity>
-                  )}
-                  onEndReachedThreshold={0.1}
-                  showsVerticalScrollIndicator={false}
-                  numColumns={4}
-                  contentContainerStyle={{paddingBottom: 80}}
+              <View
+                style={{flexDirection: 'row', gap: 5, alignItems: 'center'}}>
+                <MaterialIcons
+                  name="email"
+                  size={18}
+                  color={colors.login.headingtext2}
                 />
+                <Text style={styles.headingtext3}>{finaldata.email}</Text>
+              </View>
+            </View>
+            <View>
+              <Text style={styles.headingtext2}>Short Bio</Text>
+            </View>
+            <View>
+              {finaldata.bio ? (
+                <Text style={styles.headingtext3}>{finaldata.bio}</Text>
               ) : (
-                <Text
-                  style={{
-                    color: colors.login.headingtext2,
-                    marginTop: 50,
-                    fontSize: 20,
-                    fontWeight: '900',
-                    textAlign: 'center',
-                  }}>
-                  No Pictures
-                </Text>
-              ))}
-
-            {selectedmediatype === 'videos' &&
-              (videodata2.length > 0 ? (
-                <FlatList
-                  data={videodata2}
-                  keyExtractor={item => item.id.toString()}
-                  renderItem={({item, index}) => (
-                    <TouchableOpacity
-                      onPress={() =>
-                        setshowdetailmodel({
-                          show: true,
-                          data: item,
-                        })
-                      }>
-                      <SingleMedia item={item} index={index} />
-                    </TouchableOpacity>
-                  )}
-                  onEndReachedThreshold={0.1}
-                  showsVerticalScrollIndicator={false}
-                  numColumns={4}
-                  contentContainerStyle={{paddingBottom: 80}}
-                />
-              ) : (
-                <Text
-                  style={{
-                    color: colors.login.headingtext2,
-                    marginTop: 50,
-                    fontSize: 20,
-                    fontWeight: '900',
-                    textAlign: 'center',
-                  }}>
-                  No Videos
-                </Text>
-              ))}
+                <Text style={styles.headingtext3}>No Bio</Text>
+              )}
+            </View>
           </View>
+          <View style={styles.mediacontainer}>
+            <View style={styles.optionscontainer}>
+              <TouchableOpacity onPress={() => setselectedmediatype('bio')}>
+                <Text
+                  style={[
+                    styles.optiontext,
+                    {
+                      color:
+                        selectedmediatype === 'bio'
+                          ? colors.arrow.tertiary
+                          : colors.arrow.primary,
+                    },
+                  ]}>
+                  Bio
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setselectedmediatype('pictures')}>
+                <Text
+                  style={[
+                    styles.optiontext,
+                    {
+                      color:
+                        selectedmediatype === 'pictures'
+                          ? colors.arrow.tertiary
+                          : colors.arrow.primary,
+                    },
+                  ]}>
+                  Pictures
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setselectedmediatype('videos')}>
+                <Text
+                  style={[
+                    styles.optiontext,
+                    {
+                      color:
+                        selectedmediatype === 'videos'
+                          ? colors.arrow.tertiary
+                          : colors.arrow.primary,
+                    },
+                  ]}>
+                  Videos
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <View
+              style={[
+                styles.medialistcontainer,
+                selectedmediatype === 'pictures' && picturedata2.length > 3
+                  ? {alignItems: 'center'}
+                  : {},
+                selectedmediatype === 'videos' && videodata2.length > 3
+                  ? {alignItems: 'center'}
+                  : {},
+              ]}>
+              {selectedmediatype === 'bio' && (
+                <View
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    padding: 15,
+                  }}>
+                  <ScrollView>
+                    {Biodata.map((item, index) => {
+                      const keys = Object.keys(item);
+                      const values = Object.values(item);
+                      return (
+                        <View
+                          key={index}
+                          style={{
+                            marginBottom: 10,
+                            marginHorizontal: 10,
+                          }}>
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                            }}>
+                            <Text style={styles.headingtext3}>{keys[0]}</Text>
+                            <Text style={styles.headingtext3}>{values[0]}</Text>
+                          </View>
+                        </View>
+                      );
+                    })}
+                  </ScrollView>
+                </View>
+              )}
+
+              {selectedmediatype === 'pictures' &&
+                (picturedata2.length > 0 ? (
+                  <FlatList
+                    data={picturedata2}
+                    keyExtractor={item => item.id.toString()}
+                    renderItem={({item, index}) => (
+                      <TouchableOpacity
+                        onPress={() =>
+                          setshowdetailmodel({
+                            show: true,
+                            data: item,
+                          })
+                        }>
+                        <SingleMedia item={item} index={index} />
+                      </TouchableOpacity>
+                    )}
+                    onEndReachedThreshold={0.1}
+                    showsVerticalScrollIndicator={false}
+                    numColumns={4}
+                    contentContainerStyle={{paddingBottom: 80}}
+                  />
+                ) : (
+                  <Text
+                    style={{
+                      color: colors.login.headingtext2,
+                      marginTop: 50,
+                      fontSize: 20,
+                      fontWeight: '900',
+                      textAlign: 'center',
+                    }}>
+                    No Pictures
+                  </Text>
+                ))}
+
+              {selectedmediatype === 'videos' &&
+                (videodata2.length > 0 ? (
+                  <FlatList
+                    data={videodata2}
+                    keyExtractor={item => item.id.toString()}
+                    renderItem={({item, index}) => (
+                      <TouchableOpacity
+                        onPress={() =>
+                          setshowdetailmodel({
+                            show: true,
+                            data: item,
+                          })
+                        }>
+                        <SingleMedia item={item} index={index} />
+                      </TouchableOpacity>
+                    )}
+                    onEndReachedThreshold={0.1}
+                    showsVerticalScrollIndicator={false}
+                    numColumns={4}
+                    contentContainerStyle={{paddingBottom: 80}}
+                  />
+                ) : (
+                  <Text
+                    style={{
+                      color: colors.login.headingtext2,
+                      marginTop: 50,
+                      fontSize: 20,
+                      fontWeight: '900',
+                      textAlign: 'center',
+                    }}>
+                    No Videos
+                  </Text>
+                ))}
+            </View>
+          </View>
+          {showdetailmodel.show && (
+            <DetailMedia
+              data={showdetailmodel.data}
+              close={closedetailmodel}
+              ismyid={false}
+            />
+          )}
+          <BottomBar />
         </View>
-        {showdetailmodel.show && (
-          <DetailMedia
-            data={showdetailmodel.data}
-            close={closedetailmodel}
-            ismyid={false}
-          />
-        )}
-        <BottomBar />
-      </View>
+      </ReLoader>
     </GradientScreen>
   );
 };

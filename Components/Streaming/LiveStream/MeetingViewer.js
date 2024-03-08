@@ -18,6 +18,7 @@ export default function MeetingViewer({setlocalParticipantMode}) {
     localWebcamOn,
     localMicOn,
     end,
+    leave,
     toggleWebcam,
     toggleMic,
     changeWebcam,
@@ -233,6 +234,7 @@ export default function MeetingViewer({setlocalParticipantMode}) {
         toggleWebcam={toggleWebcam}
         changeWebcam={changeWebcam}
         end={end}
+        leave={leave}
         setBottomSheetView={setBottomSheetView}
         bottomSheetRef={bottomSheetRef}
       />

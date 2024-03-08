@@ -198,9 +198,9 @@ function App() {
       console.log('connected to socket server in app.js');
       console.log('socket id:', socket.id, socket.connected);
     });
-    return () => {
-      socket.off('connect');
-    };
+    // return () => {
+    //   socket.off('connect');
+    // };
   }, []);
 
   useEffect(() => {

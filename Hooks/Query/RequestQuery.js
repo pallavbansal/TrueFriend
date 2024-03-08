@@ -4,6 +4,7 @@ import {
   fetchFriends,
   fetchFriendRequests,
   fetchChattingFriends,
+  requestCurrentStatus,
 } from '../../Services/RequestServices';
 import {useMutation, useQuery} from '@tanstack/react-query';
 import {useSelector} from 'react-redux';
@@ -22,6 +23,16 @@ export const useUpdateRequest = () => {
     mutationFn: ({data}) => updateRequest(data, token),
   });
   return {isPending, error, mutate, reset};
+};
+
+export const useRequestCurrentStatus = id => {
+  const token = useSelector(state => state.Auth.token);
+  const {isPending, error, data, isError} = useQuery({
+    queryFn: () => requestCurrentStatus(id, token),
+    queryKey: ['requestCurrentStatus', id, token],
+  });
+
+  return {isPending, error, data, isError};
 };
 
 export const useFetchFriends = () => {
@@ -53,6 +64,8 @@ const expensiveTransform = data => {
         email: user.email,
         profile_picture: user.profile_picture,
         type: 'SINGLE',
+        chatfetchid: item.id,
+        unseenmsg: 0,
       };
     } else if (item.type === 'GROUP') {
       return {
@@ -62,6 +75,8 @@ const expensiveTransform = data => {
         grouproomid: item.id,
         profile_picture: item.profile_picture,
         admin_id: item.admin_id,
+        chatfetchid: item.id,
+        unseenmsg: 0,
       };
     }
   });

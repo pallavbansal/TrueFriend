@@ -26,8 +26,8 @@ const list = [
 const ReportUser = ({close}) => {
   const navigation = useNavigation();
   const [selected, setselected] = useState({
-    index: null,
-    value: '',
+    index: [],
+    value: [],
   });
   const handleclose = () => {
     close();
@@ -38,9 +38,18 @@ const ReportUser = ({close}) => {
   };
 
   const handleselect = (index, value) => {
-    setselected({
-      index: index,
-      value: value,
+    setselected(prev => {
+      if (prev.index.includes(index)) {
+        return {
+          index: prev.index.filter(i => i !== index),
+          value: prev.value.filter(v => v !== value),
+        };
+      } else {
+        return {
+          index: [...prev.index, index],
+          value: [...prev.value, value],
+        };
+      }
     });
   };
 
@@ -78,7 +87,7 @@ const ReportUser = ({close}) => {
                     alignItems: 'center',
                     gap: 10,
                   }}>
-                  <Text
+                  {/* <Text
                     style={[
                       styles.headingtext2,
                       {
@@ -86,6 +95,17 @@ const ReportUser = ({close}) => {
                           selected.index === index
                             ? colors.arrow.primary
                             : colors.text.primary,
+                      },
+                    ]}>
+                    {item}
+                  </Text> */}
+                  <Text
+                    style={[
+                      styles.headingtext2,
+                      {
+                        color: selected.index.includes(index)
+                          ? colors.arrow.primary
+                          : colors.text.primary,
                       },
                     ]}>
                     {item}

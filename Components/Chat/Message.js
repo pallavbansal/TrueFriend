@@ -10,9 +10,23 @@ import React, {useState} from 'react';
 import {colors} from '../../Styles/ColorData';
 import Video from 'react-native-video';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {Dimensions} from 'react-native';
+const windowWidth = Dimensions.get('window').width;
 
 const Message = ({MessageData, myid}) => {
-  const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState({
+    visible: false,
+    type: '',
+  });
+  const [isPaused, setIsPaused] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const handlePause = () => {
+    setIsPaused(prev => !prev);
+  };
+
+  const handleMute = () => {
+    setIsMuted(prev => !prev);
+  };
 
   const onBuffer = ({isBuffering}) => {
     console.log(isBuffering ? 'Video is buffering' : 'Video buffering ended');
@@ -96,23 +110,23 @@ const Message = ({MessageData, myid}) => {
           ]}>
           {MessageData.sender_id == myid ? 'You' : MessageData.sender.name}
         </Text>
-        {MessageData.type == 'image' && (
+        {MessageData.type == 'PHOTO' && (
           <MaterialIcons
             name="image"
             size={18}
             color={colors.arrow.primary}
             style={{
-              marginRight: 'auto',
+              marginLeft: 'auto',
             }}
           />
         )}
-        {MessageData.type == 'video' && (
+        {MessageData.type == 'VIDEO' && (
           <MaterialIcons
             name="video-camera-back"
             size={18}
             color={colors.arrow.primary}
             style={{
-              marginRight: 'auto',
+              marginLeft: 'auto',
             }}
           />
         )}
@@ -135,49 +149,139 @@ const Message = ({MessageData, myid}) => {
         <Text style={styles.messagetext}>{MessageData.content}</Text>
       )}
       {MessageData.type == 'PHOTO' && (
-        <Image
-          source={{uri: MessageData.media_path}}
-          style={{width: 150, height: 150}}
-        />
-      )}
-      {MessageData.type == 'VIDEO' && (
-        <TouchableOpacity onPress={() => setModalVisible(true)}>
-          <Video
-            source={{uri: MessageData.media_path}}
-            style={{width: 150, height: 150}}
-            resizeMode="cover"
-            muted={true}
-            paused={true}
-            repeat={false}
-            onBuffer={onBuffer}
-            onError={videoError}
-          />
-          {/* <Image
-            source={{uri: MessageData.media_path}}
-            style={{width: 150, height: 150}}
-          /> */}
-          <Modal
-            animationType="slide"
-            transparent={false}
-            visible={modalVisible}
-            onRequestClose={() => {
-              setModalVisible(!modalVisible);
+        <TouchableOpacity
+          onPress={() =>
+            setModalVisible({
+              visible: true,
+              type: 'image',
+            })
+          }>
+          <View
+            style={{
+              gap: 10,
             }}>
-            <View style={styles.videoModal}>
-              <Video
-                source={{uri: MessageData.media_path}}
-                style={{width: '100%', height: '100%'}}
-                resizeMode="cover"
-                controls={true}
-                paused={false}
-                repeat={false}
-                onBuffer={onBuffer}
-                onError={videoError}
-              />
-            </View>
-          </Modal>
+            {MessageData.content && (
+              <Text style={styles.messagetext}>{MessageData.content}</Text>
+            )}
+            <Image
+              source={{uri: MessageData.media_path}}
+              style={{
+                width: 150,
+                height: 150,
+                borderRadius: 15,
+                marginBottom: 10,
+                overflow: 'hidden',
+              }}
+            />
+          </View>
         </TouchableOpacity>
       )}
+      {MessageData.type == 'VIDEO' && (
+        <TouchableOpacity
+          onPress={() =>
+            setModalVisible({
+              visible: true,
+              type: 'video',
+            })
+          }>
+          <View
+            style={{
+              gap: 10,
+            }}>
+            {MessageData.content && (
+              <Text style={styles.messagetext}>{MessageData.content}</Text>
+            )}
+            <Video
+              source={{uri: MessageData.media_path}}
+              style={{
+                width: 150,
+                height: 150,
+                borderRadius: 15,
+                marginBottom: 10,
+                overflow: 'hidden',
+              }}
+              resizeMode="cover"
+              muted={true}
+              paused={true}
+              repeat={false}
+              onBuffer={onBuffer}
+              onError={videoError}
+              poster="https://www.w3schools.com/w3images/lights.jpg"
+              posterResizeMode="cover"
+            />
+          </View>
+        </TouchableOpacity>
+      )}
+      <View>
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={modalVisible.visible}
+          onRequestClose={() => {
+            setModalVisible({
+              visible: false,
+              type: '',
+            });
+          }}>
+          {modalVisible.type == 'video' && (
+            <View style={styles.innerModal}>
+              <View style={styles.profilecontainer}>
+                <Video
+                  source={{uri: MessageData.media_path}}
+                  style={{
+                    width: '100%',
+                    aspectRatio: 16 / 9,
+                  }}
+                  resizeMode="contain"
+                  controls={true}
+                  paused={isPaused}
+                  muted={isMuted}
+                  repeat={false}
+                  onBuffer={onBuffer}
+                  onError={videoError}
+                />
+              </View>
+
+              <View style={styles.videobuttons}>
+                <TouchableOpacity
+                  onPress={handlePause}
+                  style={styles.pausebutton}>
+                  <MaterialIcons
+                    name={isPaused ? 'play-arrow' : 'pause'}
+                    size={28}
+                    color={colors.text.primary}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleMute}
+                  style={styles.mutebutton}>
+                  <MaterialIcons
+                    name={isMuted ? 'volume-off' : 'volume-up'}
+                    size={28}
+                    color={colors.text.primary}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+
+          {modalVisible.type == 'image' && (
+            <View style={styles.innerModal}>
+              <View style={styles.profilecontainer}>
+                <Image
+                  source={{uri: MessageData.media_path}}
+                  style={{
+                    width: '100%',
+                    aspectRatio: 1,
+                    overflow: 'hidden',
+                  }}
+                  resizeMode="contain"
+                />
+              </View>
+            </View>
+          )}
+        </Modal>
+      </View>
     </View>
   );
 };
@@ -210,7 +314,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 10,
-    gap: 20,
+    gap: 5,
   },
   timetext: {
     fontFamily: 'Lexend',
@@ -240,10 +344,29 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
   },
-  videoModal: {
-    // backgroundColor: 'black',
+  innerModal: {
     flex: 1,
-    // padding: 10,
-    // margin: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.arrow.secondary,
+  },
+  profilecontainer: {
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    borderRadius: 20,
+    overflow: 'hidden',
+    margin: 5,
+    width: windowWidth - 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  videobuttons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 25,
+    marginTop: 20,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    padding: 10,
+    borderRadius: 20,
   },
 });

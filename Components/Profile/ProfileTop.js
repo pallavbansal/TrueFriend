@@ -177,7 +177,7 @@ const ProfileTop = ({
                   flexDirection: 'row',
                   gap: 20,
                 }}>
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   onPress={() => requestaction('acceptrequest')}>
                   <Text
                     style={{
@@ -196,7 +196,14 @@ const ProfileTop = ({
                     }}>
                     Reject
                   </Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
+                <Text
+                  style={{
+                    color: 'white',
+                    fontWeight: 'bold',
+                  }}>
+                  Request Received
+                </Text>
               </View>
             )}
             {request_status === 'Noaction' && (

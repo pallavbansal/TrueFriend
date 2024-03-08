@@ -4,26 +4,21 @@ import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../../Styles/ColorData';
 import {useNavigation} from '@react-navigation/native';
 import {getToken} from '../../Utils/Streamapi';
+import {useSelector} from 'react-redux';
 
 const SingleUser = ({item}) => {
   const navigation = useNavigation();
-  const [token, setToken] = useState('');
+  const mydata = useSelector(state => state.Auth.userinitaldata);
+
   const {profile_picture: imageUrl, online_status, id, name} = item.user;
 
-  useEffect(() => {
-    const fetchToken = async () => {
-      const token = await getToken();
-      setToken(token);
-    };
-
-    fetchToken();
-  }, [navigation]);
-
-  const handlewatchstream = () => {
+  const handlewatchstream = async () => {
+    const token = await getToken();
+    console.log('Token', token);
     navigation.navigate('WatchStream', {
       id: id,
       token: token,
-      name: name,
+      name: mydata.name,
       mode: 'VIEWER',
     });
   };

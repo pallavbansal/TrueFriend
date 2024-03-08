@@ -35,6 +35,24 @@ export async function updateRequest(data, token) {
   return response.json();
 }
 
+export async function requestCurrentStatus(id, token) {
+  const response = await fetch(
+    `${url}/friend-request/fetch-status?user_id=${id}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  if (!response.ok) {
+    console.log('Error fetchChattingFriends', response);
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
+}
+
 export async function fetchFriends(token) {
   const response = await fetch(`${url}/friend-request/fetch-friends`, {
     method: 'GET',

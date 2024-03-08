@@ -38,8 +38,8 @@ const Registration = () => {
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
   const [registerdata, setRegisterData] = useState({
-    name: 'Jhon',
-    email: '@gmail.com',
+    name: 'xogutijo',
+    email: 'xogutijo@closetab.email',
     password: '1234567',
     confirmpassword: '1234567',
     phone: '8384863081',

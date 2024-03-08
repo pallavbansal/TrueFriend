@@ -1,8 +1,9 @@
 const url = 'https://wooing.boxinallsoftech.com/public/api/v1';
 
-export async function fetchChatting(token, receiver_id, pageParam) {
+export async function fetchChatting(token, id, pageParam) {
+  console.log('fetchChatting', id, pageParam);
   const response = await fetch(
-    `${url}/chat/fetch?receiver_id=${receiver_id}&page=${pageParam}`,
+    `${url}/chat/fetch?group_id=${id}&page=${pageParam}`,
     {
       method: 'GET',
       headers: {
@@ -21,8 +22,14 @@ export async function fetchChatting(token, receiver_id, pageParam) {
 export async function createChat(token, data) {
   const form = new FormData();
   form.append('type', data.type);
-  form.append('receiver_id', data.receiver_id);
   form.append('content', data.content);
+
+  if (data.group_id) {
+    form.append('group_id', data.group_id);
+  } else {
+    form.append('receiver_id', data.receiver_id);
+  }
+
   if (data.type == 'PHOTO' || data.type == 'VIDEO') {
     form.append('media', {
       uri: data.media.path,

@@ -18,6 +18,7 @@ import {
   useLocationUpdate,
   useFetchDiscoverProfile,
 } from '../Hooks/Query/HomeQuery';
+import ReLoader from '../Components/Common/ReLoader';
 
 const Discover = () => {
   const navigation = useNavigation();
@@ -28,6 +29,7 @@ const Discover = () => {
     reset: locationReset,
   } = useLocationUpdate();
   const myuserid = useSelector(state => state.Auth.userid);
+  console.log(useSelector(state => state.Auth.token));
   console.log('My User ID', myuserid);
   const [locationupdated, setlocationupdated] = useState(false);
   const [pageoption, setpageOption] = useState('Discover');
@@ -120,149 +122,158 @@ const Discover = () => {
       end={{x: 1, y: 1}}
       colors={colors.gradients.discovergradient}
       style={styles.screen}>
-      <View style={styles.screen}>
-        <View style={styles.screencontainer}>
-          <DiscoverHeader />
+      <ReLoader queryKeys={['discoverprofiles', 'fetchProfile']}>
+        <View style={styles.screen}>
+          <View style={styles.screencontainer}>
+            <DiscoverHeader />
 
-          <View style={[styles.optioncontainer]}>
-            <TouchableOpacity onPress={() => setpageOption('Discover')}>
-              <Text
-                style={[
-                  styles.optiontext,
-                  {
-                    color:
-                      pageoption === 'Discover'
-                        ? colors.arrow.tertiary
-                        : colors.text.primary,
-                  },
-                ]}>
-                Discover
-              </Text>
-            </TouchableOpacity>
+            <View style={[styles.optioncontainer]}>
+              <TouchableOpacity onPress={() => setpageOption('Discover')}>
+                <Text
+                  style={[
+                    styles.optiontext,
+                    {
+                      color:
+                        pageoption === 'Discover'
+                          ? colors.arrow.tertiary
+                          : colors.text.primary,
+                    },
+                  ]}>
+                  Discover
+                </Text>
+              </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => setpageOption('Nearby')}>
-              <Text
-                style={[
-                  styles.optiontext,
-                  {
-                    color:
-                      pageoption === 'Nearby'
-                        ? colors.arrow.tertiary
-                        : colors.text.primary,
-                  },
-                ]}>
-                Nearby
-              </Text>
-            </TouchableOpacity>
+              <TouchableOpacity onPress={() => setpageOption('Nearby')}>
+                <Text
+                  style={[
+                    styles.optiontext,
+                    {
+                      color:
+                        pageoption === 'Nearby'
+                          ? colors.arrow.tertiary
+                          : colors.text.primary,
+                    },
+                  ]}>
+                  Nearby
+                </Text>
+              </TouchableOpacity>
+
+              <View
+                style={{
+                  position: 'relative',
+                  marginLeft: 'auto',
+                  marginRight: 10,
+                }}>
+                {pageoption === 'Nearby' && (
+                  <TouchableOpacity onPress={handleFilter}>
+                    <MaterialIcons
+                      name="filter-list"
+                      size={24}
+                      color={colors.text.primary}
+                      style={{
+                        marginLeft: 'auto',
+                      }}
+                    />
+                  </TouchableOpacity>
+                )}
+                {pageoption === 'Nearby' && showfilter && (
+                  <GradientInput style={styles.gradientborder2}>
+                    <View style={styles.dropcontainer}>
+                      {filterdata.items.map((item, index) => (
+                        <View key={index} style={styles.singleitem}>
+                          <TouchableOpacity
+                            onPress={() => {
+                              setfilterdata(prev => {
+                                return {
+                                  ...prev,
+                                  applied: item.value,
+                                };
+                              });
+                              setshowfilter(false);
+                            }}>
+                            <Text
+                              style={[
+                                styles.itemtext,
+                                {
+                                  color:
+                                    filterdata.applied === item.value
+                                      ? colors.arrow.tertiary
+                                      : colors.login.headingtext2,
+                                },
+                              ]}>
+                              {item.item}
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                      ))}
+                    </View>
+                  </GradientInput>
+                )}
+              </View>
+            </View>
 
             <View
               style={{
-                position: 'relative',
-                marginLeft: 'auto',
-                marginRight: 10,
+                marginBottom: 120,
+                alignItems:
+                  discoverData?.data?.profiles?.length > 2
+                    ? 'center'
+                    : 'stretch',
               }}>
-              {pageoption === 'Nearby' && (
-                <TouchableOpacity onPress={handleFilter}>
-                  <MaterialIcons
-                    name="filter-list"
-                    size={24}
-                    color={colors.text.primary}
-                    style={{
-                      marginLeft: 'auto',
-                    }}
-                  />
-                </TouchableOpacity>
-              )}
-              {pageoption === 'Nearby' && showfilter && (
-                <GradientInput style={styles.gradientborder2}>
-                  <View style={styles.dropcontainer}>
-                    {filterdata.items.map((item, index) => (
-                      <View key={index} style={styles.singleitem}>
-                        <TouchableOpacity
-                          onPress={() => {
-                            setfilterdata(prev => {
-                              return {
-                                ...prev,
-                                applied: item.value,
-                              };
-                            });
-                            setshowfilter(false);
-                          }}>
-                          <Text
-                            style={[
-                              styles.itemtext,
-                              {
-                                color:
-                                  filterdata.applied === item.value
-                                    ? colors.arrow.tertiary
-                                    : colors.login.headingtext2,
-                              },
-                            ]}>
-                            {item.item}
-                          </Text>
-                        </TouchableOpacity>
-                      </View>
-                    ))}
-                  </View>
-                </GradientInput>
+              {discoverData?.data?.profiles ? (
+                <FlatList
+                  data={discoverData?.data?.profiles}
+                  keyExtractor={item => item.user.id.toString()}
+                  renderItem={({item, index}) => (
+                    <SingleUser item={item} index={index} />
+                  )}
+                  onEndReachedThreshold={0.1}
+                  showsVerticalScrollIndicator={false}
+                  numColumns={3}
+                  contentContainerStyle={{paddingBottom: 80}}
+                />
+              ) : (
+                <NoData />
               )}
             </View>
-          </View>
 
-          <View style={{marginBottom: 120, alignItems: 'center'}}>
-            {discoverData?.data?.profiles ? (
-              <FlatList
-                data={discoverData?.data?.profiles}
-                keyExtractor={item => item.user.id.toString()}
-                renderItem={({item, index}) => (
-                  <SingleUser item={item} index={index} />
-                )}
-                onEndReachedThreshold={0.1}
-                showsVerticalScrollIndicator={false}
-                numColumns={3}
-                contentContainerStyle={{paddingBottom: 80}}
-              />
-            ) : (
-              <NoData />
-            )}
-          </View>
-
-          <View
-            style={{
-              position: 'absolute',
-              bottom: 75,
-              right: 20,
-              padding: 6,
-              borderRadius: 48,
-              backgroundColor: colors.text.primarylight,
-              elevation: 50,
-            }}>
-            <TouchableOpacity
+            <View
               style={{
-                backgroundColor: colors.text.primary,
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 40,
-                width: 74,
-                height: 74,
+                position: 'absolute',
+                bottom: 75,
+                right: 20,
+                padding: 6,
+                borderRadius: 48,
+                backgroundColor: colors.text.primarylight,
                 elevation: 50,
-              }}
-              onPress={() =>
-                navigation.navigate('StartStream', {
-                  isCreator: true,
-                })
-              }>
-              <Entypo
-                name="video-camera"
-                size={40}
-                color={colors.arrow.secondary}
-              />
-            </TouchableOpacity>
-          </View>
+              }}>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: colors.text.primary,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 40,
+                  width: 74,
+                  height: 74,
+                  elevation: 50,
+                }}
+                onPress={() =>
+                  navigation.navigate('StartStream', {
+                    isCreator: true,
+                  })
+                }>
+                <Entypo
+                  name="video-camera"
+                  size={40}
+                  color={colors.arrow.secondary}
+                />
+              </TouchableOpacity>
+            </View>
 
-          <BottomBar />
+            <BottomBar />
+          </View>
         </View>
-      </View>
+      </ReLoader>
     </LinearGradient>
   );
 };

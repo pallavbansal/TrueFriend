@@ -27,6 +27,7 @@ import {
   useFetchFriendRequests,
   useFetchChattingFriends,
 } from '../Hooks/Query/RequestQuery';
+import ReLoader from '../Components/Common/ReLoader';
 
 // const friendsdata = [
 //   {
@@ -222,19 +223,26 @@ const FriendsList = () => {
   useEffect(() => {
     const handleMessage = msg => {
       console.log('msg in friend list', msg, activechat);
+      // console.log('myid', myuserid);
       if (msg.sender_id === myuserid) return;
       if (msg.type === activechat.type && msg.sender_id === activechat.id)
         return;
 
+      // console.log('chats', chattingfriendsdata);
+
       setfilteredchattingfriendsdata(prevData =>
         prevData.map(item => {
-          if (item.type === 'SINGLE' && msg.sender_id === item.id) {
+          if (
+            item.type === 'SINGLE' &&
+            msg.chattype === 'SINGLE' &&
+            msg.sender_id === item.id
+          ) {
             return {...item, unseenmsg: item.unseenmsg + 1};
           }
           if (
             item.type === 'GROUP' &&
-            msg.receiver_id === item.grouproomid &&
-            msg.sender_id !== myuserid
+            msg.chattype === 'GROUP' &&
+            msg.receiver_id === item.grouproomid
           ) {
             return {...item, unseenmsg: item.unseenmsg + 1};
           }
@@ -259,6 +267,15 @@ const FriendsList = () => {
 
   const handleChatClick = data => {
     console.log('data in handle chat', data);
+    console.log(filteredchattingfriendsdata);
+    setfilteredchattingfriendsdata(prevData =>
+      prevData.map(item => {
+        if (item.id === data.userid && item.type === data.type) {
+          return {...item, unseenmsg: 0};
+        }
+        return item;
+      }),
+    );
     setactivechat({
       type: data.type,
       id: data.userid,
@@ -282,224 +299,232 @@ const FriendsList = () => {
     return <Loading />;
   }
 
-  // console.log('friendsdata2', friendsdata2.data.friends);
-  // console.log('requestdata2', requestdata2.data.friends);
-  // console.log('chattingfriendsdata', chattingfriendsdata);
-
   return (
     <GradientScreen>
-      <View style={styles.container}>
-        <View style={styles.headerbackcontainer}>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.goBack();
-            }}>
-            <MaterialIcons
-              name="arrow-back"
-              size={24}
-              color={colors.arrow.primary}
-              style={{marginLeft: 20}}
-            />
-          </TouchableOpacity>
-
-          {selectedoptiontype === 'friends' && (
+      <ReLoader
+        queryKeys={[
+          'fetchFriends',
+          'fetchFriendRequests',
+          'fetchChattingFriends',
+        ]}>
+        <View style={styles.container}>
+          <View style={styles.headerbackcontainer}>
             <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginRight: 20,
-                gap: 3,
-              }}
-              onPress={() => setshowgroupmodal(true)}>
-              <View
+              onPress={() => {
+                navigation.goBack();
+              }}>
+              <MaterialIcons
+                name="arrow-back"
+                size={24}
+                color={colors.arrow.primary}
+                style={{marginLeft: 20}}
+              />
+            </TouchableOpacity>
+
+            {selectedoptiontype === 'friends' && (
+              <TouchableOpacity
                 style={{
-                  backgroundColor: '#FF5A90',
-                  padding: 5,
-                  borderRadius: 50,
-                }}>
-                <AntDesign
-                  name="plus"
-                  size={24}
-                  color="white"
-                  style={{fontWeight: '900'}}
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginRight: 20,
+                  gap: 3,
+                }}
+                onPress={() => setshowgroupmodal(true)}>
+                <View
+                  style={{
+                    backgroundColor: '#FF5A90',
+                    padding: 5,
+                    borderRadius: 50,
+                  }}>
+                  <AntDesign
+                    name="plus"
+                    size={24}
+                    color="white"
+                    style={{fontWeight: '900'}}
+                  />
+                </View>
+                <Text style={styles.headingtext2}> Create Group</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          <View style={styles.headingsearchcontainer}>
+            <GradientInput style={styles.gradientborder}>
+              <View style={styles.inputcontainer}>
+                <MaterialIcons
+                  name="search"
+                  size={18}
+                  color={colors.text.secondary}
+                />
+                <TextInput
+                  placeholder={
+                    selectedoptiontype === 'friends'
+                      ? 'Search All Friends'
+                      : selectedoptiontype === 'requests'
+                      ? 'Search Requests'
+                      : 'Search Chats'
+                  }
+                  keyboardType="email-address"
+                  placeholderTextColor={colors.login.headingtext2}
+                  onChangeText={text => setsearchfilter(text)}
+                  value={searchfilter}
+                  cursorColor={colors.login.headingtext2}
+                  style={{color: colors.login.headingtext2, flex: 1}}
                 />
               </View>
-              <Text style={styles.headingtext2}> Create Group</Text>
+            </GradientInput>
+          </View>
+          <View style={styles.optionscontainer}>
+            <TouchableOpacity onPress={() => setselectedoptiontype('chats')}>
+              <Text
+                style={[
+                  styles.optiontext,
+                  {
+                    color:
+                      selectedoptiontype === 'chats'
+                        ? colors.arrow.tertiary
+                        : colors.arrow.primary,
+                  },
+                ]}>
+                Chats
+              </Text>
             </TouchableOpacity>
-          )}
-        </View>
-        <View style={styles.headingsearchcontainer}>
-          <GradientInput style={styles.gradientborder}>
-            <View style={styles.inputcontainer}>
-              <MaterialIcons
-                name="search"
-                size={18}
-                color={colors.text.secondary}
-              />
-              <TextInput
-                placeholder={
-                  selectedoptiontype === 'friends'
-                    ? 'Search All Friends'
-                    : selectedoptiontype === 'requests'
-                    ? 'Search Requests'
-                    : 'Search Chats'
-                }
-                keyboardType="email-address"
-                placeholderTextColor={colors.login.headingtext2}
-                onChangeText={text => setsearchfilter(text)}
-                value={searchfilter}
-                cursorColor={colors.login.headingtext2}
-                style={{color: colors.login.headingtext2, flex: 1}}
-              />
-            </View>
-          </GradientInput>
-        </View>
-        <View style={styles.optionscontainer}>
-          <TouchableOpacity onPress={() => setselectedoptiontype('chats')}>
-            <Text
-              style={[
-                styles.optiontext,
-                {
-                  color:
-                    selectedoptiontype === 'chats'
-                      ? colors.arrow.tertiary
-                      : colors.arrow.primary,
-                },
-              ]}>
-              Chats
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setselectedoptiontype('friends')}>
-            <Text
-              style={[
-                styles.optiontext,
-                {
-                  color:
-                    selectedoptiontype === 'friends'
-                      ? colors.arrow.tertiary
-                      : colors.arrow.primary,
-                },
-              ]}>
-              Friends
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setselectedoptiontype('requests')}>
-            <Text
-              style={[
-                styles.optiontext,
-                {
-                  color:
-                    selectedoptiontype === 'requests'
-                      ? colors.arrow.tertiary
-                      : colors.arrow.primary,
-                },
-              ]}>
-              Requests
-            </Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.headingContainer}></View>
-        <View style={styles.friendlistcontainer}>
-          {selectedoptiontype === 'friends' ? (
-            filteredfriendsdata.filter(item => item.id !== myuserid).length >
-            0 ? (
-              <FlatList
-                data={filteredfriendsdata.filter(item => item.id !== myuserid)}
-                keyExtractor={item => item.id.toString()}
-                renderItem={({item, index}) => (
-                  <SingleFriend
-                    data={item}
-                    index={index}
-                    hideunseen={true}
-                    handleChatClick={handleChatClick}
-                  />
-                )}
-                onEndReachedThreshold={0.1}
-                showsVerticalScrollIndicator={false}
-                numColumns={1}
-                contentContainerStyle={{paddingBottom: 250}}
-              />
-            ) : (
+            <TouchableOpacity onPress={() => setselectedoptiontype('friends')}>
               <Text
-                style={{
-                  color: colors.login.headingtext2,
-                  marginTop: 80,
-                  fontSize: 20,
-                  fontWeight: '900',
-                  textAlign: 'center',
-                }}>
-                No Friends Found
+                style={[
+                  styles.optiontext,
+                  {
+                    color:
+                      selectedoptiontype === 'friends'
+                        ? colors.arrow.tertiary
+                        : colors.arrow.primary,
+                  },
+                ]}>
+                Friends
               </Text>
-            )
-          ) : selectedoptiontype === 'requests' ? (
-            filteredrequestdata.length > 0 ? (
-              <FlatList
-                data={filteredrequestdata}
-                keyExtractor={item => item.friend_id.toString()}
-                renderItem={({item, index}) => (
-                  <SingleRequest
-                    data={item}
-                    index={index}
-                    setfilteredrequestdata={setfilteredrequestdata}
-                  />
-                )}
-                onEndReachedThreshold={0.1}
-                showsVerticalScrollIndicator={false}
-                numColumns={1}
-                contentContainerStyle={{paddingBottom: 250}}
-              />
-            ) : (
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setselectedoptiontype('requests')}>
               <Text
-                style={{
-                  color: colors.login.headingtext2,
-                  marginTop: 80,
-                  fontSize: 20,
-                  fontWeight: '900',
-                  textAlign: 'center',
-                }}>
-                No Requests Found
+                style={[
+                  styles.optiontext,
+                  {
+                    color:
+                      selectedoptiontype === 'requests'
+                        ? colors.arrow.tertiary
+                        : colors.arrow.primary,
+                  },
+                ]}>
+                Requests
               </Text>
-            )
-          ) : selectedoptiontype === 'chats' ? (
-            filteredchattingfriendsdata.length > 0 ? (
-              <FlatList
-                data={filteredchattingfriendsdata}
-                keyExtractor={(item, index) => index.toString()}
-                // keyExtractor={item => item.id.toString()}
-                renderItem={({item, index}) => (
-                  <SingleFriend
-                    data={item}
-                    index={index}
-                    hideunseen={false}
-                    handleChatClick={handleChatClick}
-                  />
-                )}
-                onEndReachedThreshold={0.1}
-                showsVerticalScrollIndicator={false}
-                numColumns={1}
-                contentContainerStyle={{paddingBottom: 250}}
-              />
-            ) : (
-              <Text
-                style={{
-                  color: colors.login.headingtext2,
-                  marginTop: 80,
-                  fontSize: 20,
-                  fontWeight: '900',
-                  textAlign: 'center',
-                }}>
-                No Chats Found
-              </Text>
-            )
-          ) : null}
+            </TouchableOpacity>
+          </View>
+          <View style={styles.headingContainer}></View>
+          <View style={styles.friendlistcontainer}>
+            {selectedoptiontype === 'friends' ? (
+              filteredfriendsdata.filter(item => item.id !== myuserid).length >
+              0 ? (
+                <FlatList
+                  data={filteredfriendsdata.filter(
+                    item => item.id !== myuserid,
+                  )}
+                  keyExtractor={item => item.id.toString()}
+                  renderItem={({item, index}) => (
+                    <SingleFriend
+                      data={item}
+                      index={index}
+                      hideunseen={true}
+                      handleChatClick={handleChatClick}
+                    />
+                  )}
+                  onEndReachedThreshold={0.1}
+                  showsVerticalScrollIndicator={false}
+                  numColumns={1}
+                  contentContainerStyle={{paddingBottom: 250}}
+                />
+              ) : (
+                <Text
+                  style={{
+                    color: colors.login.headingtext2,
+                    marginTop: 80,
+                    fontSize: 20,
+                    fontWeight: '900',
+                    textAlign: 'center',
+                  }}>
+                  No Friends Found
+                </Text>
+              )
+            ) : selectedoptiontype === 'requests' ? (
+              filteredrequestdata.length > 0 ? (
+                <FlatList
+                  data={filteredrequestdata}
+                  keyExtractor={item => item.friend_id.toString()}
+                  renderItem={({item, index}) => (
+                    <SingleRequest
+                      data={item}
+                      index={index}
+                      setfilteredrequestdata={setfilteredrequestdata}
+                    />
+                  )}
+                  onEndReachedThreshold={0.1}
+                  showsVerticalScrollIndicator={false}
+                  numColumns={1}
+                  contentContainerStyle={{paddingBottom: 250}}
+                />
+              ) : (
+                <Text
+                  style={{
+                    color: colors.login.headingtext2,
+                    marginTop: 80,
+                    fontSize: 20,
+                    fontWeight: '900',
+                    textAlign: 'center',
+                  }}>
+                  No Requests Found
+                </Text>
+              )
+            ) : selectedoptiontype === 'chats' ? (
+              filteredchattingfriendsdata.length > 0 ? (
+                <FlatList
+                  nestedScrollEnabled={true}
+                  data={filteredchattingfriendsdata}
+                  keyExtractor={(item, index) => index.toString()}
+                  // keyExtractor={item => item.id.toString()}
+                  renderItem={({item, index}) => (
+                    <SingleFriend
+                      data={item}
+                      index={index}
+                      hideunseen={false}
+                      handleChatClick={handleChatClick}
+                    />
+                  )}
+                  onEndReachedThreshold={0.1}
+                  showsVerticalScrollIndicator={false}
+                  numColumns={1}
+                  contentContainerStyle={{
+                    paddingBottom: 250,
+                  }}
+                />
+              ) : (
+                <Text
+                  style={{
+                    color: colors.login.headingtext2,
+                    marginTop: 80,
+                    fontSize: 20,
+                    fontWeight: '900',
+                    textAlign: 'center',
+                  }}>
+                  No Chats Found
+                </Text>
+              )
+            ) : null}
+          </View>
+          <CreateGroupModal
+            showgroupmodal={showgroupmodal}
+            setshowgroupmodal={setshowgroupmodal}
+            friendsdata2={friendsdata2}
+          />
+          <BottomBar />
         </View>
-        <CreateGroupModal
-          showgroupmodal={showgroupmodal}
-          setshowgroupmodal={setshowgroupmodal}
-          friendsdata2={friendsdata2}
-        />
-        <BottomBar />
-      </View>
+      </ReLoader>
     </GradientScreen>
   );
 };

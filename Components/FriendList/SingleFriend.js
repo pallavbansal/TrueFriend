@@ -9,6 +9,7 @@ import {useSelector} from 'react-redux';
 import {getToken, createMeeting} from '../../Utils/Streamapi';
 
 const SingleFriend = ({data, hideunseen, handleChatClick}) => {
+  console.log('Single Friend Data:', data);
   const mydata = useSelector(state => state.Auth.userinitaldata);
   const navigation = useNavigation();
   const isCreator = true;
@@ -20,6 +21,7 @@ const SingleFriend = ({data, hideunseen, handleChatClick}) => {
       imageUrl: data.profile_picture,
       type: data.type,
       grouproomid: data.grouproomid,
+      chatfetchid: data.chatfetchid,
     };
     handleChatClick(finaldata);
     navigation.navigate('Chat', finaldata);

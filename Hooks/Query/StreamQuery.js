@@ -2,12 +2,11 @@ import {
   createStream,
   endStream,
   getStreamMeetingId,
+  getStream,
+  getAdjacentStream,
 } from '../../Services/StreamServices';
-import {useMutation, useQuery} from '@tanstack/react-query';
+import {useMutation, useQuery, useInfiniteQuery} from '@tanstack/react-query';
 import {useSelector} from 'react-redux';
-
-// [{"key":"meeting_id","value":"1234567","description":"","type":"text"},
-// {"key":"type","value":"STREAM","description":"STREAM,VIDEO,AUDIO","type":"text"}]
 
 export const useCreateStream = () => {
   const token = useSelector(state => state.Auth.token);
@@ -32,4 +31,45 @@ export const useEndStream = () => {
     queryKey: ['endstream', token],
   });
   return {isPending, error, data, isError};
+};
+
+export const useFetchStreams = () => {
+  const token = useSelector(state => state.Auth.token);
+  const {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isPending,
+    isFetching,
+  } = useInfiniteQuery({
+    queryKey: ['streams', token],
+    initialPageParam: 1,
+    queryFn: ({pageParam}) => getStream(token, pageParam),
+    getNextPageParam: lastPage => {
+      if (!lastPage.data.streams.next_page_url) return undefined;
+      const match = lastPage.data.streams.next_page_url.match(/page=(\d+)/);
+      const page = match ? Number(match[1]) : undefined;
+      return page;
+    },
+  });
+  return {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isPending,
+    isFetching,
+  };
+};
+
+export const useFetchAdjacentStream = streamId => {
+  const token = useSelector(state => state.Auth.token);
+  const {data, error, isPending, isError} = useQuery({
+    queryFn: () => getAdjacentStream(token, streamId),
+    queryKey: ['adjacentstream', token, streamId],
+  });
+  return {data, error, isPending, isError};
 };
