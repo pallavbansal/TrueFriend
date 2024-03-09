@@ -1,7 +1,8 @@
 const url = 'https://wooing.boxinallsoftech.com/public/api/v1';
 // Login service
 export async function login(data) {
-  console.log('data', data);
+  console.log('==Login Api==');
+
   const response = await fetch(`${url}/auth/login`, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -16,6 +17,7 @@ export async function login(data) {
 }
 // Verify service
 export async function verify(data) {
+  console.log('==Login Verify==');
   const response = await fetch(`${url}/auth/register/verify`, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -31,6 +33,7 @@ export async function verify(data) {
 }
 // Forgot Password service
 export async function forgotPassword(data) {
+  console.log('==Login ForgotPassword==');
   const response = await fetch(`${url}/auth/forget-password`, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -45,6 +48,7 @@ export async function forgotPassword(data) {
 
 // Register service
 export async function register(data) {
+  console.log('==Login Register==');
   const formData = new FormData();
   formData.append('city', data.city);
   formData.append('dob', data.dob);

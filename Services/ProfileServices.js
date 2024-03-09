@@ -1,7 +1,7 @@
 const url = 'https://wooing.boxinallsoftech.com/public/api/v1';
 
 export async function profileCreation(data, token) {
-  console.log('data', data, token);
+  console.log('==Profile  profilecreation==');
   const response = await fetch(`${url}/profile/create`, {
     method: 'POST',
     headers: {
@@ -18,6 +18,7 @@ export async function profileCreation(data, token) {
 }
 
 export async function fetchProfile(token) {
+  console.log('==Profile  fetchprofile==');
   const response = await fetch(`${url}/profile/fetch`, {
     method: 'GET',
     headers: {
@@ -33,6 +34,7 @@ export async function fetchProfile(token) {
 }
 
 export async function fetchProfileById(id, token) {
+  console.log('==Profile  fetchprofilebyid==');
   const response = await fetch(
     `${url}/profile/fetch-profile-by-id?user_id=${id}`,
     {
@@ -51,6 +53,7 @@ export async function fetchProfileById(id, token) {
 }
 
 export async function updateProfile(data, token) {
+  console.log('==Profile  updateprofile==');
   const formData = new FormData();
   formData.append('mobile_number', data.mobile_number);
   formData.append('bio', data.bio);

@@ -57,7 +57,7 @@ const DiscoverHeader = () => {
               borderColor: 'white',
             }}
             source={{
-              uri: UserProfileData.data.profile.profile_picture,
+              uri: UserProfileData?.data?.profile.profile_picture,
             }}
           />
         </TouchableOpacity>

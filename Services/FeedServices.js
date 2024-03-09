@@ -1,30 +1,7 @@
 const url = 'https://wooing.boxinallsoftech.com/public/api/v1';
 
-// export async function CreatePost(data, token) {
-//   const formData = new FormData();
-//   formData.append('caption', data.caption);
-//   formData.append('media_type', data.media_type);
-//   formData.append('media', {
-//     uri: data.media.path,
-//     type: data.media.mime,
-//     name: data.media.fileName,
-//   });
-//   const response = await fetch(`${url}/post/create`, {
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'multipart/form-data',
-//       Authorization: `Bearer ${token}`,
-//     },
-//     body: formData,
-//   });
-//   if (!response.ok) {
-//     console.log('Create Post Error 1', response);
-//     throw new Error('Network response was not ok');
-//   }
-//   return response.json();
-// }
-
 export async function CreatePost(data, token) {
+  console.log('==Feed CreatePost==');
   const formData = new FormData();
   formData.append('caption', data.caption);
 
@@ -58,7 +35,7 @@ export async function CreatePost(data, token) {
 }
 
 export async function getSocialFeedPosts(token, page) {
-  // console.log('token in api', page);
+  console.log('==Feed getsocialfeedposts==');
   const response = await fetch(`${url}/post/fetch?page=${page}`, {
     method: 'GET',
     headers: {
@@ -74,6 +51,7 @@ export async function getSocialFeedPosts(token, page) {
 }
 
 export async function likePost(token, postid) {
+  console.log('==Feed Likepost==');
   const response = await fetch(`${url}/post/like-post`, {
     method: 'POST',
     headers: {
@@ -90,6 +68,7 @@ export async function likePost(token, postid) {
 }
 
 export async function dislikePost(token, postid) {
+  console.log('==Feed dislikepost==');
   const response = await fetch(`${url}/post/dislike-post`, {
     method: 'POST',
     headers: {
@@ -106,6 +85,7 @@ export async function dislikePost(token, postid) {
 }
 
 export async function getPostComments(token, postid, page) {
+  console.log('==Feed getpostcomments==');
   const response = await fetch(
     `${url}/comment/fetch?post_id=${postid}&page=${page}`,
     {
@@ -124,6 +104,7 @@ export async function getPostComments(token, postid, page) {
 }
 
 export async function createPostComment(token, data) {
+  console.log('==Feed createpostcomments==');
   const response = await fetch(`${url}/comment/create`, {
     method: 'POST',
     headers: {
@@ -140,6 +121,7 @@ export async function createPostComment(token, data) {
 }
 
 export async function createCommentReply(token, data) {
+  console.log('==Feed createcommentreply==');
   const response = await fetch(`${url}/comment/reply`, {
     method: 'POST',
     headers: {
