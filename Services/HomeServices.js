@@ -1,7 +1,7 @@
 const url = 'https://wooing.boxinallsoftech.com/public/api/v1';
 
 export async function locationUpdate(data, token) {
-  console.log('location api start', data, token);
+  console.log('==Home Locationupdate==');
   const response = await fetch(`${url}/profile-matching/update-location`, {
     method: 'POST',
     headers: {
@@ -18,7 +18,7 @@ export async function locationUpdate(data, token) {
 }
 
 export async function getDiscoverProfiles(token, distance) {
-  console.log('discover profile api start', token, distance);
+  console.log('==Home getdiscoverprofiles==');
   const response = await fetch(
     `${url}/profile-matching/fetch?distance=${distance}`,
     {

@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TextInput,
   FlatList,
+  RefreshControl,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {colors} from '../Styles/ColorData';
@@ -21,103 +22,18 @@ import {useSelector} from 'react-redux';
 import Toast from 'react-native-toast-message';
 import FriendsListSkeleton from '../Layouts/Skeletions/FriendsListSkeleton';
 import CreateGroupModal from '../Components/FriendList/CreateGroupModal';
+import MyLoadingIndicator from '../Components/Common/MyLoadingIndicator';
 import Loading from './Loading';
 import {
   useFetchFriends,
   useFetchFriendRequests,
   useFetchChattingFriends,
 } from '../Hooks/Query/RequestQuery';
-import ReLoader from '../Components/Common/ReLoader';
-
-// const friendsdata = [
-//   {
-//     id: 7,
-//     name: 'Jhon Doe',
-//     type: 'SINGLE',
-//     liked: true,
-//     imageUrl:
-//       'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-//     unseenmsg: 0,
-//   },
-//   {
-//     id: 44,
-//     name: 'Vivek',
-//     type: 'SINGLE',
-//     imageUrl:
-//       'https://images.unsplash.com/photo-1613521140785-e85e427f8002?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-//     unseenmsg: 0,
-//   },
-//   {
-//     id: 45,
-//     name: 'Vivek 2',
-//     type: 'SINGLE',
-//     liked: true,
-//     imageUrl:
-//       'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-//     unseenmsg: 0,
-//   },
-//   {
-//     id: 56,
-//     name: 'Jhon',
-//     type: 'SINGLE',
-//     imageUrl:
-//       'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-//     liked: true,
-//     unseenmsg: 0,
-//   },
-//   {
-//     id: 200,
-//     name: 'Friends Group',
-//     type: 'GROUP',
-//     grouproomid: '123',
-//     imageUrl:
-//       'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-//     unseenmsg: 0,
-//   },
-// ];
-// const requestdata = [
-//   {
-//     id: 7,
-//     name: 'Jhon Doe',
-//     type: 'SINGLE',
-//     imageUrl:
-//       'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-//   },
-//   {
-//     id: 44,
-//     name: 'Vivek',
-//     type: 'SINGLE',
-//     imageUrl:
-//       'https://images.unsplash.com/photo-1613521140785-e85e427f8002?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-//   },
-//   {
-//     id: 45,
-//     name: 'Collage Friends',
-//     type: 'GROUP',
-//     imageUrl:
-//       'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D',
-//   },
-// ];
-
-// const tempgroupdata = [
-//   {
-//     id: 3,
-//     name: 'Test Group ',
-//     type: 'GROUP',
-//     grouproomid: 3,
-//   },
-//   {
-//     id: 44,
-//     name: 'Vivek',
-//     email: 'Testboxinall@gmail.com',
-//     profile_picture:
-//       'https://wooing.boxinallsoftech.com/public/uploads/profile/93495_1706851876_Screenshot_2024-01-25-11-07-38-00_325fbdb1dc4eedea0ce3f5f060f574f6.jpg',
-//     type: 'SINGLE',
-//   },
-// ];
+import {useRefreshData} from '../Hooks/Custom/useRefreshData';
 
 const FriendsList = () => {
   const navigation = useNavigation();
+  const {refreshing, onRefresh} = useRefreshData();
   const myuserid = useSelector(state => state.Auth.userid);
   const [selectedoptiontype, setselectedoptiontype] = useState('chats');
   const [showgroupmodal, setshowgroupmodal] = useState(false);
@@ -301,230 +217,242 @@ const FriendsList = () => {
 
   return (
     <GradientScreen>
-      <ReLoader
-        queryKeys={[
-          'fetchFriends',
-          'fetchFriendRequests',
-          'fetchChattingFriends',
-        ]}>
-        <View style={styles.container}>
-          <View style={styles.headerbackcontainer}>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.goBack();
-              }}>
-              <MaterialIcons
-                name="arrow-back"
-                size={24}
-                color={colors.arrow.primary}
-                style={{marginLeft: 20}}
-              />
-            </TouchableOpacity>
+      <View style={styles.container}>
+        <MyLoadingIndicator isRefreshing={refreshing} />
+        <View style={styles.headerbackcontainer}>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.goBack();
+            }}>
+            <MaterialIcons
+              name="arrow-back"
+              size={24}
+              color={colors.arrow.primary}
+              style={{marginLeft: 20}}
+            />
+          </TouchableOpacity>
 
-            {selectedoptiontype === 'friends' && (
-              <TouchableOpacity
+          {selectedoptiontype === 'friends' && (
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginRight: 20,
+                gap: 3,
+              }}
+              onPress={() => setshowgroupmodal(true)}>
+              <View
                 style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginRight: 20,
-                  gap: 3,
-                }}
-                onPress={() => setshowgroupmodal(true)}>
-                <View
-                  style={{
-                    backgroundColor: '#FF5A90',
-                    padding: 5,
-                    borderRadius: 50,
-                  }}>
-                  <AntDesign
-                    name="plus"
-                    size={24}
-                    color="white"
-                    style={{fontWeight: '900'}}
-                  />
-                </View>
-                <Text style={styles.headingtext2}> Create Group</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-          <View style={styles.headingsearchcontainer}>
-            <GradientInput style={styles.gradientborder}>
-              <View style={styles.inputcontainer}>
-                <MaterialIcons
-                  name="search"
-                  size={18}
-                  color={colors.text.secondary}
-                />
-                <TextInput
-                  placeholder={
-                    selectedoptiontype === 'friends'
-                      ? 'Search All Friends'
-                      : selectedoptiontype === 'requests'
-                      ? 'Search Requests'
-                      : 'Search Chats'
-                  }
-                  keyboardType="email-address"
-                  placeholderTextColor={colors.login.headingtext2}
-                  onChangeText={text => setsearchfilter(text)}
-                  value={searchfilter}
-                  cursorColor={colors.login.headingtext2}
-                  style={{color: colors.login.headingtext2, flex: 1}}
+                  backgroundColor: '#FF5A90',
+                  padding: 5,
+                  borderRadius: 50,
+                }}>
+                <AntDesign
+                  name="plus"
+                  size={24}
+                  color="white"
+                  style={{fontWeight: '900'}}
                 />
               </View>
-            </GradientInput>
-          </View>
-          <View style={styles.optionscontainer}>
-            <TouchableOpacity onPress={() => setselectedoptiontype('chats')}>
-              <Text
-                style={[
-                  styles.optiontext,
-                  {
-                    color:
-                      selectedoptiontype === 'chats'
-                        ? colors.arrow.tertiary
-                        : colors.arrow.primary,
-                  },
-                ]}>
-                Chats
-              </Text>
+              <Text style={styles.headingtext2}> Create Group</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setselectedoptiontype('friends')}>
-              <Text
-                style={[
-                  styles.optiontext,
-                  {
-                    color:
-                      selectedoptiontype === 'friends'
-                        ? colors.arrow.tertiary
-                        : colors.arrow.primary,
-                  },
-                ]}>
-                Friends
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setselectedoptiontype('requests')}>
-              <Text
-                style={[
-                  styles.optiontext,
-                  {
-                    color:
-                      selectedoptiontype === 'requests'
-                        ? colors.arrow.tertiary
-                        : colors.arrow.primary,
-                  },
-                ]}>
-                Requests
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.headingContainer}></View>
-          <View style={styles.friendlistcontainer}>
-            {selectedoptiontype === 'friends' ? (
-              filteredfriendsdata.filter(item => item.id !== myuserid).length >
-              0 ? (
-                <FlatList
-                  data={filteredfriendsdata.filter(
-                    item => item.id !== myuserid,
-                  )}
-                  keyExtractor={item => item.id.toString()}
-                  renderItem={({item, index}) => (
-                    <SingleFriend
-                      data={item}
-                      index={index}
-                      hideunseen={true}
-                      handleChatClick={handleChatClick}
-                    />
-                  )}
-                  onEndReachedThreshold={0.1}
-                  showsVerticalScrollIndicator={false}
-                  numColumns={1}
-                  contentContainerStyle={{paddingBottom: 250}}
-                />
-              ) : (
-                <Text
-                  style={{
-                    color: colors.login.headingtext2,
-                    marginTop: 80,
-                    fontSize: 20,
-                    fontWeight: '900',
-                    textAlign: 'center',
-                  }}>
-                  No Friends Found
-                </Text>
-              )
-            ) : selectedoptiontype === 'requests' ? (
-              filteredrequestdata.length > 0 ? (
-                <FlatList
-                  data={filteredrequestdata}
-                  keyExtractor={item => item.friend_id.toString()}
-                  renderItem={({item, index}) => (
-                    <SingleRequest
-                      data={item}
-                      index={index}
-                      setfilteredrequestdata={setfilteredrequestdata}
-                    />
-                  )}
-                  onEndReachedThreshold={0.1}
-                  showsVerticalScrollIndicator={false}
-                  numColumns={1}
-                  contentContainerStyle={{paddingBottom: 250}}
-                />
-              ) : (
-                <Text
-                  style={{
-                    color: colors.login.headingtext2,
-                    marginTop: 80,
-                    fontSize: 20,
-                    fontWeight: '900',
-                    textAlign: 'center',
-                  }}>
-                  No Requests Found
-                </Text>
-              )
-            ) : selectedoptiontype === 'chats' ? (
-              filteredchattingfriendsdata.length > 0 ? (
-                <FlatList
-                  nestedScrollEnabled={true}
-                  data={filteredchattingfriendsdata}
-                  keyExtractor={(item, index) => index.toString()}
-                  // keyExtractor={item => item.id.toString()}
-                  renderItem={({item, index}) => (
-                    <SingleFriend
-                      data={item}
-                      index={index}
-                      hideunseen={false}
-                      handleChatClick={handleChatClick}
-                    />
-                  )}
-                  onEndReachedThreshold={0.1}
-                  showsVerticalScrollIndicator={false}
-                  numColumns={1}
-                  contentContainerStyle={{
-                    paddingBottom: 250,
-                  }}
-                />
-              ) : (
-                <Text
-                  style={{
-                    color: colors.login.headingtext2,
-                    marginTop: 80,
-                    fontSize: 20,
-                    fontWeight: '900',
-                    textAlign: 'center',
-                  }}>
-                  No Chats Found
-                </Text>
-              )
-            ) : null}
-          </View>
-          <CreateGroupModal
-            showgroupmodal={showgroupmodal}
-            setshowgroupmodal={setshowgroupmodal}
-            friendsdata2={friendsdata2}
-          />
-          <BottomBar />
+          )}
         </View>
-      </ReLoader>
+        <View style={styles.headingsearchcontainer}>
+          <GradientInput style={styles.gradientborder}>
+            <View style={styles.inputcontainer}>
+              <MaterialIcons
+                name="search"
+                size={18}
+                color={colors.text.secondary}
+              />
+              <TextInput
+                placeholder={
+                  selectedoptiontype === 'friends'
+                    ? 'Search All Friends'
+                    : selectedoptiontype === 'requests'
+                    ? 'Search Requests'
+                    : 'Search Chats'
+                }
+                keyboardType="email-address"
+                placeholderTextColor={colors.login.headingtext2}
+                onChangeText={text => setsearchfilter(text)}
+                value={searchfilter}
+                cursorColor={colors.login.headingtext2}
+                style={{color: colors.login.headingtext2, flex: 1}}
+              />
+            </View>
+          </GradientInput>
+        </View>
+        <View style={styles.optionscontainer}>
+          <TouchableOpacity onPress={() => setselectedoptiontype('chats')}>
+            <Text
+              style={[
+                styles.optiontext,
+                {
+                  color:
+                    selectedoptiontype === 'chats'
+                      ? colors.arrow.tertiary
+                      : colors.arrow.primary,
+                },
+              ]}>
+              Chats
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setselectedoptiontype('friends')}>
+            <Text
+              style={[
+                styles.optiontext,
+                {
+                  color:
+                    selectedoptiontype === 'friends'
+                      ? colors.arrow.tertiary
+                      : colors.arrow.primary,
+                },
+              ]}>
+              Friends
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setselectedoptiontype('requests')}>
+            <Text
+              style={[
+                styles.optiontext,
+                {
+                  color:
+                    selectedoptiontype === 'requests'
+                      ? colors.arrow.tertiary
+                      : colors.arrow.primary,
+                },
+              ]}>
+              Requests
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.friendlistcontainer}>
+          {selectedoptiontype === 'friends' ? (
+            filteredfriendsdata.filter(item => item.id !== myuserid).length >
+            0 ? (
+              <FlatList
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={() => onRefresh(['fetchFriends'])}
+                    progressViewOffset={-500}
+                  />
+                }
+                data={filteredfriendsdata.filter(item => item.id !== myuserid)}
+                keyExtractor={item => item.id.toString()}
+                renderItem={({item, index}) => (
+                  <SingleFriend
+                    data={item}
+                    index={index}
+                    hideunseen={true}
+                    handleChatClick={handleChatClick}
+                  />
+                )}
+                onEndReachedThreshold={0.1}
+                showsVerticalScrollIndicator={false}
+                numColumns={1}
+                contentContainerStyle={{paddingBottom: 250}}
+              />
+            ) : (
+              <Text
+                style={{
+                  color: colors.login.headingtext2,
+                  marginTop: 80,
+                  fontSize: 20,
+                  fontWeight: '900',
+                  textAlign: 'center',
+                }}>
+                No Friends Found
+              </Text>
+            )
+          ) : selectedoptiontype === 'requests' ? (
+            filteredrequestdata.length > 0 ? (
+              <FlatList
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={() => onRefresh(['fetchFriendRequests'])}
+                    progressViewOffset={-500}
+                  />
+                }
+                data={filteredrequestdata}
+                keyExtractor={item => item.friend_id.toString()}
+                renderItem={({item, index}) => (
+                  <SingleRequest
+                    data={item}
+                    index={index}
+                    setfilteredrequestdata={setfilteredrequestdata}
+                  />
+                )}
+                onEndReachedThreshold={0.1}
+                showsVerticalScrollIndicator={false}
+                numColumns={1}
+                contentContainerStyle={{paddingBottom: 250}}
+              />
+            ) : (
+              <Text
+                style={{
+                  color: colors.login.headingtext2,
+                  marginTop: 80,
+                  fontSize: 20,
+                  fontWeight: '900',
+                  textAlign: 'center',
+                }}>
+                No Requests Found
+              </Text>
+            )
+          ) : selectedoptiontype === 'chats' ? (
+            filteredchattingfriendsdata.length > 0 ? (
+              <FlatList
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={() => onRefresh(['fetchChattingFriends'])}
+                    progressViewOffset={-500}
+                  />
+                }
+                data={filteredchattingfriendsdata}
+                keyExtractor={(item, index) => index.toString()}
+                // keyExtractor={item => item.id.toString()}
+                renderItem={({item, index}) => (
+                  <SingleFriend
+                    data={item}
+                    index={index}
+                    hideunseen={false}
+                    handleChatClick={handleChatClick}
+                  />
+                )}
+                onEndReachedThreshold={0.1}
+                showsVerticalScrollIndicator={false}
+                numColumns={1}
+                contentContainerStyle={{
+                  paddingBottom: 250,
+                }}
+              />
+            ) : (
+              <Text
+                style={{
+                  color: colors.login.headingtext2,
+                  marginTop: 80,
+                  fontSize: 20,
+                  fontWeight: '900',
+                  textAlign: 'center',
+                }}>
+                No Chats Found
+              </Text>
+            )
+          ) : null}
+        </View>
+        <CreateGroupModal
+          showgroupmodal={showgroupmodal}
+          setshowgroupmodal={setshowgroupmodal}
+          friendsdata2={friendsdata2}
+        />
+        <BottomBar />
+      </View>
     </GradientScreen>
   );
 };

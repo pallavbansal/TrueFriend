@@ -1,5 +1,12 @@
-import {View, Text, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
-import React, {useState, useRef, useEffect, useCallback, useMemo} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  RefreshControl,
+} from 'react-native';
+import React, {useState, useRef, useEffect, useCallback} from 'react';
 import GradientText from '../Components/Common/GradientText';
 import BottomBar from '../Layouts/BottomBar';
 import GradientScreen from '../Layouts/GradientScreen';
@@ -11,12 +18,18 @@ import {useNavigation} from '@react-navigation/native';
 import {useFetchSocialFeedPosts} from '../Hooks/Query/FeedQuery';
 import Loading from './Loading';
 import DetailFeed from '../Components/SocialFeed/DetailFeed';
+// import {useQueryClient} from '@tanstack/react-query';
+import {useRefreshData} from '../Hooks/Custom/useRefreshData';
+import MyLoadingIndicator from '../Components/Common/MyLoadingIndicator';
 
 const SocialFeed = () => {
   const navigation = useNavigation();
+  const {refreshing, onRefresh} = useRefreshData();
+  // const queryClient = useQueryClient();
   const [isMuted, setIsMuted] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [allPosts, setAllPosts] = useState([]);
+  // const [refreshing, setRefreshing] = useState(false);
   const [showdetailfeed, setShowDetailFeed] = useState({
     show: false,
     data: {},
@@ -74,8 +87,16 @@ const SocialFeed = () => {
     <GradientScreen>
       <View style={styles.container}>
         {/* <FeedHeader /> */}
+        <MyLoadingIndicator isRefreshing={refreshing} />
         <View style={styles.feedscontainer}>
           <FlatList
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={() => onRefresh(['socialfeedposts'])}
+                progressViewOffset={-1000}
+              />
+            }
             data={allPosts}
             keyExtractor={item => item.id.toString()}
             viewabilityConfig={viewabilityConfig.current}

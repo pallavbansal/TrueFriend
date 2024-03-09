@@ -1,7 +1,7 @@
 const url = 'https://wooing.boxinallsoftech.com/public/api/v1';
 
 export async function fetchChatting(token, id, pageParam) {
-  console.log('fetchChatting', id, pageParam);
+  console.log('==Chat FetchChatting==');
   const response = await fetch(
     `${url}/chat/fetch?group_id=${id}&page=${pageParam}`,
     {
@@ -20,6 +20,7 @@ export async function fetchChatting(token, id, pageParam) {
 }
 
 export async function createChat(token, data) {
+  console.log('==Chat CreateChat==');
   const form = new FormData();
   form.append('type', data.type);
   form.append('content', data.content);
@@ -63,6 +64,7 @@ export async function createChat(token, data) {
 // };
 
 export async function createGroup(token, data) {
+  console.log('==Chat CreateGroup==');
   const response = await fetch(`${url}/group/create`, {
     method: 'POST',
     headers: {
@@ -79,6 +81,7 @@ export async function createGroup(token, data) {
 }
 
 export async function fetchGroupData(token, group_id) {
+  console.log('==CHAT fetchGroupData==');
   const response = await fetch(`${url}/group/fetch?group_id=${group_id}`, {
     method: 'GET',
     headers: {
@@ -94,6 +97,7 @@ export async function fetchGroupData(token, group_id) {
 }
 
 export async function leaveGroup(token, data) {
+  console.log('==Chat leaveGroup==');
   const response = await fetch(`${url}/group/leave`, {
     method: 'POST',
     headers: {
@@ -110,6 +114,7 @@ export async function leaveGroup(token, data) {
 }
 
 export async function addUserToGroup(token, data) {
+  console.log('==Chat addusertogroup==');
   const response = await fetch(`${url}/group/add-users-to-group`, {
     method: 'POST',
     headers: {
@@ -126,6 +131,7 @@ export async function addUserToGroup(token, data) {
 }
 
 export async function removeUserFromGroup(token, data) {
+  console.log('==Chat removeUserFromGroup==');
   const response = await fetch(`${url}/group/remove-users-from-group`, {
     method: 'POST',
     headers: {
@@ -142,6 +148,7 @@ export async function removeUserFromGroup(token, data) {
 }
 
 export async function editGroupName(token, data) {
+  console.log('==Chat editgroupname==');
   const response = await fetch(`${url}/group/edit-name`, {
     method: 'POST',
     headers: {

@@ -1,6 +1,7 @@
 const url = 'https://wooing.boxinallsoftech.com/public/api/v1';
 
 export async function sendRequest(data, token) {
+  console.log('==Request sendRequest  ==');
   console.log('data', data, token);
   const response = await fetch(`${url}/friend-request/create`, {
     method: 'POST',
@@ -19,6 +20,7 @@ export async function sendRequest(data, token) {
 
 // to accept or reject request
 export async function updateRequest(data, token) {
+  console.log('==Request updateRequest==');
   console.log('data', data, token);
   const response = await fetch(`${url}/friend-request/update-status`, {
     method: 'POST',
@@ -36,6 +38,7 @@ export async function updateRequest(data, token) {
 }
 
 export async function requestCurrentStatus(id, token) {
+  console.log('==Request requestcurrentstatus==');
   const response = await fetch(
     `${url}/friend-request/fetch-status?user_id=${id}`,
     {
@@ -54,6 +57,7 @@ export async function requestCurrentStatus(id, token) {
 }
 
 export async function fetchFriends(token) {
+  console.log('==Request fetchFriends==');
   const response = await fetch(`${url}/friend-request/fetch-friends`, {
     method: 'GET',
     headers: {
@@ -69,6 +73,7 @@ export async function fetchFriends(token) {
 }
 
 export async function fetchFriendRequests(token) {
+  console.log('==Request fetchFriendRequests==');
   const response = await fetch(`${url}/friend-request/fetch`, {
     method: 'GET',
     headers: {
@@ -84,6 +89,7 @@ export async function fetchFriendRequests(token) {
 }
 
 export async function fetchChattingFriends(token) {
+  console.log('==Request fetchchattingfriends==');
   const response = await fetch(`${url}/chat/fetch-chats`, {
     method: 'GET',
     headers: {
