@@ -1,17 +1,70 @@
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import GradientScreen from '../Layouts/GradientScreen';
 import GradientButton from '../Components/Common/GradientButton';
 import GradientText from '../Components/Common/GradientText';
-import React from 'react';
+import React, {useState} from 'react';
 import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../Styles/ColorData';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation} from '@react-navigation/native';
+import MultipleImagePicker from '@baronha/react-native-multiple-image-picker';
+import Toast from 'react-native-toast-message';
+import {useCreateReport} from '../Hooks/Query/ReportQuery';
+const UploadScreenshot = ({route}) => {
+  const {selected, userid} = route.params;
+  console.log('selected', selected, userid);
 
-const UploadScreenshot = () => {
+  const {mutate, isPending} = useCreateReport();
   const navigation = useNavigation();
-  const handlecontinue = () => {};
+  const [postinputs, setPostInputs] = useState({
+    reason: selected,
+    reported_user_id: userid,
+    Image: [],
+  });
+  const handlecontinue = () => {
+    if (postinputs.Image.length === 0) {
+      return Toast.show({
+        type: 'error',
+        text1: 'Please upload screenshots',
+      });
+    }
+    const finaldata = {
+      reason: postinputs.reason,
+      reported_user_id: postinputs.reported_user_id,
+      media: postinputs.Image,
+    };
+    console.log('finaldata', finaldata);
+    mutate(
+      {data: finaldata},
+      {
+        onSuccess: data => {
+          console.log('report success data', data);
+          if (data.status_code === 1) {
+            Toast.show({
+              type: 'success',
+              text1: 'Reported Successfully',
+            });
+            return navigation.navigate('FriendsList');
+          }
+        },
+      },
+    );
+  };
+
+  const handleImageUpload = async () => {
+    try {
+      const response = await MultipleImagePicker.openPicker({
+        mediaType: 'image',
+        maxSelectedAssets: 1,
+      });
+      if (response && response.length > 0) {
+        setPostInputs({...postinputs, Image: response});
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   return (
     <GradientScreen>
@@ -52,22 +105,69 @@ const UploadScreenshot = () => {
           colors={colors.gradients.buttongradient}
           style={styles.gradientsouter}>
           <View style={styles.gradientinner}>
-            <MaterialCommunityIcons
-              name="file-upload"
-              size={100}
-              color="#4C407B"
-            />
-            <TouchableOpacity>
-              <GradientText style={styles.headingtext2}>
-                Upload Screenshots
-              </GradientText>
-            </TouchableOpacity>
+            {postinputs.Image.length > 0 ? (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  justifyContent: 'center',
+                }}>
+                {postinputs.Image.map((item, index) => {
+                  return (
+                    <View
+                      key={index}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        margin: 5,
+                        borderRadius: 10,
+                        overflow: 'hidden',
+                      }}>
+                      <Image
+                        source={{uri: item.path}}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                        }}
+                      />
+                    </View>
+                  );
+                })}
+              </View>
+            ) : (
+              <TouchableOpacity
+                onPress={handleImageUpload}
+                style={{
+                  alignItems: 'center',
+                }}>
+                <MaterialCommunityIcons
+                  name="file-upload"
+                  size={100}
+                  color="#4C407B"
+                />
+                <GradientText style={styles.headingtext2}>
+                  Upload Screenshots
+                </GradientText>
+              </TouchableOpacity>
+            )}
           </View>
         </LinearGradient>
 
+        <TouchableOpacity
+          onPress={() =>
+            setPostInputs(prev => {
+              return {...prev, Image: []};
+            })
+          }
+          style={{marginTop: 20}}>
+          <GradientText style={styles.headingtext2}>
+            Clear Screenshots
+          </GradientText>
+        </TouchableOpacity>
+
         <TouchableOpacity onPress={handlecontinue} style={{marginTop: 20}}>
           <GradientButton style={styles.submitbutton}>
-            <Text style={styles.submittext}>Continue</Text>
+            <Text style={styles.submittext}>Submit</Text>
           </GradientButton>
         </TouchableOpacity>
       </View>

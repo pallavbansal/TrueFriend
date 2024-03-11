@@ -155,6 +155,7 @@ const ChatBottom = ({
   };
 
   const sendTextMessage = () => {
+    console.log('media', media.length, typetext.length);
     if (media.length == 0 && typetext.length == 0) {
       return;
     }
