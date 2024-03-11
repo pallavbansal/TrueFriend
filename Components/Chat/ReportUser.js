@@ -2,8 +2,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TextInput,
-  ScrollView,
   TouchableOpacity,
   Pressable,
 } from 'react-native';
@@ -13,6 +11,7 @@ import {colors} from '../../Styles/ColorData';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation} from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
 
 const list = [
   'It’s spam',
@@ -23,33 +22,34 @@ const list = [
   'I just don’t like it',
 ];
 
-const ReportUser = ({close}) => {
+const ReportUser = ({close, userid}) => {
   const navigation = useNavigation();
+
   const [selected, setselected] = useState({
-    index: [],
-    value: [],
+    index: '',
+    value: '',
   });
   const handleclose = () => {
     close();
   };
 
   const handleattach = () => {
-    return navigation.navigate('UploadScreenshot');
+    if (selected.value === '') {
+      return Toast.show({
+        type: 'error',
+        text1: 'Please select a reason to report',
+      });
+    }
+    return navigation.navigate('UploadScreenshot', {
+      selected: selected.value,
+      userid: userid,
+    });
   };
 
   const handleselect = (index, value) => {
-    setselected(prev => {
-      if (prev.index.includes(index)) {
-        return {
-          index: prev.index.filter(i => i !== index),
-          value: prev.value.filter(v => v !== value),
-        };
-      } else {
-        return {
-          index: [...prev.index, index],
-          value: [...prev.value, value],
-        };
-      }
+    setselected({
+      index: index,
+      value: value,
     });
   };
 
@@ -87,7 +87,7 @@ const ReportUser = ({close}) => {
                     alignItems: 'center',
                     gap: 10,
                   }}>
-                  {/* <Text
+                  <Text
                     style={[
                       styles.headingtext2,
                       {
@@ -98,21 +98,11 @@ const ReportUser = ({close}) => {
                       },
                     ]}>
                     {item}
-                  </Text> */}
-                  <Text
-                    style={[
-                      styles.headingtext2,
-                      {
-                        color: selected.index.includes(index)
-                          ? colors.arrow.primary
-                          : colors.text.primary,
-                      },
-                    ]}>
-                    {item}
                   </Text>
                 </TouchableOpacity>
               ))}
             </View>
+
             <View style={styles.uploadcontainer}>
               <TouchableOpacity
                 onPress={handleattach}
@@ -126,18 +116,6 @@ const ReportUser = ({close}) => {
                   borderWidth: 1,
                   borderColor: colors.text.primary,
                 }}>
-                {/* <TextInput
-                  placeholder="Upload Screenshots"
-                  placeholderTextColor={colors.text.primary}
-                  cursorColor={colors.text.primary}
-                  style={{
-                    color: colors.text.primary,
-                    fontWeight: '900',
-                    flex: 1,
-                    borderRadius: 20,
-                    margin: 5,
-                  }}
-                /> */}
                 <View
                   style={{
                     color: colors.text.primary,

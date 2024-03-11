@@ -184,9 +184,11 @@ const ChatHeader = ({name, imageUrl, userid, chattype}) => {
               <FontAwesome5 name="video" size={24} color="white" />
             </TouchableOpacity>
           )}
-          <TouchableOpacity onPress={handleroptionsdialog}>
-            <Entypo name="dots-three-vertical" size={24} color="white" />
-          </TouchableOpacity>
+          {chattype == 'SINGLE' && (
+            <TouchableOpacity onPress={handleroptionsdialog}>
+              <Entypo name="dots-three-vertical" size={24} color="white" />
+            </TouchableOpacity>
+          )}
         </View>
         {optionsdialog && (
           <GradientInput style={styles.gradientborder2}>
@@ -202,7 +204,9 @@ const ChatHeader = ({name, imageUrl, userid, chattype}) => {
           </GradientInput>
         )}
       </LinearGradient>
-      {reportdialog && <ReportUser close={handlerreportdialog} />}
+      {reportdialog && (
+        <ReportUser close={handlerreportdialog} userid={userid} />
+      )}
     </>
   );
 };
