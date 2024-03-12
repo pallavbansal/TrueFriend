@@ -56,21 +56,12 @@ const CommentReplyModal = ({data, commentid, setReplyData}) => {
   };
 
   return (
-    <View style={styles.replycontainer}>
+    <LinearGradient
+      colors={colors.gradients.buttongradient}
+      start={{x: 0, y: 0}}
+      end={{x: 1, y: 0}}
+      style={styles.replycontainer}>
       <View style={styles.innerconatiner}>
-        <ScrollView
-          style={{flex: 1, marginTop: 10}}
-          showsVerticalScrollIndicator={false}
-          nestedScrollEnabled={true}>
-          <FlatList
-            data={data}
-            keyExtractor={item => item.id.toString()}
-            renderItem={({item}) => <SingleCommentReply data={item} />}
-            showsVerticalScrollIndicator={false}
-            numColumns={1}
-            contentContainerStyle={{paddingBottom: 100}}
-          />
-        </ScrollView>
         <View style={styles.headingsearchcontainer}>
           <GradientInput style={styles.gradientborder}>
             <View style={styles.inputcontainer}>
@@ -82,7 +73,6 @@ const CommentReplyModal = ({data, commentid, setReplyData}) => {
                 value={replyinput}
                 cursorColor={colors.login.headingtext2}
                 style={{color: colors.login.headingtext2, flex: 1}}
-                autoFocus={true}
               />
               <Ionicons
                 name="send"
@@ -93,8 +83,21 @@ const CommentReplyModal = ({data, commentid, setReplyData}) => {
             </View>
           </GradientInput>
         </View>
+        <ScrollView
+          style={{flex: 1}}
+          showsVerticalScrollIndicator={false}
+          nestedScrollEnabled={true}>
+          <FlatList
+            data={data}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({item}) => <SingleCommentReply data={item} />}
+            showsVerticalScrollIndicator={false}
+            numColumns={1}
+            contentContainerStyle={{paddingBottom: 100}}
+          />
+        </ScrollView>
       </View>
-    </View>
+    </LinearGradient>
   );
 };
 
@@ -106,18 +109,17 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     overflow: 'hidden',
     marginVertical: 10,
-    marginLeft: 20,
   },
   innerconatiner: {
     borderRadius: 28,
     height: 400,
     // backgroundColor: 'rgba(255,255,255,0.5)',
-    backgroundColor: 'rgba(0,0,0,0.1)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
     padding: 10,
   },
   headingsearchcontainer: {
     marginTop: 10,
-    marginHorizontal: 20,
+    marginHorizontal: 30,
     marginBottom: 10,
   },
   gradientborder: {

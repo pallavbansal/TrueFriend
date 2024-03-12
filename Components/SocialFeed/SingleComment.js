@@ -1,12 +1,26 @@
 import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../../Styles/ColorData';
 import React, {useState} from 'react';
 import CommentReplyModal from './CommentReplyModal';
+import {formatDistanceStrict, parseISO} from 'date-fns';
 
-const SingleComment = ({data}) => {
-  const [showreplymodal, setShowReplyModal] = useState(false);
+const SingleComment = ({data, showreplymodal, setShowReplyModal}) => {
+  const timeAgo = formatDistanceStrict(parseISO(data.created_at), new Date());
   const [replydata, setReplyData] = useState(data.replies);
+
+  const handlesetreplymodal = () => {
+    if (showreplymodal.status && showreplymodal.id == data.id) {
+      setShowReplyModal({
+        status: false,
+        id: null,
+      });
+    } else {
+      setShowReplyModal({
+        status: true,
+        id: data.id,
+      });
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -34,63 +48,68 @@ const SingleComment = ({data}) => {
             }}>
             <Text
               style={{
-                color: colors.text.primary,
-                fontSize: 16,
+                // color: colors.text.primary,
+                color: 'black',
+                fontSize: 12,
                 fontWeight: 'bold',
               }}>
               {data.user.name}
             </Text>
             <Text
               style={{
-                color: colors.text.tertiary,
+                color: colors.text.secondary,
                 fontSize: 8,
               }}>
-              {data.created_at.split('T')[0]}
+              {timeAgo} ago
             </Text>
           </View>
 
           <Text
             style={{
-              color: colors.text.primary,
+              color: 'black',
               fontSize: 12,
-              fontWeight: 'bold',
             }}>
             {data.content}
           </Text>
-
-          <TouchableOpacity
-            onPress={() => setShowReplyModal(prev => !prev)}
+          <View
             style={{
-              marginTop: 10,
+              flexDirection: 'row',
+              gap: 10,
             }}>
-            <Text
+            <TouchableOpacity
+              onPress={handlesetreplymodal}
               style={{
-                color: colors.text.tertiary,
-                fontSize: 10,
+                marginTop: 10,
               }}>
-              {showreplymodal ? 'Hide Replies' : 'View Replies'}
-            </Text>
-          </TouchableOpacity>
+              <Text
+                style={{
+                  color: colors.text.secondary,
+                  fontSize: 10,
+                }}>
+                {showreplymodal.status && showreplymodal.id == data.id
+                  ? 'Hide Replies'
+                  : 'View Replies'}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
-      {showreplymodal && (
+      {showreplymodal.status === true && showreplymodal.id == data.id && (
         <CommentReplyModal
           data={replydata}
           commentid={data.id}
           setReplyData={setReplyData}
         />
       )}
-      <LinearGradient
-        colors={colors.gradients.buttongradient}
-        start={{x: 0, y: 0}}
-        end={{x: 1, y: 0}}
+      <View
         style={{
-          height: 1,
+          height: 0,
           width: '90%',
           marginVertical: 10,
           borderRadius: 10,
           alignSelf: 'center',
-        }}></LinearGradient>
+          backgroundColor: colors.text.secondary,
+        }}></View>
     </View>
   );
 };

@@ -1,9 +1,11 @@
-import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
+import {View, Text, Image, StyleSheet} from 'react-native';
 import {colors} from '../../Styles/ColorData';
 import React from 'react';
+import {parseISO, formatDistanceStrict} from 'date-fns';
 
 const SingleCommentReply = ({data}) => {
+  const timeAgo = formatDistanceStrict(parseISO(data.created_at), new Date());
+
   return (
     <View style={styles.container}>
       <View
@@ -30,42 +32,41 @@ const SingleCommentReply = ({data}) => {
             }}>
             <Text
               style={{
-                color: colors.text.primary,
-                fontSize: 16,
+                // color: colors.text.primary,
+                color: 'black',
+                fontSize: 12,
                 fontWeight: 'bold',
               }}>
               {data.user.name}
             </Text>
+
             <Text
               style={{
-                color: colors.text.primary,
+                color: colors.text.secondary,
                 fontSize: 8,
               }}>
-              {data.created_at.split('T')[0]}
+              {timeAgo} ago
             </Text>
           </View>
 
           <Text
             style={{
-              color: colors.text.primary,
+              color: 'black',
               fontSize: 12,
-              fontWeight: 'bold',
             }}>
             {data.content}
           </Text>
         </View>
       </View>
-      <LinearGradient
-        colors={colors.gradients.buttongradient}
-        start={{x: 0, y: 0}}
-        end={{x: 1, y: 0}}
+      <View
         style={{
-          height: 1,
+          height: 0,
           width: '90%',
           marginVertical: 20,
           borderRadius: 10,
           alignSelf: 'center',
-        }}></LinearGradient>
+          backgroundColor: colors.text.secondary,
+        }}></View>
       <View></View>
     </View>
   );

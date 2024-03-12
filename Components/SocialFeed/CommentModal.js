@@ -5,6 +5,7 @@ import {
   TextInput,
   FlatList,
   ScrollView,
+  Image,
 } from 'react-native';
 import GradientInput from '../Common/GradientInput';
 import GradientScreen from '../../Layouts/GradientScreen';
@@ -22,6 +23,7 @@ import GradientText from '../Common/GradientText';
 
 const CommentModal = ({feed}) => {
   const userinitaldata = useSelector(state => state.Auth.userinitaldata);
+  console.log(userinitaldata);
   const {
     data,
     error,
@@ -34,6 +36,10 @@ const CommentModal = ({feed}) => {
   const {mutate, reset} = useCreatePostComment();
   const [CommentsData2, setCommentsData2] = useState([]);
   const [commentinput, setCommentInput] = useState('');
+  const [showreplymodal, setShowReplyModal] = useState({
+    status: false,
+    id: null,
+  });
 
   function handleaddcomment() {
     if (commentinput) {
@@ -91,44 +97,30 @@ const CommentModal = ({feed}) => {
     <View
       style={{
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.9)',
+        // backgroundColor: 'rgba(0,0,0,0.9)',
+        backgroundColor: 'white',
         marginTop: 2,
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,
         marginHorizontal: 2,
       }}>
-      <View style={styles.headingsearchcontainer}>
-        <GradientInput style={styles.gradientborder}>
-          <View style={styles.inputcontainer}>
-            <TextInput
-              placeholder="Comment"
-              keyboardType="email-address"
-              placeholderTextColor={colors.login.headingtext2}
-              onChangeText={text => setCommentInput(text)}
-              value={commentinput}
-              cursorColor={colors.login.headingtext2}
-              style={{color: colors.login.headingtext2, flex: 1}}
-            />
-            <Ionicons
-              name="send"
-              size={18}
-              color={colors.text.secondary}
-              onPress={handleaddcomment}
-            />
-          </View>
-        </GradientInput>
-      </View>
-      <View style={{paddingBottom: 100, paddingHorizontal: 10}}>
+      <View style={{paddingHorizontal: 10, paddingTop: 30, flex: 1}}>
         <FlatList
           data={CommentsData2}
           keyExtractor={item => item.id.toString()}
-          renderItem={({item}) => <SingleComment data={item} />}
+          renderItem={({item}) => (
+            <SingleComment
+              data={item}
+              showreplymodal={showreplymodal}
+              setShowReplyModal={setShowReplyModal}
+            />
+          )}
           showsVerticalScrollIndicator={false}
           numColumns={1}
           contentContainerStyle={{paddingBottom: 100}}
           onEndReachedThreshold={0.5}
           onEndReached={fetchNextPage}
-          removeClippedSubviews={true} // Unloads offscreen items
+          removeClippedSubviews={true}
           initialNumToRender={10}
           updateCellsBatchingPeriod={30}
           maxToRenderPerBatch={10}
@@ -154,6 +146,33 @@ const CommentModal = ({feed}) => {
           </View>
         </View>
       ) : null}
+
+      <View style={styles.headingsearchcontainer}>
+        <Image
+          source={{uri: userinitaldata.profile_picture}}
+          style={{width: 40, height: 40, borderRadius: 20}}
+        />
+        <GradientInput style={styles.gradientborder}>
+          <View style={styles.inputcontainer}>
+            <TextInput
+              placeholder="Comment"
+              keyboardType="email-address"
+              placeholderTextColor={colors.login.headingtext2}
+              onChangeText={text => setCommentInput(text)}
+              value={commentinput}
+              cursorColor={colors.login.headingtext2}
+              style={{color: colors.login.headingtext2, flex: 1}}
+              autoFocus={true}
+            />
+            <Ionicons
+              name="send"
+              size={18}
+              color={colors.text.secondary}
+              onPress={handleaddcomment}
+            />
+          </View>
+        </GradientInput>
+      </View>
     </View>
   );
 };
@@ -163,14 +182,18 @@ export default CommentModal;
 const styles = StyleSheet.create({
   headingsearchcontainer: {
     marginTop: 10,
-    marginHorizontal: 30,
+    marginHorizontal: 10,
     marginBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
   },
   gradientborder: {
     padding: 2,
     borderRadius: 30,
     overflow: 'hidden',
-    width: '100%',
+    flex: 1,
   },
 
   inputcontainer: {
