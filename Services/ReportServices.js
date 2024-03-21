@@ -1,4 +1,5 @@
-const url = 'https://wooing.boxinallsoftech.com/public/api/v1';
+import {BACKEND_API_URL} from '@env';
+const url = BACKEND_API_URL;
 
 export async function CreateReport(data, token) {
   console.log('==Report CreateReport==');

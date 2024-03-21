@@ -15,6 +15,27 @@ const createChannel = () => {
   );
 };
 
+// const notificationHandler = (title, message, date) => {
+//   PushNotification.localNotification({
+//     channelId: '1234',
+//     title: title,
+//     message: message,
+//     autoCancel: true,
+//     subText: 'Notification',
+//     vibrate: true,
+//     vibration: 300,
+//     playSound: true,
+//     soundName: 'default',
+//     ignoreInForeground: false,
+//     importance: 'high',
+//     invokeApp: true,
+//     allowWhileIdle: true,
+//     priority: 'high',
+//     visibility: 'public',
+//     date: date,
+//     actions: ['Accept', 'Reject'],
+//   });
+// };
 const notificationHandler = (title, message, date) => {
   PushNotification.localNotification({
     channelId: '1234',
@@ -33,7 +54,6 @@ const notificationHandler = (title, message, date) => {
     priority: 'high',
     visibility: 'public',
     date: date,
-    actions: ['Accept', 'Reject'],
   });
 };
 

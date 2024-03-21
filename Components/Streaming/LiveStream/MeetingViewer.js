@@ -26,6 +26,8 @@ export default function MeetingViewer({setlocalParticipantMode}) {
     hlsState,
     startHls,
     stopHls,
+    startRecording,
+    stopRecording,
   } = useMeeting({
     onError: data => {
       const {code, message} = data;
@@ -62,6 +64,9 @@ export default function MeetingViewer({setlocalParticipantMode}) {
         theme: 'DARK',
         orientation: 'landscape',
       });
+      startRecording({
+        quality: 'low',
+      });
       if (meetingId) {
         const formdata = {
           meeting_id: meetingId,
@@ -80,6 +85,7 @@ export default function MeetingViewer({setlocalParticipantMode}) {
         );
       }
     } else if (hlsState === 'HLS_PLAYABLE') {
+      stopRecording();
       stopHls();
     }
   };
@@ -99,30 +105,6 @@ export default function MeetingViewer({setlocalParticipantMode}) {
       style={{
         flex: 1,
       }}>
-      {/* <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          position: 'absolute',
-          bottom: 300,
-          right: 10,
-          zIndex: 100,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          padding: 5,
-          borderRadius: 8,
-        }}>
-        <Text
-          style={{
-            fontSize: 12,
-            color: 'white',
-            marginLeft: 4,
-            marginRight: 4,
-            fontWeight: 'bold',
-          }}>
-          {meetingId ? meetingId : 'No Meeting ID'}
-        </Text>
-      </View> */}
-
       <View
         style={{
           flexDirection: 'row',

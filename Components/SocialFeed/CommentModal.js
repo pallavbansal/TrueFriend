@@ -23,7 +23,7 @@ import GradientText from '../Common/GradientText';
 
 const CommentModal = ({feed}) => {
   const userinitaldata = useSelector(state => state.Auth.userinitaldata);
-  console.log(userinitaldata);
+  // console.log(userinitaldata);
   const {
     data,
     error,
@@ -104,27 +104,61 @@ const CommentModal = ({feed}) => {
         borderTopRightRadius: 30,
         marginHorizontal: 2,
       }}>
-      <View style={{paddingHorizontal: 10, paddingTop: 30, flex: 1}}>
-        <FlatList
-          data={CommentsData2}
-          keyExtractor={item => item.id.toString()}
-          renderItem={({item}) => (
-            <SingleComment
-              data={item}
-              showreplymodal={showreplymodal}
-              setShowReplyModal={setShowReplyModal}
-            />
-          )}
-          showsVerticalScrollIndicator={false}
-          numColumns={1}
-          contentContainerStyle={{paddingBottom: 100}}
-          onEndReachedThreshold={0.5}
-          onEndReached={fetchNextPage}
-          removeClippedSubviews={true}
-          initialNumToRender={10}
-          updateCellsBatchingPeriod={30}
-          maxToRenderPerBatch={10}
-        />
+      {CommentsData2.length > 0 && (
+        <View
+          style={{
+            paddingTop: 10,
+            paddingHorizontal: 20,
+          }}>
+          <Text
+            style={{
+              color: colors.login.headingtext2,
+              fontSize: 18,
+              fontWeight: 'bold',
+            }}>
+            Comments
+          </Text>
+        </View>
+      )}
+      <View style={{paddingHorizontal: 10, paddingTop: 10, flex: 1}}>
+        {CommentsData2.length > 0 ? (
+          <FlatList
+            data={CommentsData2}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({item}) => (
+              <SingleComment
+                data={item}
+                showreplymodal={showreplymodal}
+                setShowReplyModal={setShowReplyModal}
+              />
+            )}
+            showsVerticalScrollIndicator={false}
+            numColumns={1}
+            contentContainerStyle={{paddingBottom: 100}}
+            onEndReachedThreshold={0.5}
+            onEndReached={fetchNextPage}
+            removeClippedSubviews={true}
+            initialNumToRender={10}
+            updateCellsBatchingPeriod={30}
+            maxToRenderPerBatch={10}
+          />
+        ) : (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Text
+              style={{
+                color: colors.login.headingtext2,
+                fontSize: 18,
+                fontWeight: 'bold',
+              }}>
+              No Comments
+            </Text>
+          </View>
+        )}
       </View>
       {isFetching || isFetchingNextPage ? (
         <View

@@ -15,10 +15,11 @@ import SingleCommentReply from './SingleCommentReply';
 import {useSelector} from 'react-redux';
 import {useCreateCommentReply} from '../../Hooks/Query/FeedQuery';
 
-const CommentReplyModal = ({data, commentid, setReplyData}) => {
+const CommentReplyModal = ({data, commentid}) => {
   const userinitaldata = useSelector(state => state.Auth.userinitaldata);
   const {mutate, reset} = useCreateCommentReply();
   const [replyinput, setReplyInput] = useState('');
+  const [replydata, setReplyData] = useState(data.replies);
 
   const handleaddreply = () => {
     if (replyinput) {
@@ -57,19 +58,44 @@ const CommentReplyModal = ({data, commentid, setReplyData}) => {
 
   return (
     <View style={styles.replycontainer}>
-      <View style={styles.innerconatiner}>
+      <View
+        style={[
+          styles.innerconatiner,
+          {
+            height: replydata.length > 2 ? 400 : 250,
+          },
+        ]}>
         <ScrollView
           style={{flex: 1, marginTop: 10}}
           showsVerticalScrollIndicator={false}
           nestedScrollEnabled={true}>
-          <FlatList
-            data={data}
-            keyExtractor={item => item.id.toString()}
-            renderItem={({item}) => <SingleCommentReply data={item} />}
-            showsVerticalScrollIndicator={false}
-            numColumns={1}
-            contentContainerStyle={{paddingBottom: 100}}
-          />
+          {replydata.length > 0 ? (
+            <FlatList
+              data={replydata}
+              keyExtractor={item => item.id.toString()}
+              renderItem={({item}) => <SingleCommentReply data={item} />}
+              showsVerticalScrollIndicator={false}
+              numColumns={1}
+              contentContainerStyle={{paddingBottom: 100}}
+            />
+          ) : (
+            <View
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+                paddingTop: 30,
+              }}>
+              <Text
+                style={{
+                  color: colors.login.headingtext2,
+                  fontSize: 18,
+                  fontWeight: 'bold',
+                }}>
+                No Replies
+              </Text>
+            </View>
+          )}
         </ScrollView>
         <View style={styles.headingsearchcontainer}>
           <GradientInput style={styles.gradientborder}>
@@ -110,8 +136,6 @@ const styles = StyleSheet.create({
   },
   innerconatiner: {
     borderRadius: 28,
-    height: 400,
-    // backgroundColor: 'rgba(255,255,255,0.5)',
     backgroundColor: 'rgba(0,0,0,0.1)',
     padding: 10,
   },

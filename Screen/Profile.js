@@ -20,9 +20,11 @@ import DetailMedia from '../Components/Profile/DetailMedia';
 import Loading from './Loading';
 import {useRefreshData} from '../Hooks/Custom/useRefreshData';
 import MyLoadingIndicator from '../Components/Common/MyLoadingIndicator';
+import {useNavigation} from '@react-navigation/native';
 
 const Profile = () => {
   const {isPending, error, data: profiledata, isError} = useFetchProfile();
+  const navigation = useNavigation();
   const {refreshing, onRefresh} = useRefreshData();
   const [selectedmediatype, setselectedmediatype] = useState('pictures');
   const [showeditmodel, setshoweditmodel] = useState(false);
@@ -57,6 +59,11 @@ const Profile = () => {
       show: false,
       data: null,
     });
+  }
+
+  function handlerecharge() {
+    // navigation.navigate('Recharge');
+    navigation.navigate('Payment');
   }
 
   if (isPending) {
@@ -108,8 +115,28 @@ const Profile = () => {
           />
         </View>
         <View style={styles.biocontainer}>
-          <View>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 10,
+            }}>
             <Text style={styles.headingtext}>{finaldata.name}</Text>
+            <TouchableOpacity
+              onPress={handlerecharge}
+              style={{
+                backgroundColor: colors.arrow.primary,
+                padding: 7,
+                paddingHorizontal: 15,
+                borderRadius: 50,
+              }}>
+              <Text
+                style={{
+                  color: 'white',
+                }}>
+                Recharge
+              </Text>
+            </TouchableOpacity>
           </View>
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <View style={{flexDirection: 'row', gap: 5, alignItems: 'center'}}>
