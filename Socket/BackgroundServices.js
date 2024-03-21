@@ -1,62 +1,14 @@
 import BackgroundService from 'react-native-background-actions';
-import io from 'socket.io-client';
 import {getToken} from '../Utils/Streamapi';
 import Sound from 'react-native-sound';
 import socket from './Socket';
 import {notificationHandler} from './Notification';
-import {NavigationActions} from 'react-navigation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// let socket;
 let ringtone;
-const friendsdata = [
-  {
-    id: 7,
-    name: 'Jhon Doe',
-    type: 'SINGLE',
-    liked: true,
-    imageUrl:
-      'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    unseenmsg: 0,
-  },
-  {
-    id: 44,
-    name: 'Vivek',
-    type: 'SINGLE',
-    imageUrl:
-      'https://images.unsplash.com/photo-1613521140785-e85e427f8002?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    unseenmsg: 0,
-  },
-  {
-    id: 45,
-    name: 'Vivek 2',
-    type: 'SINGLE',
-    liked: true,
-    imageUrl:
-      'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    unseenmsg: 0,
-  },
-  {
-    id: 56,
-    name: 'Jhon',
-    type: 'SINGLE',
-    imageUrl:
-      'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=1854&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    liked: true,
-    unseenmsg: 0,
-  },
-  {
-    id: 200,
-    name: 'Friends Group',
-    type: 'GROUP',
-    grouproomid: '123',
-    imageUrl:
-      'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    unseenmsg: 0,
-  },
-];
-const myuserid = 56;
-
 const connectToSocket = async () => {
+  const myuserid = JSON.parse(await AsyncStorage.getItem('userid'));
+  console.log('===myuserid in background services===:', myuserid);
   socket.on('connect', () => {
     console.log('Socket connection opened for background service');
     socket.emit('register', myuserid);
@@ -82,7 +34,6 @@ const handleCall = data => {
     console.log('incoming :', data);
     // ringtone.setVolume(1);
     // ringtone.play();
-    const timeoutId = setTimeout(() => handleReject(data), 15000);
 
     notificationHandler(
       'Incoming Call',
@@ -90,7 +41,10 @@ const handleCall = data => {
       new Date(Date.now() + 15000),
     );
 
-    return () => clearTimeout(timeoutId);
+    // const timeoutId = setTimeout(() => handleReject(data), 15000);
+    // return () => clearTimeout(timeoutId);
+  } else if (data.callaction === 'incoming-rejected') {
+    console.log('incoming-rejected :', data);
   }
 };
 
@@ -100,7 +54,7 @@ const handleCallAccept = async data => {
 
   try {
     const token = await getToken();
-    const navigateAction = NavigationActions.navigate({
+    const finalData = {
       routeName: 'Call',
       params: {
         name: data?.reciever?.name.trim(),
@@ -111,11 +65,9 @@ const handleCallAccept = async data => {
         isCreator: false,
         mode: 'CONFERENCE',
       },
-    });
-    NavigationService.dispatch(navigateAction);
+    };
   } catch (error) {
     console.error('Error navigating to call screen:', error);
-    // Handle error if navigation fails
   }
 };
 

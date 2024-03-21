@@ -42,6 +42,7 @@ import {
   stopBackgroundSocketService,
 } from './Socket/BackgroundServices.js';
 import {createChannel} from './Socket/Notification.js';
+import {AppState} from 'react-native';
 
 const MainNavigator = () => {
   const Stack = createStackNavigator();
@@ -52,7 +53,23 @@ const MainNavigator = () => {
   //     stopBackgroundSocketService();
   //   };
   // }, []);
+  // useEffect(() => {
+  //   const handleAppStateChange = nextAppState => {
+  //     if (nextAppState === 'active') {
+  //       console.log('App has come to the foreground!------------------');
+  //       startBackgroundSocketService();
+  //     } else if (nextAppState === 'background') {
+  //       console.log('App has gone to the background!------------------');
+  //       stopBackgroundSocketService();
+  //     }
+  //   };
 
+  //   AppState.addEventListener('change', handleAppStateChange);
+
+  //   return () => {
+  //     AppState.removeEventListener('change', handleAppStateChange);
+  //   };
+  // }, []);
   return (
     <CallHandler>
       <Stack.Navigator>

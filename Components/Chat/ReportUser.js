@@ -17,7 +17,7 @@ const list = [
   'It’s spam',
   'Nudity or sexual activity',
   'Hate speech or symbols',
-  'Violence or dangerous organosation',
+  'Violence or dangerous organisation',
   'Scam or fraud',
   'I just don’t like it',
 ];

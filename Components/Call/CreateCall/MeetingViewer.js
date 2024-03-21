@@ -23,6 +23,8 @@ export default function MeetingViewer({}) {
     toggleMic,
     changeWebcam,
     hlsState,
+    startRecording,
+    stopRecording,
   } = useMeeting({
     onError: data => {
       const {code, message} = data;
@@ -48,16 +50,6 @@ export default function MeetingViewer({}) {
   }, [hlsState]);
 
   useEffect(() => {
-    if (hlsRef.current) {
-      if (hlsState === 'HLS_STARTING' || hlsState === 'HLS_STOPPING') {
-        hlsRef.current.start();
-      } else {
-        hlsRef.current.stop();
-      }
-    }
-  }, [hlsState]);
-
-  useEffect(() => {
     if (localParticipant && participants) {
       setLocalId(localParticipant.id);
       const nonLocalParticipantIds = Array.from(participants.values())
@@ -66,6 +58,13 @@ export default function MeetingViewer({}) {
       if (nonLocalParticipantIds.length > 0) {
         setOtherId(nonLocalParticipantIds[0]);
         setWaiting(false);
+        startRecording({
+          layout: {
+            type: 'GRID',
+            gridSize: 2,
+          },
+          quality: 'low',
+        });
       }
     }
   }, [localParticipant, participants]);
@@ -90,6 +89,7 @@ export default function MeetingViewer({}) {
   // };
 
   const makenull = () => {
+    stopRecording();
     setLocalId(null);
     setOtherId(null);
   };
