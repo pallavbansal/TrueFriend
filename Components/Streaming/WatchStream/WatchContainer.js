@@ -40,6 +40,6 @@ export default function WatchContainer({webcamEnabled, userid, streamdata}) {
   return isJoined ? (
     <ViewerContainer userid={userid} streamotherdata={streamdata} />
   ) : (
-    <WaitingToJoinView />
+    <WaitingToJoinView userdata={streamdata.user} />
   );
 }

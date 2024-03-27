@@ -1,14 +1,5 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  FlatList,
-  ScrollView,
-  Image,
-} from 'react-native';
+import {View, Text, StyleSheet, TextInput, FlatList, Image} from 'react-native';
 import GradientInput from '../Common/GradientInput';
-import GradientScreen from '../../Layouts/GradientScreen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import React, {useState, useEffect} from 'react';
 import SingleComment from './SingleComment';
@@ -20,10 +11,11 @@ import {
 import {useSelector} from 'react-redux';
 import Loading from '../../Screen/Loading';
 import GradientText from '../Common/GradientText';
+import {useQueryClient} from '@tanstack/react-query';
 
 const CommentModal = ({feed}) => {
+  const queryClient = useQueryClient();
   const userinitaldata = useSelector(state => state.Auth.userinitaldata);
-  // console.log(userinitaldata);
   const {
     data,
     error,
@@ -52,21 +44,8 @@ const CommentModal = ({feed}) => {
         {
           onSuccess: data => {
             if (data.status_code == '1') {
-              setCommentsData2(prev => {
-                return [
-                  {
-                    id: prev.length + 1,
-                    replies: [],
-                    content: commentinput,
-                    created_at: new Date().toISOString(),
-                    user: {
-                      id: userinitaldata.id,
-                      name: userinitaldata.name,
-                      profile_picture: userinitaldata.profile_picture,
-                    },
-                  },
-                  ...prev,
-                ];
+              queryClient.invalidateQueries({
+                queryKey: ['postcomments', feed.id],
               });
             }
           },
@@ -78,16 +57,26 @@ const CommentModal = ({feed}) => {
 
   useEffect(() => {
     if (data) {
-      const newData = data.pages.flatMap(page => page.data.comments.data);
-      setCommentsData2(prevData => {
-        let combinedData = [...prevData, ...newData];
-        return combinedData.filter(
-          (value, index, self) =>
-            self.findIndex(v => v.id === value.id) === index,
-        );
-      });
+      let newData = data.pages.map(page => page.data.comments.data).flat();
+      setCommentsData2(newData);
     }
   }, [data]);
+
+  const addreplyincomment = ({commentid, data}) => {
+    let newdata = CommentsData2.map(item => {
+      if (item.id == commentid) {
+        return {
+          ...item,
+          replies: [...item.replies, data],
+        };
+      }
+      return item;
+    });
+    setCommentsData2(newdata);
+    queryClient.invalidateQueries({
+      queryKey: ['postcomments', feed.id],
+    });
+  };
 
   if (isPending) {
     return <Loading />;
@@ -97,7 +86,6 @@ const CommentModal = ({feed}) => {
     <View
       style={{
         flex: 1,
-        // backgroundColor: 'rgba(0,0,0,0.9)',
         backgroundColor: 'white',
         marginTop: 2,
         borderTopLeftRadius: 30,
@@ -128,8 +116,10 @@ const CommentModal = ({feed}) => {
             renderItem={({item}) => (
               <SingleComment
                 data={item}
+                addreplyincomment={addreplyincomment}
                 showreplymodal={showreplymodal}
                 setShowReplyModal={setShowReplyModal}
+                feed={feed}
               />
             )}
             showsVerticalScrollIndicator={false}

@@ -4,9 +4,14 @@ import React, {useState} from 'react';
 import CommentReplyModal from './CommentReplyModal';
 import {formatDistanceStrict, parseISO} from 'date-fns';
 
-const SingleComment = ({data, showreplymodal, setShowReplyModal}) => {
+const SingleComment = ({
+  data,
+  showreplymodal,
+  setShowReplyModal,
+  feed,
+  addreplyincomment,
+}) => {
   const timeAgo = formatDistanceStrict(parseISO(data.created_at), new Date());
-  // const [replydata, setReplyData] = useState(data.replies);
 
   const handlesetreplymodal = () => {
     if (showreplymodal.status && showreplymodal.id == data.id) {
@@ -95,12 +100,12 @@ const SingleComment = ({data, showreplymodal, setShowReplyModal}) => {
         </View>
       </View>
       {showreplymodal.status === true && showreplymodal.id == data.id && (
-        // <CommentReplyModal
-        //   data={replydata}
-        //   commentid={data.id}
-        //   setReplyData={setReplyData}
-        // />
-        <CommentReplyModal data={data} commentid={data.id} />
+        <CommentReplyModal
+          data={data}
+          commentid={data.id}
+          postid={data.post_id}
+          addreplyincomment={addreplyincomment}
+        />
       )}
       <View
         style={{

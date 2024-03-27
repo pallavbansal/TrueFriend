@@ -68,6 +68,7 @@ export const useDislikePost = () => {
 };
 
 export const useFetchPostComments = postid => {
+  console.log('postid', postid);
   const token = useSelector(state => state.Auth.token);
   const {
     data,
