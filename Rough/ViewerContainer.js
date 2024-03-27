@@ -28,16 +28,11 @@ import {useRequestCurrentStatus} from '../../../Hooks/Query/RequestQuery';
 import Toast from 'react-native-toast-message';
 import ProfileNavigator from '../../Common/ProfileNavigator';
 import {useSelector} from 'react-redux';
-import WaitingToJoinView from '../common/WaitingToJoinView';
-// import WaitingToJoinView from '../common/WaitingToJoinView';
 
 const ViewerContainer = ({userid, streamotherdata}) => {
   const navigation = useNavigation();
   const mydata = useSelector(state => state.Auth.userinitaldata);
   const {changeMode, leave, hlsState, hlsUrls, participants} = useMeeting();
-  const [nextStreamdata, setNextStreamData] = useState({});
-  const [previousStreamdata, setPreviousStreamData] = useState({});
-
   const videoPlayer = useRef(null);
   const bottomSheetRef = useRef();
   const [bottomSheetView, setBottomSheetView] = useState('CHAT');
@@ -55,14 +50,6 @@ const ViewerContainer = ({userid, streamotherdata}) => {
   } = useRequestCurrentStatus(streamotherdata.user.id);
 
   const translateX = new Animated.Value(0);
-
-  useEffect(() => {
-    if (streamData) {
-      console.log('streamData', streamData.data);
-      setNextStreamData(streamData.data.next_stream);
-      setPreviousStreamData(streamData.data.previous_stream);
-    }
-  }, [streamData]);
 
   useEffect(() => {
     if (requestStatus) {
@@ -233,11 +220,7 @@ const ViewerContainer = ({userid, streamotherdata}) => {
       onGestureEvent={onGestureEvent}
       onHandlerStateChange={onHandlerStateChange}>
       <Animated.View
-        style={{
-          transform: [{translateX}, {rotate}, {scale}],
-          flex: 1,
-          flexDirection: 'row',
-        }}>
+        style={{transform: [{translateX}, {rotate}, {scale}], flex: 1}}>
         <View
           style={{
             flex: 1,
@@ -407,39 +390,6 @@ const ViewerContainer = ({userid, streamotherdata}) => {
               <ChatViewer raiseHandVisible={false} />
             ) : null}
           </BottomSheet>
-
-          <View
-            style={{
-              position: 'absolute',
-              bottom: '50%',
-              right: -120,
-              padding: 10,
-              backgroundColor: 'rgba(0,0,0,0.3)',
-              borderRadius: 30,
-            }}>
-            <Text>Next Stream</Text>
-            {nextStreamdata.user?.profile_picture && (
-              <Image
-                source={{uri: nextStreamdata.user?.profile_picture}}
-                style={{
-                  width: 60,
-                  height: 60,
-                  borderRadius: 30,
-                }}
-              />
-            )}
-          </View>
-          <View
-            style={{
-              position: 'absolute',
-              bottom: '50%',
-              left: -150,
-              padding: 10,
-              backgroundColor: 'rgba(0,0,0,0.3)',
-              borderRadius: 30,
-            }}>
-            <Text>Previous Stream</Text>
-          </View>
         </View>
       </Animated.View>
     </PanGestureHandler>

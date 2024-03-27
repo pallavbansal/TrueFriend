@@ -65,9 +65,6 @@ const DiscoverHeader = () => {
           <Text style={{color: 'white', fontSize: 20, fontWeight: 900}}>
             {UserProfileData.data.profile?.name}
           </Text>
-          {/* <Text style={{color: 'white', fontSize: 16, fontWeight: 800}}>
-            {'UserId : ' + UserProfileData.data.profile?.id}
-          </Text> */}
         </View>
         <View style={styles.headericoncontainer}>
           <TouchableOpacity onPress={handleLogout}>
@@ -124,6 +121,7 @@ const styles = StyleSheet.create({
   headerdetailcontainer: {
     flex: 1,
     padding: 10,
+    justifyContent: 'center',
   },
   headericoncontainer: {
     flexDirection: 'row',

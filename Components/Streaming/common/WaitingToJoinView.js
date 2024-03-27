@@ -5,7 +5,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../../../Styles/ColorData';
 import {useNavigation} from '@react-navigation/native';
 
-const WaitingToJoinView = () => {
+const WaitingToJoinView = ({userdata}) => {
+  console.log('User Data', userdata);
   const navigation = useNavigation();
   const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
   const moveAnim = useRef(new Animated.Value(0)).current; // Initial value for movement: 0
@@ -45,13 +46,19 @@ const WaitingToJoinView = () => {
       style={styles.container}>
       <Animated.View
         style={[styles.loaderContainer, {transform: [{translateY: moveAnim}]}]}>
-        <Animated.Text style={[styles.text, {opacity: fadeAnim}]}>
-          <MaterialIcons
-            name="live-tv"
-            size={150}
-            color={colors.profile.edit}
-          />
-        </Animated.Text>
+        <Animated.Image
+          source={{uri: userdata.profile_picture}}
+          style={{height: '100%', width: '100%', borderRadius: 20}}
+        />
+      </Animated.View>
+      <Animated.View
+        style={[
+          styles.ConnectContainer,
+          {transform: [{translateY: moveAnim}]},
+        ]}>
+        {/* <Animated.Text style={[styles.text, {opacity: fadeAnim}]}>
+          <MaterialIcons name="live-tv" size={50} color={colors.profile.edit} />
+        </Animated.Text> */}
 
         <Animated.Text style={[styles.text, {opacity: fadeAnim}]}>
           Connecting...
@@ -68,11 +75,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#f5f5f5',
     padding: 20,
+    height: '100%',
   },
   loaderContainer: {
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
+    height: '100%',
+    width: '100%',
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 30,
+  },
+  ConnectContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
     width: '100%',
     margin: 20,
     backgroundColor: 'white',
@@ -81,7 +98,8 @@ const styles = StyleSheet.create({
   text: {
     color: colors.text.secondary,
     fontSize: 20,
-    marginTop: 20,
+    padding: 10,
+    // marginTop: 20,
   },
 });
 

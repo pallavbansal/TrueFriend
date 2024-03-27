@@ -15,11 +15,12 @@ import SingleCommentReply from './SingleCommentReply';
 import {useSelector} from 'react-redux';
 import {useCreateCommentReply} from '../../Hooks/Query/FeedQuery';
 
-const CommentReplyModal = ({data, commentid}) => {
+const CommentReplyModal = ({data, commentid, addreplyincomment}) => {
   const userinitaldata = useSelector(state => state.Auth.userinitaldata);
   const {mutate, reset} = useCreateCommentReply();
   const [replyinput, setReplyInput] = useState('');
-  const [replydata, setReplyData] = useState(data.replies);
+  // const [replydata, setReplyData] = useState(data.replies);
+  const replydata = data.replies;
 
   const handleaddreply = () => {
     if (replyinput) {
@@ -27,26 +28,23 @@ const CommentReplyModal = ({data, commentid}) => {
         comment_id: commentid,
         content: replyinput,
       };
-
       mutate(
         {data: finalData},
         {
           onSuccess: data => {
             if (data.status_code == '1') {
-              setReplyData(prev => {
-                return [
-                  {
-                    id: prev.length + 1 + Math.random(),
-                    content: replyinput,
-                    created_at: new Date().toISOString(),
-                    user: {
-                      id: userinitaldata.id,
-                      name: userinitaldata.name,
-                      profile_picture: userinitaldata.profile_picture,
-                    },
+              addreplyincomment({
+                commentid: commentid,
+                data: {
+                  id: new Date().toISOString() + 1 + Math.random(),
+                  content: replyinput,
+                  created_at: new Date().toISOString(),
+                  user: {
+                    id: userinitaldata.id,
+                    name: userinitaldata.name,
+                    profile_picture: userinitaldata.profile_picture,
                   },
-                  ...prev,
-                ];
+                },
               });
             }
           },
