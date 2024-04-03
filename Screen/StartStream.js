@@ -19,10 +19,10 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
 import {useSelector} from 'react-redux';
 import {useDispatch} from 'react-redux';
-import {useCreateStream} from '../Hooks/Query/StreamQuery';
+// import {useCreateStream} from '../Hooks/Query/StreamQuery';
 const StartStream = ({route}) => {
   const navigation = useNavigation();
-  const {isPending, error, mutate, reset} = useCreateStream();
+  // const {isPending, error, mutate, reset} = useCreateStream();
   const dispatch = useDispatch();
   const {name} = useSelector(state => state.Auth.userinitaldata);
   const [tracks, setTrack] = useState('');

@@ -4,6 +4,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import {useNavigation} from '@react-navigation/native';
 import {normalize} from 'react-native-elements';
 
 function SingleNotificationicon({type}) {
@@ -33,7 +34,7 @@ function SingleNotificationicon({type}) {
       </View>
     );
   }
-  if (type == 'newrequest') {
+  if (type == 'FRIEND_REQUEST' || type == 'FRIEND_REQUEST_RESPONSE') {
     return (
       <View
         style={[
@@ -62,31 +63,44 @@ function SingleNotificationicon({type}) {
 }
 
 const SingleNotification = ({data}) => {
+  const navigation = useNavigation();
+  const createdAt = new Date(data.created_at);
+  const date = createdAt.toLocaleDateString();
+  const time = createdAt.toLocaleTimeString();
+
+  const handleNavigation = route => {
+    return navigation.navigate(route);
+  };
+
   return (
     <View>
       <View style={styles.noticontainer}>
         <SingleNotificationicon type={data.type} />
-        <View style={{flex: 1}}>
-          <Text style={styles.text1}>{data.title}</Text>
-          <Text style={styles.text2}>{data.text}</Text>
+        <View style={{flex: 1, gap: 3}}>
+          <Text style={styles.text1}>{data.type}</Text>
+          <Text style={styles.text2}>{data.message}</Text>
           <View style={{flexDirection: 'row', gap: 10}}>
-            <Text style={styles.text3}>{data.time}</Text>
+            <Text style={styles.text3}>{time}</Text>
             <Text style={styles.text3}>|</Text>
-            <Text style={styles.text3}>{data.date}</Text>
+            <Text style={styles.text3}>{date}</Text>
           </View>
-          {data.type == 'newrequest' && (
+          {(data.type == 'FRIEND_REQUEST' ||
+            data.type == 'FRIEND_REQUEST_RESPONSE') && (
             <View style={{flexDirection: 'row', gap: 10, marginTop: 10}}>
-              <TouchableOpacity style={styles.followbutton}>
+              <TouchableOpacity
+                style={styles.followbutton}
+                onPress={() => handleNavigation('FriendsList')}>
                 <Text
                   style={{
                     color: 'white',
                     fontWeight: '500',
                   }}>
-                  Follow back
+                  {/* Follow back */}
+                  Check
                 </Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.ignorebutton}>
+              {/* <TouchableOpacity style={styles.ignorebutton}>
                 <Text
                   style={{
                     color: 'black',
@@ -94,7 +108,7 @@ const SingleNotification = ({data}) => {
                   }}>
                   Ignore
                 </Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
           )}
         </View>
@@ -127,17 +141,17 @@ const styles = StyleSheet.create({
 
   text1: {
     color: '#33196B',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '900',
   },
   text2: {
     color: '#745594',
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '700',
   },
   text3: {
     color: '#4635E2',
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '500',
   },
 

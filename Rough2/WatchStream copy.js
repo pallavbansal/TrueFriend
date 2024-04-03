@@ -8,6 +8,7 @@ import {
 } from '@videosdk.live/react-native-sdk';
 import WatchContainer from '../Components/Streaming/WatchStream/WatchContainer';
 import {useNavigation} from '@react-navigation/native';
+import {useGetMeetingId} from '../Hooks/Query/StreamQuery';
 import Loading from './Loading';
 import {PanGestureHandler, State} from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
@@ -19,6 +20,8 @@ import OfflineViewerContainer from '../Components/Streaming/WatchStream/OfflineV
 const WatchStream = ({route}) => {
   const navigation = useNavigation();
   const mydata = useSelector(state => state.Auth.userinitaldata);
+  const [meetingid, setmeetingid] = useState(null);
+  const [otherdata, setotherdata] = useState({});
   const [nextStreamdata, setNextStreamData] = useState({});
   const [previousStreamdata, setPreviousStreamData] = useState({});
   const id = route.params.id;
@@ -26,12 +29,12 @@ const WatchStream = ({route}) => {
   const micEnabled = false;
   const webcamEnabled = false;
   const mode = 'VIEWER';
-  const name = route.params.name;
-  const type = route.params.type;
-  const meetingid = route.params.meeting_id;
-  const otherdata = route.params.otherdata; // {meeting_id,stream_id,stream_status,user}
-  const recordedurl = route.params.recordedurl;
+  const name = route.params.name ? route.params.name : 'Test User';
 
+  const isswiped = route.params.isswiped ? route.params.isswiped : false;
+  const type = route.params.type ? route.params.type : 'ONLINE';
+
+  const {isPending, error, mutate, reset} = useGetMeetingId();
   const {
     data: streamData,
     error: streamError,
@@ -42,59 +45,55 @@ const WatchStream = ({route}) => {
 
   useEffect(() => {
     if (streamData) {
-      if (streamData.data.next_stream != null) {
-        const nextparams = {
-          id: streamData.data.next_stream.user.id,
-          token: token,
-          name: mydata.name,
-          mode: 'VIEWER',
-          isswiped: true,
-          meeting_id: streamData.data.next_stream.meeting_id,
-          otherdata: {
-            meeting_id: streamData.data.next_stream.meeting_id,
-            stream_id: streamData.data.next_stream.id,
-            stream_status: streamData.data.next_stream.status, // "ACTIVE","ENDED"
-            user: streamData.data.next_stream.user,
-          },
-          type:
-            streamData.data.next_stream.status === 'ACTIVE'
-              ? 'ONLINE'
-              : 'OFFLINE',
-          recordedurl:
-            streamData.data.next_stream.status === 'ENDED'
-              ? streamData.data.next_stream.recorded_url
-              : null,
-        };
-        setNextStreamData(nextparams);
-      }
-
-      if (streamData.data.previous_stream != null) {
-        const previousparams = {
-          id: streamData.data.previous_stream.user.id,
-          token: token,
-          name: mydata.name,
-          mode: 'VIEWER',
-          isswiped: true,
-          meeting_id: streamData.data.previous_stream.meeting_id,
-          otherdata: {
-            meeting_id: streamData.data.previous_stream.meeting_id,
-            stream_id: streamData.data.previous_stream.id,
-            stream_status: streamData.data.previous_stream.status, // "ACTIVE","ENDED"
-            user: streamData.data.previous_stream.user,
-          },
-          type:
-            streamData.data.previous_stream.status === 'ACTIVE'
-              ? 'ONLINE'
-              : 'OFFLINE',
-          recordedurl:
-            streamData.data.previous_stream.status === 'ENDED'
-              ? streamData.data.previous_stream.recorded_url
-              : null,
-        };
-        setPreviousStreamData(previousparams);
-      }
+      setNextStreamData(streamData?.data?.next_stream?.user);
+      setPreviousStreamData(streamData?.data?.previous_stream?.user);
     }
   }, [streamData]);
+
+  useEffect(() => {
+    if (!isswiped) {
+      const formdata = {
+        user_id: id,
+      };
+      mutate(
+        {data: formdata},
+        {
+          onSuccess: data => {
+            if (data.status_code == 1) {
+              if (data.data.stream == null) {
+                Toast.show({
+                  type: 'info',
+                  text1: 'Stream Ended',
+                  visibilityTime: 1000,
+                });
+                navigation.navigate('Discover');
+              }
+              if (data.data.stream?.meeting_id) {
+                setmeetingid(data.data.stream.meeting_id);
+                setotherdata({
+                  meeting_id: data.data.stream.meeting_id,
+                  stream_id: data.data.stream.id,
+                  stream_status: data.data.stream.status, // "ACTIVE","ENDED"
+                  user: data.data.stream.user,
+                });
+              }
+            }
+            if (data.status_code == 0) {
+              Toast.show({
+                type: 'error',
+                text1: 'Stream Ended',
+                visibilityTime: 1000,
+              });
+              navigation.navigate('Discover');
+            }
+          },
+        },
+      );
+    } else {
+      setmeetingid(route.params.swipedmeetingid);
+      setotherdata(route.params.swipedmeetingotherdata);
+    }
+  }, []);
 
   const onGestureEvent = Animated.event(
     [
@@ -124,9 +123,9 @@ const WatchStream = ({route}) => {
         useNativeDriver: true,
       }).start();
       if (nativeEvent.translationX < -100) {
-        handleLeftSwipe();
+        // handleLeftSwipe();
       } else if (nativeEvent.translationX > 100) {
-        handleRightSwipe();
+        // handleRightSwipe();
       }
     }
   };
@@ -136,7 +135,7 @@ const WatchStream = ({route}) => {
       return;
     }
 
-    if (!nextStreamdata) {
+    if (streamData.data.next_stream == null) {
       Toast.show({
         type: 'info',
         text1: 'No More Streams Available',
@@ -146,6 +145,8 @@ const WatchStream = ({route}) => {
       return;
     }
 
+    const token = await getToken();
+    // leave();
     navigation.reset({
       index: 1,
       routes: [
@@ -154,7 +155,23 @@ const WatchStream = ({route}) => {
         },
         {
           name: 'WatchStream',
-          params: nextStreamdata,
+          params: {
+            token: token,
+            name: mydata.name,
+            mode: 'VIEWER',
+            isswiped: true,
+            swipedmeetingid: streamData.data.next_stream.meeting_id,
+            swipedmeetingotherdata: {
+              meeting_id: streamData.data.next_stream.meeting_id,
+              stream_id: streamData.data.next_stream.id,
+              stream_status: streamData.data.next_stream.status, // "ACTIVE","ENDED"
+              user: streamData.data.next_stream.user,
+            },
+            type:
+              streamData.data.next_stream.status === 'ACTIVE'
+                ? 'ONLINE'
+                : 'OFFLINE',
+          },
         },
       ],
     });
@@ -164,7 +181,8 @@ const WatchStream = ({route}) => {
     if (streamPending) {
       return;
     }
-    if (!previousStreamdata) {
+
+    if (streamData.data.previous_stream == null) {
       Toast.show({
         type: 'info',
         text1: 'No More Streams Available',
@@ -173,6 +191,9 @@ const WatchStream = ({route}) => {
       });
       return;
     }
+
+    const token = await getToken();
+    leave();
     navigation.reset({
       index: 1,
       routes: [
@@ -181,13 +202,29 @@ const WatchStream = ({route}) => {
         },
         {
           name: 'WatchStream',
-          params: previousStreamdata,
+          params: {
+            token: token,
+            name: mydata.name,
+            mode: 'VIEWER',
+            isswiped: true,
+            swipedmeetingid: streamData.data.previous_stream.meeting_id,
+            swipedmeetingotherdata: {
+              meeting_id: streamData.data.previous_stream.meeting_id,
+              stream_id: streamData.data.previous_stream.id,
+              stream_status: streamData.data.previous_stream.status, // "ACTIVE","ENDED"
+              user: streamData.data.previous_stream.user,
+            },
+            type:
+              streamData.data.previous_stream.status === 'ACTIVE'
+                ? 'ONLINE'
+                : 'OFFLINE',
+          },
         },
       ],
     });
   };
 
-  if (meetingid === null || streamPending || !otherdata) {
+  if (meetingid === null || isPending || streamPending || !otherdata) {
     return <Loading />;
   }
 
@@ -218,10 +255,10 @@ const WatchStream = ({route}) => {
                   webcamEnabled: webcamEnabled,
                   name,
                   mode,
-                  // notification: {
-                  //   title: 'Video SDK Meeting',
-                  //   message: 'Meeting is running.',
-                  // },
+                  notification: {
+                    title: 'Video SDK Meeting',
+                    message: 'Meeting is running.',
+                  },
                 }}
                 token={token}>
                 <MeetingConsumer
@@ -245,7 +282,9 @@ const WatchStream = ({route}) => {
             ) : (
               <OfflineViewerContainer
                 streamotherdata={otherdata}
-                downstreamUrl={recordedurl}
+                downstreamUrl={
+                  'https://cdn.videosdk.live/meetings-hls/bdd01425-0f36-44b0-9b98-27b7a9f4ace9/index.m3u8'
+                }
               />
             )}
 
@@ -260,7 +299,7 @@ const WatchStream = ({route}) => {
                 overflow: 'hidden',
               }}>
               <NextPreviousJoin
-                userdata={nextStreamdata?.otherdata?.user}
+                userdata={nextStreamdata}
                 next={true}
                 isPending={streamPending}
               />
@@ -276,7 +315,7 @@ const WatchStream = ({route}) => {
                 overflow: 'hidden',
               }}>
               <NextPreviousJoin
-                userdata={previousStreamdata?.otherdata?.user}
+                userdata={previousStreamdata}
                 next={false}
                 isPending={streamPending}
               />

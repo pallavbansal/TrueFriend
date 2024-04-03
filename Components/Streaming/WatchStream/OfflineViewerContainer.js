@@ -1,49 +1,28 @@
-import React, {useRef, useState, useEffect} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Dimensions,
-  Image,
-} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import Video from 'react-native-video';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import LinearGradient from 'react-native-linear-gradient';
-import {useMeeting} from '@videosdk.live/react-native-sdk';
-import BottomSheet from '../common/BottomSheet';
-import ChatViewer from '../common/ChatViewer';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import {colors} from '../../../Styles/ColorData';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useSendRequest} from '../../../Hooks/Query/RequestQuery';
-import StreamLoading from './StreamLoading';
 import {useRequestCurrentStatus} from '../../../Hooks/Query/RequestQuery';
 import Toast from 'react-native-toast-message';
 import ProfileNavigator from '../../Common/ProfileNavigator';
-import {getToken, createMeeting} from '../../../Utils/Streamapi';
-import socket from '../../../Socket/Socket';
-import {useSelector} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
 
-const ViewerContainer = ({userid, streamotherdata}) => {
-  const {changeMode, leave, hlsState, hlsUrls, participants} = useMeeting();
-  const mydata = useSelector(state => state.Auth.userinitaldata);
+const OfflineViewerContainer = ({streamotherdata, downstreamUrl}) => {
+  console.log('streamotherdata', streamotherdata, downstreamUrl);
   const navigation = useNavigation();
-  const isCreator = true;
-  const videoPlayer = useRef(null);
-  const bottomSheetRef = useRef();
-  const [bottomSheetView, setBottomSheetView] = useState('CHAT');
   const [friendrequest, setFriendRequest] = useState('');
   const {isPending, error, mutate, reset} = useSendRequest();
   const {
     data: requestStatus,
     error: requestError,
     isPending: requestPending,
-  } = useRequestCurrentStatus(streamotherdata.user.id);
-
-  console.log('requestStatus', streamotherdata);
+  } = useRequestCurrentStatus(streamotherdata?.user?.id);
 
   useEffect(() => {
     if (requestStatus) {
@@ -85,39 +64,8 @@ const ViewerContainer = ({userid, streamotherdata}) => {
     );
   };
 
-  const handleCall = async () => {
-    const token = await getToken();
-    let meetingId = '';
-    if (isCreator) {
-      meetingId = await createMeeting({token});
-    }
-
-    const finaldata = {
-      caller: {
-        userid: mydata.id,
-        name: mydata.name,
-        imageUrl: mydata.profile_picture,
-      },
-      reciever: {
-        name: streamotherdata.user.name,
-        id: streamotherdata.user.id,
-      },
-      meetingId: meetingId,
-      callaction: 'outgoing',
-      type: 'audio',
-    };
-    leave();
-    navigation.navigate('Call', {
-      name: mydata.name.trim(),
-      token: token,
-      meetingId: meetingId,
-      micEnabled: true,
-      webcamEnabled: false,
-      isCreator: isCreator,
-      mode: 'CONFERENCE',
-      finaldata: finaldata,
-    });
-    socket.emit('call', finaldata);
+  const leaveoffline = () => {
+    navigation.navigate('Discover');
   };
 
   return (
@@ -125,71 +73,63 @@ const ViewerContainer = ({userid, streamotherdata}) => {
       style={{
         flex: 1,
       }}>
-      {hlsState == 'HLS_PLAYABLE' ? (
-        <View
+      <View
+        style={{
+          flex: 1,
+        }}>
+        <Video
+          source={{
+            uri: downstreamUrl,
+          }}
+          fullscreen={true}
+          resizeMode="cover"
           style={{
             flex: 1,
-          }}>
-          <Video
-            ref={videoPlayer}
-            source={{
-              uri: hlsUrls.downstreamUrl,
-            }}
-            fullscreen={true}
-            resizeMode="cover"
+            borderBottomLeftRadius: 30,
+            borderBottomRightRadius: 30,
+          }}
+        />
+        {friendrequest === 'Noaction' && (
+          <TouchableOpacity
             style={{
-              flex: 1,
-              borderBottomLeftRadius: 30,
-              borderBottomRightRadius: 30,
+              position: 'absolute',
+              bottom: 15,
+              right: 15,
+              height: 50,
+              width: 50,
+              backgroundColor: 'rgba(0,0,0,0.3)',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 15,
+              elevation: 5,
+              zIndex: 100,
             }}
-            onError={e => console.log('error', e)}
-          />
-          {friendrequest === 'Noaction' && (
-            <TouchableOpacity
-              style={{
-                position: 'absolute',
-                bottom: 15,
-                right: 15,
-                height: 50,
-                width: 50,
-                backgroundColor: 'rgba(0,0,0,0.3)',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 15,
-                elevation: 5,
-                zIndex: 100,
-              }}
-              onPress={handlefollow}>
-              <SimpleLineIcons name="user-follow" size={24} color="white" />
-            </TouchableOpacity>
-          )}
-          {friendrequest === 'Friends' && (
-            <TouchableOpacity
-              style={{
-                position: 'absolute',
-                bottom: 15,
-                right: 15,
-                height: 50,
-                width: 50,
-                backgroundColor: 'rgba(0,0,0,0.3)',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 15,
-                elevation: 5,
-                zIndex: 100,
-              }}>
-              <SimpleLineIcons name="user-following" size={24} color="green" />
-            </TouchableOpacity>
-          )}
-        </View>
-      ) : (
-        <View style={styles.waitcontainer}>
-          <StreamLoading />
-        </View>
-      )}
+            onPress={handlefollow}>
+            <SimpleLineIcons name="user-follow" size={24} color="white" />
+          </TouchableOpacity>
+        )}
+        {friendrequest === 'Friends' && (
+          <TouchableOpacity
+            style={{
+              position: 'absolute',
+              bottom: 15,
+              right: 15,
+              height: 50,
+              width: 50,
+              backgroundColor: 'rgba(0,0,0,0.3)',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 15,
+              elevation: 5,
+              zIndex: 100,
+            }}>
+            <SimpleLineIcons name="user-following" size={24} color="green" />
+          </TouchableOpacity>
+        )}
+      </View>
 
       <View style={styles.bottomcontainer}>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={{
             width: 50,
             backgroundColor: 'rgba(0,0,0,0.1)',
@@ -203,13 +143,12 @@ const ViewerContainer = ({userid, streamotherdata}) => {
             size={24}
             color="black"
             onPress={() => {
-              setBottomSheetView('CHAT');
-              bottomSheetRef.current.show();
+              console.log('chat');
             }}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity
-          onPress={handleCall}
+          onPress={leaveoffline}
           style={{
             backgroundColor: 'white',
             borderRadius: 50,
@@ -229,7 +168,7 @@ const ViewerContainer = ({userid, streamotherdata}) => {
             </LinearGradient>
           </LinearGradient>
         </TouchableOpacity>
-        <View
+        {/* <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
@@ -246,9 +185,11 @@ const ViewerContainer = ({userid, streamotherdata}) => {
               color: 'black',
               fontWeight: 'bold',
             }}>
-            {participants ? [...participants.keys()].length : 1}
+            {10}
           </Text>
-        </View>
+        </View> */}
+
+        {/* profile */}
         <View
           style={{
             position: 'absolute',
@@ -271,26 +212,11 @@ const ViewerContainer = ({userid, streamotherdata}) => {
           </ProfileNavigator>
         </View>
       </View>
-
-      <BottomSheet
-        sheetBackgroundColor={'#2B3034'}
-        draggable={false}
-        radius={12}
-        hasDraggableIcon
-        closeFunction={() => {
-          setBottomSheetView('');
-        }}
-        ref={bottomSheetRef}
-        height={Dimensions.get('window').height * 0.5}>
-        {bottomSheetView === 'CHAT' ? (
-          <ChatViewer raiseHandVisible={false} />
-        ) : null}
-      </BottomSheet>
     </View>
   );
 };
 
-export default ViewerContainer;
+export default OfflineViewerContainer;
 const styles = StyleSheet.create({
   waitcontainer: {
     flex: 1,

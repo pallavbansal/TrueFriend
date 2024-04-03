@@ -215,7 +215,7 @@ const FriendsList = () => {
     return <Loading />;
   }
 
-  console.log('friendsdata2', chattingfriendsdata);
+  // console.log('friendsdata2', chattingfriendsdata);
 
   return (
     <GradientScreen>

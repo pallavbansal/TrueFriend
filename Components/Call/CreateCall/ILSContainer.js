@@ -8,7 +8,7 @@ import WaitingResponse from './WaitingResponse';
 import React from 'react';
 import MeetingViewer from './MeetingViewer';
 
-export default function ILSContainer({webcamEnabled}) {
+export default function ILSContainer({webcamEnabled, finaldata}) {
   const [isJoined, setJoined] = useState(false);
   const mMeeting = useMeeting({});
   const mMeetingRef = useRef();
@@ -38,5 +38,9 @@ export default function ILSContainer({webcamEnabled}) {
     };
   }, []);
 
-  return isJoined ? <MeetingViewer /> : <WaitingToJoinView />;
+  return isJoined ? (
+    <MeetingViewer finaldata={finaldata} />
+  ) : (
+    <WaitingToJoinView />
+  );
 }

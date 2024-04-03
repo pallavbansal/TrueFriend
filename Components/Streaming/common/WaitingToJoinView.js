@@ -1,13 +1,9 @@
 import React, {useEffect, useRef} from 'react';
 import {StyleSheet, Animated, Easing} from 'react-native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../../../Styles/ColorData';
-import {useNavigation} from '@react-navigation/native';
 
 const WaitingToJoinView = ({userdata}) => {
-  console.log('User Data', userdata);
-  const navigation = useNavigation();
   const fadeAnim = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
   const moveAnim = useRef(new Animated.Value(0)).current; // Initial value for movement: 0
 
