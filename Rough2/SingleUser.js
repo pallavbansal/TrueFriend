@@ -12,59 +12,19 @@ const SingleUser = ({item}) => {
   const navigation = useNavigation();
   const mydata = useSelector(state => state.Auth.userinitaldata);
   const {profile_picture: imageUrl, online_status, id, name} = item.user;
+  const [meetingid, setmeetingid] = useState(null);
+  const [otherdata, setotherdata] = useState(null);
   const {isPending, error, mutate, reset} = useGetMeetingId();
 
   const handlewatchstream = async () => {
     const token = await getToken();
-    const formdata = {
-      user_id: id,
-    };
-    mutate(
-      {data: formdata},
-      {
-        onSuccess: data => {
-          if (data.status_code == 1) {
-            if (data.data.stream == null) {
-              Toast.show({
-                type: 'info',
-                text1: 'Stream Ended',
-                visibilityTime: 1000,
-              });
-              navigation.navigate('Discover');
-            }
-            if (data.data.stream?.meeting_id) {
-              navigation.navigate('WatchStream', {
-                id: id,
-                token: token,
-                name: mydata.name,
-                mode: 'VIEWER',
-                meeting_id: data.data.stream.meeting_id,
-                otherdata: {
-                  meeting_id: data.data.stream.meeting_id,
-                  stream_id: data.data.stream.id,
-                  stream_status: data.data.stream.status, // "ACTIVE","ENDED"
-                  user: data.data.stream.user,
-                },
-                type:
-                  data.data.stream.status == 'ACTIVE' ? 'ONLINE' : 'OFFLINE',
-                recordedurl:
-                  data.data.stream.status == 'ENDED'
-                    ? data.data.stream.recorded_url
-                    : null,
-              });
-            }
-          }
-          if (data.status_code == 0) {
-            Toast.show({
-              type: 'error',
-              text1: 'Stream Ended',
-              visibilityTime: 1000,
-            });
-            navigation.navigate('Discover');
-          }
-        },
-      },
-    );
+    navigation.navigate('WatchStream', {
+      id: id,
+      token: token,
+      name: mydata.name,
+      mode: 'VIEWER',
+      type: 'ONLINE',
+    });
   };
 
   return (

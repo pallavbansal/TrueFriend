@@ -53,7 +53,6 @@ const SpeakerFooter = ({
       />
       <TouchableOpacity
         onPress={end}
-        // onPress={leave}
         style={{
           backgroundColor: 'white',
           borderRadius: 50,
@@ -69,7 +68,7 @@ const SpeakerFooter = ({
             end={{x: 1, y: 1}}
             colors={colors.gradients.callinnergradient}
             style={styles.calliconcontainer}>
-            <Ionicons name="call" size={28} color="white" />
+            <MaterialIcons name="tv-off" size={28} color="white" />
           </LinearGradient>
         </LinearGradient>
       </TouchableOpacity>

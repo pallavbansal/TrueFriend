@@ -8,7 +8,10 @@ import ParticipantView from './ParticipantView';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import WaitingToJoinView from './WaitingToJoinView';
 
-export default function MeetingViewer({}) {
+export default function MeetingViewer({finaldata}) {
+  const callerid = finaldata.caller.userid;
+  const receiverid = finaldata.reciever.id;
+  console.log('finaldata in meetingviewer :', callerid, receiverid);
   const [localId, setLocalId] = useState(null);
   const [otherId, setOtherId] = useState(null);
   const [waiting, setWaiting] = useState(true);
@@ -25,29 +28,41 @@ export default function MeetingViewer({}) {
     hlsState,
     startRecording,
     stopRecording,
+    onMeetingJoined, // Add this
+    onMeetingLeft, // Add this
+    onMeetingStateChanged, // Add this
   } = useMeeting({
-    onError: data => {
-      const {code, message} = data;
-      Toast.show({
-        type: 'error',
-        text1: `Error: ${code}`,
-        text2: message,
-      });
+    // onError: data => {
+    //   const {code, message} = data;
+    //   Toast.show({
+    //     type: 'error',
+    //     text1: `Error: ${code}`,
+    //     text2: message,
+    //   });
+    // },
+    onMeetingJoined: () => {
+      console.log('Meeting joined----------');
+    },
+    onMeetingLeft: () => {
+      console.log('Meeting left---------');
+    },
+    onMeetingStateChanged: data => {
+      console.log('Meeting state changed------------', data);
     },
   });
 
-  const hlsRef = useRef();
-  const orientation = useOrientation();
+  // const hlsRef = useRef();
+  // const orientation = useOrientation();
 
-  useEffect(() => {
-    if (hlsRef.current) {
-      if (hlsState === 'HLS_STARTING' || hlsState === 'HLS_STOPPING') {
-        hlsRef.current.start();
-      } else {
-        hlsRef.current.stop();
-      }
-    }
-  }, [hlsState]);
+  // useEffect(() => {
+  //   if (hlsRef.current) {
+  //     if (hlsState === 'HLS_STARTING' || hlsState === 'HLS_STOPPING') {
+  //       hlsRef.current.start();
+  //     } else {
+  //       hlsRef.current.stop();
+  //     }
+  //   }
+  // }, [hlsState]);
 
   useEffect(() => {
     if (localParticipant && participants) {

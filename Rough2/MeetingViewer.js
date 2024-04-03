@@ -43,44 +43,37 @@ export default function MeetingViewer({setlocalParticipantMode}) {
   const orientation = useOrientation();
   const [bottomSheetView, setBottomSheetView] = useState('');
 
-  useEffect(() => {
-    const _handleHLS = () => {
-      if (!hlsState || hlsState === 'HLS_STOPPED') {
-        startHls({
-          layout: {
-            type: 'SPOTLIGHT',
-            priority: 'PIN',
+  const _handleHLS = () => {
+    if (!hlsState || hlsState === 'HLS_STOPPED') {
+      startHls({
+        layout: {
+          type: 'SPOTLIGHT',
+          priority: 'PIN',
+        },
+        theme: 'DARK',
+        orientation: 'landscape',
+      });
+      startRecording({
+        quality: 'low',
+      });
+      if (meetingId) {
+        const formdata = {
+          meeting_id: meetingId,
+          type: 'STREAM',
+        };
+        console.log(meetingId, formdata);
+        mutate(
+          {
+            data: formdata,
           },
-          theme: 'DARK',
-          orientation: 'landscape',
-        });
-        startRecording({
-          quality: 'low',
-        });
-        if (meetingId) {
-          const formdata = {
-            meeting_id: meetingId,
-            type: 'STREAM',
-          };
-          console.log(meetingId, formdata);
-          mutate(
-            {
-              data: formdata,
+          {
+            onSuccess: data => {
+              console.log('start stream meetingid push success', data);
             },
-            {
-              onSuccess: data => {
-                console.log('start stream meetingid push success', data);
-              },
-            },
-          );
-        }
+          },
+        );
       }
-    };
-    _handleHLS();
-  }, [hlsState]);
-
-  const _handleEnd = () => {
-    if (hlsState === 'HLS_PLAYABLE') {
+    } else if (hlsState === 'HLS_PLAYABLE') {
       stopRecording();
       stopHls();
       end();
@@ -105,55 +98,54 @@ export default function MeetingViewer({setlocalParticipantMode}) {
           borderRadius: 8,
         }}>
         <View style={{flexDirection: 'row'}}>
-          {
-            hlsState === 'HLS_STARTED' ||
-            hlsState === 'HLS_STOPPING' ||
-            hlsState === 'HLS_PLAYABLE' ||
-            hlsState === 'HLS_STARTING' ? (
-              <TouchableOpacity
-                onPress={() => {
-                  _handleEnd();
-                }}
-                activeOpacity={1}
+          {hlsState === 'HLS_STARTED' ||
+          hlsState === 'HLS_STOPPING' ||
+          hlsState === 'HLS_PLAYABLE' ||
+          hlsState === 'HLS_STARTING' ? (
+            <TouchableOpacity
+              onPress={() => {
+                _handleHLS();
+              }}
+              activeOpacity={1}
+              style={{
+                padding: 4,
+              }}>
+              <Text
                 style={{
-                  padding: 4,
+                  fontSize: 12,
+                  color: '#FF5D5D',
+                  fontWeight: 'bold',
                 }}>
-                <Text
-                  style={{
-                    fontSize: 12,
-                    color: '#FF5D5D',
-                    fontWeight: 'bold',
-                  }}>
-                  {hlsState === 'HLS_STARTED'
-                    ? `Live Started`
-                    : hlsState === 'HLS_STOPPING'
-                    ? `Live Stopping`
-                    : hlsState === 'HLS_STARTING'
-                    ? `Live Starting`
-                    : hlsState === 'HLS_PLAYABLE'
-                    ? 'Stop Live'
-                    : null}
-                </Text>
-              </TouchableOpacity>
-            ) : null
-            // <TouchableOpacity
-            //   onPress={() => {
-            //     // _handleHLS();
-            //   }}
-            //   activeOpacity={1}
-            //   style={{
-            //     padding: 4,
-            //   }}>
-            //   <Text
-            //     style={{
-            //       fontSize: 12,
-            //       color: '#FF5D5D',
-            //       fontWeight: 'bold',
-            //     }}>
-            //     Go Live
-            //   </Text>
-            // </TouchableOpacity>
-          }
+                {hlsState === 'HLS_STARTED'
+                  ? `Live Started`
+                  : hlsState === 'HLS_STOPPING'
+                  ? `Live Stopping`
+                  : hlsState === 'HLS_STARTING'
+                  ? `Live Starting`
+                  : hlsState === 'HLS_PLAYABLE'
+                  ? 'Stop Live'
+                  : null}
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={() => {
+                _handleHLS();
+              }}
+              activeOpacity={1}
+              style={{
+                padding: 4,
+              }}>
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: '#FF5D5D',
+                  fontWeight: 'bold',
+                }}>
+                Go Live
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
       <View

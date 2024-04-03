@@ -70,6 +70,7 @@ const CallHandler = ({children}) => {
       webcamEnabled: data.type === 'video' ? true : false,
       isCreator: false,
       mode: 'CONFERENCE',
+      finaldata: data,
     });
   };
 

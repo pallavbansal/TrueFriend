@@ -92,7 +92,12 @@ const Call = ({route}) => {
                 },
               }}>
               {() => {
-                return <ILSContainer webcamEnabled={webcamEnabled} />;
+                return (
+                  <ILSContainer
+                    webcamEnabled={webcamEnabled}
+                    finaldata={finaldata}
+                  />
+                );
               }}
             </MeetingConsumer>
           </MeetingProvider>

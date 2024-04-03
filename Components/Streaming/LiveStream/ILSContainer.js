@@ -6,8 +6,11 @@ import {useEffect, useRef, useState} from 'react';
 import WaitingToJoinView from '../common/WaitingToJoinView';
 import React from 'react';
 import MeetingViewer from './MeetingViewer';
+import {useSelector} from 'react-redux';
 
 export default function ILSContainer({webcamEnabled}) {
+  const mydata = useSelector(state => state.Auth.userinitaldata);
+  console.log('Mydata', mydata);
   const [isJoined, setJoined] = useState(false);
   const mMeeting = useMeeting({});
   const mMeetingRef = useRef();
@@ -37,5 +40,5 @@ export default function ILSContainer({webcamEnabled}) {
     };
   }, []);
 
-  return isJoined ? <MeetingViewer /> : <WaitingToJoinView />;
+  return isJoined ? <MeetingViewer /> : <WaitingToJoinView userdata={mydata} />;
 }

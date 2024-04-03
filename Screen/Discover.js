@@ -225,8 +225,11 @@ const Discover = () => {
               marginBottom: 120,
               alignItems:
                 discoverData?.data?.profiles?.length > 2 ? 'center' : 'stretch',
+              // backgroundColor: 'black',
+              height: '100%',
+              paddingBottom: 70,
             }}>
-            {discoverData?.data?.profiles ? (
+            {discoverData?.data?.profiles.length > 0 ? (
               <FlatList
                 refreshControl={
                   <RefreshControl
@@ -245,10 +248,38 @@ const Discover = () => {
                 onEndReachedThreshold={0.1}
                 showsVerticalScrollIndicator={false}
                 numColumns={3}
-                contentContainerStyle={{paddingBottom: 80}}
+                contentContainerStyle={{paddingBottom: 80, height: '100%'}}
               />
             ) : (
-              <NoData />
+              <FlatList
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={() =>
+                      onRefresh(['discoverprofiles', 'fetchProfile'])
+                    }
+                    progressViewOffset={-500}
+                  />
+                }
+                data={[
+                  {
+                    user: {
+                      id: 44,
+                      name: 'Vivek',
+                      profile_picture:
+                        'https://wooing.boxinallsoftech.com/public/uploads/profile/93495_1706851876_Screenshot_2024-01-25-11-07-38-00_325fbdb1dc4eedea0ce3f5f060f574f6.jpg',
+                      online_status: 'online',
+                    },
+                  },
+                ]}
+                keyExtractor={item => item.user.id.toString()}
+                renderItem={({item, index}) => (
+                  <NoData item={item} index={index} />
+                  // <SingleUser item={item} index={index} />
+                )}
+                numColumns={1}
+                contentContainerStyle={{height: '100%', paddingBottom: 40}}
+              />
             )}
           </View>
 

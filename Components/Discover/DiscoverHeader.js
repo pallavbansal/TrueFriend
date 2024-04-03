@@ -62,21 +62,24 @@ const DiscoverHeader = () => {
           />
         </TouchableOpacity>
         <View style={styles.headerdetailcontainer}>
-          <Text style={{color: 'white', fontSize: 20, fontWeight: 900}}>
+          <Text
+            style={{
+              color: 'white',
+              fontSize: 20,
+              fontWeight: 900,
+            }}>
             {UserProfileData.data.profile?.name}
           </Text>
         </View>
         <View style={styles.headericoncontainer}>
-          <TouchableOpacity onPress={handleLogout}>
-            <MaterialIcons name="logout" size={28} color="white" />
+          <TouchableOpacity onPress={() => setshowsearch(!showsearch)}>
+            <MaterialIcons name="search" size={28} color="white" />
           </TouchableOpacity>
-
           <TouchableOpacity onPress={handlenotification}>
             <MaterialIcons name="notifications" size={28} color="white" />
           </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => setshowsearch(!showsearch)}>
-            <MaterialIcons name="search" size={28} color="white" />
+          <TouchableOpacity onPress={handleLogout}>
+            <MaterialIcons name="logout" size={28} color="white" />
           </TouchableOpacity>
         </View>
       </View>
@@ -126,7 +129,7 @@ const styles = StyleSheet.create({
   headericoncontainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
+    gap: 8,
   },
 
   headerbottomcontainer: {
