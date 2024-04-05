@@ -6,6 +6,8 @@ import {
   Linking,
   SafeAreaView,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import TextInputContainer from './TextInput';
 import {useMeeting} from '@videosdk.live/react-native-sdk';
@@ -14,11 +16,9 @@ import moment from 'moment';
 import {usePubSub} from '@videosdk.live/react-native-sdk';
 import colors from './colors';
 import {convertRFValue, useStandardHeight} from './spacing';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const ChatViewer = () => {
   const mpubsubRef = useRef();
-  const [showinput, setshowinput] = useState(false);
 
   const mpubsub = usePubSub('CHAT', {});
 
@@ -56,7 +56,7 @@ const ChatViewer = () => {
           flex: 1,
           justifyContent: 'flex-end',
         }}>
-        {/* <View
+        <View
           style={{
             marginLeft: 12,
             marginVertical: 12,
@@ -69,7 +69,7 @@ const ChatViewer = () => {
             }}>
             Chat
           </Text>
-        </View> */}
+        </View>
         {mpubsub.messages ? (
           <FlatList
             ref={flatListRef}
@@ -84,17 +84,18 @@ const ChatViewer = () => {
                   key={i}
                   style={{
                     backgroundColor: colors.primary[600],
-                    paddingVertical: 4,
+                    paddingVertical: 8,
                     paddingHorizontal: 10,
-                    marginVertical: 3,
+                    marginVertical: 6,
+                    borderRadius: 4,
                     borderRadius: 10,
-                    marginHorizontal: 6,
+                    marginHorizontal: 12,
                     // alignSelf: localSender ? 'flex-end' : 'flex-start',
                     alignSelf: 'flex-start',
                   }}>
                   <Text
                     style={{
-                      fontSize: convertRFValue(8),
+                      fontSize: convertRFValue(12),
                       color: '#9A9FA5',
                       fontWeight: 'bold',
                     }}>
@@ -106,13 +107,13 @@ const ChatViewer = () => {
                     linkStyle={{color: 'blue'}}>
                     <Text
                       style={{
-                        fontSize: convertRFValue(10),
+                        fontSize: convertRFValue(14),
                         color: 'white',
                       }}>
                       {message}
                     </Text>
                   </Hyperlink>
-                  {/* <Text
+                  <Text
                     style={{
                       color: 'grey',
                       fontSize: convertRFValue(10),
@@ -120,7 +121,7 @@ const ChatViewer = () => {
                       marginTop: 4,
                     }}>
                     {time}
-                  </Text> */}
+                  </Text>
                 </View>
               );
             }}
@@ -130,44 +131,23 @@ const ChatViewer = () => {
             }}
           />
         ) : null}
-
-        <TouchableOpacity
+        <View
           style={{
-            padding: 4,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            borderRadius: 10,
-            width: 40,
-            marginBottom: 10,
-            marginLeft: 10,
-            alignItems: 'center',
+            paddingHorizontal: 12,
+            flexDirection: 'row',
           }}>
-          <MaterialIcons
-            name={showinput ? 'keyboard-arrow-down' : 'keyboard-arrow-up'}
-            size={28}
-            color="white"
-            onPress={() => setshowinput(prev => !prev)}
-          />
-        </TouchableOpacity>
-
-        {showinput && (
           <View
             style={{
-              paddingHorizontal: 6,
-              flexDirection: 'row',
+              flex: 1,
             }}>
-            <View
-              style={{
-                flex: 1,
-              }}>
-              <TextInputContainer
-                message={message}
-                setMessage={setMessage}
-                isSending={isSending}
-                sendMessage={sendMessage}
-              />
-            </View>
+            <TextInputContainer
+              message={message}
+              setMessage={setMessage}
+              isSending={isSending}
+              sendMessage={sendMessage}
+            />
           </View>
-        )}
+        </View>
       </SafeAreaView>
     </View>
   );

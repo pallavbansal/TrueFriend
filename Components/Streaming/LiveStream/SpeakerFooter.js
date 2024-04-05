@@ -1,6 +1,7 @@
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import React from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../../../Styles/ColorData';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -28,19 +29,19 @@ const SpeakerFooter = ({
   toggleWebcam,
   changeWebcam,
   setBottomSheetView,
+  bottomSheetView,
   bottomSheetRef,
   end,
   leave,
+  _handleEnd,
+  handleChat,
 }) => {
   return (
     <View style={styles.bottomcontainer}>
       <IconContainer
         backgroundColor="transparent"
-        onPress={() => {
-          setBottomSheetView('CHAT');
-          bottomSheetRef.current.show();
-        }}
-        iconName="chat"
+        onPress={handleChat}
+        iconName={bottomSheetView === 'CHAT' ? 'cancel-presentation' : 'chat'}
         iconColor="black"
       />
       <IconContainer
@@ -52,7 +53,7 @@ const SpeakerFooter = ({
         iconColor="black"
       />
       <TouchableOpacity
-        onPress={end}
+        onPress={_handleEnd}
         style={{
           backgroundColor: 'white',
           borderRadius: 50,
@@ -68,7 +69,8 @@ const SpeakerFooter = ({
             end={{x: 1, y: 1}}
             colors={colors.gradients.callinnergradient}
             style={styles.calliconcontainer}>
-            <MaterialIcons name="tv-off" size={28} color="white" />
+            {/* <MaterialIcons name="tv-off" size={28} color="white" /> */}
+            <AntDesign name="home" size={28} color="white" />
           </LinearGradient>
         </LinearGradient>
       </TouchableOpacity>

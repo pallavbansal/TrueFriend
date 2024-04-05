@@ -125,6 +125,7 @@ class BottomSheet extends Component {
                 styles.container,
                 {
                   height: animatedHeight,
+                  width: '100%',
                   borderTopRightRadius: radius || 10,
                   borderTopLeftRadius: radius || 10,
                   backgroundColor: sheetBackgroundColor || '#F3F3F3',

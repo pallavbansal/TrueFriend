@@ -74,7 +74,18 @@ const WaitingResponse = ({finaldata}) => {
       ...finaldata,
       callaction: 'outgoing-rejected',
     });
-    navigation.navigate('FriendsList');
+    return navigation.reset({
+      index: 1,
+      routes: [
+        {
+          name: 'Discover',
+        },
+        {
+          name: 'FriendsList',
+        },
+      ],
+    });
+    // return navigation.navigate('FriendsList');
   };
 
   return (

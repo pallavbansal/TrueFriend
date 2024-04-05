@@ -7,6 +7,7 @@ import {getToken} from '../../Utils/Streamapi';
 import {useSelector} from 'react-redux';
 import {useGetMeetingId} from '../../Hooks/Query/StreamQuery';
 import Video from 'react-native-video';
+import Toast from 'react-native-toast-message';
 
 const SingleUser = ({item}) => {
   const navigation = useNavigation();
@@ -16,6 +17,7 @@ const SingleUser = ({item}) => {
 
   const handlewatchstream = async () => {
     const token = await getToken();
+    console.log('singleuser', id);
     const formdata = {
       user_id: id,
     };

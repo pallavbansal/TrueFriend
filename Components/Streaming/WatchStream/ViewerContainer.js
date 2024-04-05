@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   Dimensions,
   Image,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import Video from 'react-native-video';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -34,7 +36,7 @@ const ViewerContainer = ({userid, streamotherdata}) => {
   const isCreator = true;
   const videoPlayer = useRef(null);
   const bottomSheetRef = useRef();
-  const [bottomSheetView, setBottomSheetView] = useState('CHAT');
+  const [bottomSheetView, setBottomSheetView] = useState('');
   const [friendrequest, setFriendRequest] = useState('');
   const {isPending, error, mutate, reset} = useSendRequest();
   const {
@@ -86,38 +88,63 @@ const ViewerContainer = ({userid, streamotherdata}) => {
   };
 
   const handleCall = async () => {
-    const token = await getToken();
-    let meetingId = '';
-    if (isCreator) {
-      meetingId = await createMeeting({token});
+    if (hlsState == 'HLS_PLAYABLE') {
+      const token = await getToken();
+      let meetingId = '';
+      if (isCreator) {
+        meetingId = await createMeeting({token});
+      }
+
+      const finaldata = {
+        caller: {
+          userid: mydata.id,
+          name: mydata.name,
+          imageUrl: mydata.profile_picture,
+        },
+        reciever: {
+          name: streamotherdata.user.name,
+          id: streamotherdata.user.id,
+        },
+        meetingId: meetingId,
+        callaction: 'outgoing',
+        type: 'audio',
+      };
+      leave();
+      navigation.navigate('Call', {
+        name: mydata.name.trim(),
+        token: token,
+        meetingId: meetingId,
+        micEnabled: true,
+        webcamEnabled: false,
+        isCreator: isCreator,
+        mode: 'CONFERENCE',
+        finaldata: finaldata,
+      });
+      socket.emit('call', finaldata);
+    } else {
+      Toast.show({
+        type: 'info',
+        text1: 'The stream has not started yet.',
+        text2: 'Please wait or try another stream.',
+        visibilityTime: 2000,
+      });
+    }
+  };
+
+  const handleChat = () => {
+    if (hlsState == 'HLS_PLAYABLE') {
+      setBottomSheetView(prev => (prev === 'CHAT' ? '' : 'CHAT'));
+    } else {
+      setBottomSheetView('');
+      Toast.show({
+        type: 'info',
+        text1: 'The stream has not started yet.',
+        text2: 'Please wait or try another stream.',
+        visibilityTime: 2000,
+      });
     }
 
-    const finaldata = {
-      caller: {
-        userid: mydata.id,
-        name: mydata.name,
-        imageUrl: mydata.profile_picture,
-      },
-      reciever: {
-        name: streamotherdata.user.name,
-        id: streamotherdata.user.id,
-      },
-      meetingId: meetingId,
-      callaction: 'outgoing',
-      type: 'audio',
-    };
-    leave();
-    navigation.navigate('Call', {
-      name: mydata.name.trim(),
-      token: token,
-      meetingId: meetingId,
-      micEnabled: true,
-      webcamEnabled: false,
-      isCreator: isCreator,
-      mode: 'CONFERENCE',
-      finaldata: finaldata,
-    });
-    socket.emit('call', finaldata);
+    // bottomSheetRef.current.show();
   };
 
   return (
@@ -148,7 +175,7 @@ const ViewerContainer = ({userid, streamotherdata}) => {
             <TouchableOpacity
               style={{
                 position: 'absolute',
-                bottom: 15,
+                bottom: 90,
                 right: 15,
                 height: 50,
                 width: 50,
@@ -199,36 +226,30 @@ const ViewerContainer = ({userid, streamotherdata}) => {
             borderRadius: 8,
           }}>
           <MaterialIcons
-            name="chat"
+            name={bottomSheetView === 'CHAT' ? 'cancel-presentation' : 'chat'}
             size={24}
             color="black"
-            onPress={() => {
-              setBottomSheetView('CHAT');
-              bottomSheetRef.current.show();
-            }}
+            onPress={handleChat}
           />
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={handleCall}
+        <View
           style={{
             backgroundColor: 'white',
             borderRadius: 50,
             padding: 15,
           }}>
-          <LinearGradient
-            start={{x: 0, y: 0}}
-            end={{x: 1, y: 1}}
-            colors={colors.gradients.calloutergradient}
-            style={styles.gradienticon}>
-            <LinearGradient
-              start={{x: 0, y: 0}}
-              end={{x: 1, y: 1}}
-              colors={colors.gradients.callinnergradient}
-              style={styles.calliconcontainer}>
-              <Ionicons name="call" size={28} color="white" />
-            </LinearGradient>
-          </LinearGradient>
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={leave}
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: 60,
+              width: 60,
+              borderRadius: 40,
+            }}>
+            <AntDesign name="home" size={34} color="blue" />
+          </TouchableOpacity>
+        </View>
         <View
           style={{
             flexDirection: 'row',
@@ -270,10 +291,48 @@ const ViewerContainer = ({userid, streamotherdata}) => {
             />
           </ProfileNavigator>
         </View>
+        <TouchableOpacity
+          style={{
+            position: 'absolute',
+            top: -90,
+            right: 5,
+          }}
+          onPress={handleCall}>
+          <LinearGradient
+            start={{x: 0, y: 0}}
+            end={{x: 1, y: 1}}
+            colors={colors.gradients.calloutergradient}
+            style={styles.gradienticon}>
+            <LinearGradient
+              start={{x: 0, y: 0}}
+              end={{x: 1, y: 1}}
+              colors={colors.gradients.callinnergradient}
+              style={styles.calliconcontainer}>
+              <Ionicons name="call" size={28} color="white" />
+            </LinearGradient>
+          </LinearGradient>
+        </TouchableOpacity>
       </View>
 
-      <BottomSheet
+      {bottomSheetView === 'CHAT' ? (
+        <View
+          style={{
+            position: 'absolute',
+            width: '48%',
+            height: '60%',
+            bottom: 190,
+            left: 5,
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.05)',
+            borderRadius: 15,
+          }}>
+          <ChatViewer />
+        </View>
+      ) : null}
+
+      {/* <BottomSheet
         sheetBackgroundColor={'#2B3034'}
+        // sheetBackgroundColor={'transparent'}
         draggable={false}
         radius={12}
         hasDraggableIcon
@@ -282,10 +341,8 @@ const ViewerContainer = ({userid, streamotherdata}) => {
         }}
         ref={bottomSheetRef}
         height={Dimensions.get('window').height * 0.5}>
-        {bottomSheetView === 'CHAT' ? (
-          <ChatViewer raiseHandVisible={false} />
-        ) : null}
-      </BottomSheet>
+        {bottomSheetView === 'CHAT' ? <ChatViewer /> : null}
+      </BottomSheet> */}
     </View>
   );
 };
