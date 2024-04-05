@@ -1,17 +1,24 @@
 import React, {useEffect, useRef, useState, useMemo} from 'react';
-import {View, Platform, Dimensions, Text, TouchableOpacity} from 'react-native';
-import {useMeeting, usePubSub} from '@videosdk.live/react-native-sdk';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+  TextInput,
+} from 'react-native';
+import {useMeeting} from '@videosdk.live/react-native-sdk';
 import Toast from 'react-native-toast-message';
 import SpeakerFooter from './SpeakerFooter';
 import {useOrientation} from './useOrientation';
 import ParticipantView from './ParticipantView';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import BottomSheet from '../common/BottomSheet';
 import ChatViewer from '../common/ChatViewer';
 import {useCreateStream} from '../../../Hooks/Query/StreamQuery';
 
 export default function MeetingViewer({setlocalParticipantMode}) {
   const {isPending, error, mutate, reset} = useCreateStream();
+
   const {
     localParticipant,
     participants,
@@ -31,11 +38,11 @@ export default function MeetingViewer({setlocalParticipantMode}) {
   } = useMeeting({
     onError: data => {
       const {code, message} = data;
-      Toast.show({
-        type: 'error',
-        text1: `Error: ${code}`,
-        text2: message,
-      });
+      // Toast.show({
+      //   type: 'error',
+      //   text1: `Error: ${code}`,
+      //   text2: message,
+      // });
     },
   });
 
@@ -87,6 +94,19 @@ export default function MeetingViewer({setlocalParticipantMode}) {
     }
   };
 
+  const handleChat = () => {
+    if (hlsState === 'HLS_PLAYABLE') {
+      setBottomSheetView(prev => (prev === 'CHAT' ? '' : 'CHAT'));
+    } else {
+      setBottomSheetView('');
+      Toast.show({
+        type: 'info',
+        text2: 'Stream is not started yet.',
+      });
+    }
+    // bottomSheetRef.current.show();
+  };
+
   return (
     <View
       style={{
@@ -97,63 +117,63 @@ export default function MeetingViewer({setlocalParticipantMode}) {
           flexDirection: 'row',
           alignItems: 'center',
           position: 'absolute',
-          bottom: 150,
+          bottom: 165,
           right: 10,
           zIndex: 100,
           backgroundColor: 'rgba(0,0,0,0.5)',
-          padding: 5,
+          // padding: 5,
           borderRadius: 8,
         }}>
         <View style={{flexDirection: 'row'}}>
-          {
-            hlsState === 'HLS_STARTED' ||
+          {/* hlsState === 'HLS_PLAYABLE' */}
+          {(hlsState === 'HLS_STARTED' ||
             hlsState === 'HLS_STOPPING' ||
-            hlsState === 'HLS_PLAYABLE' ||
-            hlsState === 'HLS_STARTING' ? (
-              <TouchableOpacity
-                onPress={() => {
-                  _handleEnd();
-                }}
-                activeOpacity={1}
+            hlsState === 'HLS_STARTING') && (
+            <TouchableOpacity
+              onPress={() => {
+                _handleEnd();
+              }}
+              activeOpacity={1}
+              style={{
+                padding: 9,
+              }}>
+              <Text
                 style={{
-                  padding: 4,
+                  fontSize: 12,
+                  color: '#FF5D5D',
+                  fontWeight: 'bold',
                 }}>
-                <Text
-                  style={{
-                    fontSize: 12,
-                    color: '#FF5D5D',
-                    fontWeight: 'bold',
-                  }}>
-                  {hlsState === 'HLS_STARTED'
-                    ? `Live Started`
-                    : hlsState === 'HLS_STOPPING'
-                    ? `Live Stopping`
-                    : hlsState === 'HLS_STARTING'
-                    ? `Live Starting`
-                    : hlsState === 'HLS_PLAYABLE'
-                    ? 'Stop Live'
-                    : null}
-                </Text>
-              </TouchableOpacity>
-            ) : null
-            // <TouchableOpacity
-            //   onPress={() => {
-            //     // _handleHLS();
-            //   }}
-            //   activeOpacity={1}
-            //   style={{
-            //     padding: 4,
-            //   }}>
-            //   <Text
-            //     style={{
-            //       fontSize: 12,
-            //       color: '#FF5D5D',
-            //       fontWeight: 'bold',
-            //     }}>
-            //     Go Live
-            //   </Text>
-            // </TouchableOpacity>
-          }
+                {hlsState === 'HLS_STARTED'
+                  ? `Live Started`
+                  : hlsState === 'HLS_STOPPING'
+                  ? `Live Stopping`
+                  : hlsState === 'HLS_STARTING'
+                  ? `Live Starting`
+                  : hlsState === 'HLS_PLAYABLE'
+                  ? 'Stop Live'
+                  : null}
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          {/* </View></View> : null
+            <TouchableOpacity
+              onPress={() => {
+                // _handleHLS();
+              }}
+              activeOpacity={1}
+              style={{
+                padding: 4,
+              }}>
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: '#FF5D5D',
+                  fontWeight: 'bold',
+                }}>
+                Go Live
+              </Text>
+            </TouchableOpacity> */}
         </View>
       </View>
       <View
@@ -161,7 +181,7 @@ export default function MeetingViewer({setlocalParticipantMode}) {
           flexDirection: 'row',
           alignItems: 'center',
           position: 'absolute',
-          bottom: 200,
+          bottom: 115,
           right: 10,
           zIndex: 100,
           backgroundColor: 'rgba(0,0,0,0.5)',
@@ -197,6 +217,7 @@ export default function MeetingViewer({setlocalParticipantMode}) {
           />
         )}
       </View>
+
       <SpeakerFooter
         localMicOn={localMicOn}
         toggleMic={toggleMic}
@@ -204,11 +225,35 @@ export default function MeetingViewer({setlocalParticipantMode}) {
         toggleWebcam={toggleWebcam}
         changeWebcam={changeWebcam}
         end={end}
+        _handleEnd={_handleEnd}
         leave={leave}
         setBottomSheetView={setBottomSheetView}
+        bottomSheetView={bottomSheetView}
         bottomSheetRef={bottomSheetRef}
+        handleChat={handleChat}
       />
-      <BottomSheet
+
+      {bottomSheetView === 'CHAT' ? (
+        <View
+          style={{
+            position: 'absolute',
+            width: '48%',
+            height: '60%',
+            bottom: 160,
+            left: 5,
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.1)',
+            borderRadius: 15,
+          }}>
+          <ChatViewer />
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
+{
+  /* <BottomSheet
         sheetBackgroundColor={'#2B3034'}
         draggable={false}
         radius={12}
@@ -221,7 +266,5 @@ export default function MeetingViewer({setlocalParticipantMode}) {
         {bottomSheetView === 'CHAT' ? (
           <ChatViewer raiseHandVisible={false} />
         ) : null}
-      </BottomSheet>
-    </View>
-  );
+      </BottomSheet> */
 }
