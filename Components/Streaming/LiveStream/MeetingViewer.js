@@ -1,12 +1,5 @@
 import React, {useEffect, useRef, useState, useMemo} from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  KeyboardAvoidingView,
-  Platform,
-  TextInput,
-} from 'react-native';
+import {View, Text, TouchableOpacity} from 'react-native';
 import {useMeeting} from '@videosdk.live/react-native-sdk';
 import Toast from 'react-native-toast-message';
 import SpeakerFooter from './SpeakerFooter';
@@ -16,8 +9,10 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import ChatViewer from '../common/ChatViewer';
 import {useCreateStream} from '../../../Hooks/Query/StreamQuery';
 
-export default function MeetingViewer({setlocalParticipantMode}) {
+export default function MeetingViewer({}) {
   const {isPending, error, mutate, reset} = useCreateStream();
+  const [showinputouter, setshowinputouter] = useState(false);
+  const [message, setMessage] = useState('');
 
   const {
     localParticipant,
@@ -231,6 +226,10 @@ export default function MeetingViewer({setlocalParticipantMode}) {
         bottomSheetView={bottomSheetView}
         bottomSheetRef={bottomSheetRef}
         handleChat={handleChat}
+        showinputouter={showinputouter}
+        message={message}
+        setMessage={setMessage}
+        setshowinputouter={setshowinputouter}
       />
 
       {bottomSheetView === 'CHAT' ? (
@@ -238,33 +237,20 @@ export default function MeetingViewer({setlocalParticipantMode}) {
           style={{
             position: 'absolute',
             width: '48%',
-            height: '60%',
+            height: 300,
             bottom: 160,
             left: 5,
             flex: 1,
             backgroundColor: 'rgba(0,0,0,0.1)',
             borderRadius: 15,
+            overflow: 'hidden',
           }}>
-          <ChatViewer />
+          <ChatViewer
+            setshowinputouter={setshowinputouter}
+            showinputouter={showinputouter}
+          />
         </View>
       ) : null}
     </View>
   );
-}
-
-{
-  /* <BottomSheet
-        sheetBackgroundColor={'#2B3034'}
-        draggable={false}
-        radius={12}
-        hasDraggableIcon
-        closeFunction={() => {
-          setBottomSheetView('');
-        }}
-        ref={bottomSheetRef}
-        height={Dimensions.get('window').height * 0.5}>
-        {bottomSheetView === 'CHAT' ? (
-          <ChatViewer raiseHandVisible={false} />
-        ) : null}
-      </BottomSheet> */
 }

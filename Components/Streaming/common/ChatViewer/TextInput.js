@@ -11,7 +11,7 @@ export default function TextInputContainer({sendMessage, setMessage, message}) {
       <View
         style={{
           height: vertical_40,
-          marginBottom: 14,
+          // marginBottom: 14,
           flexDirection: 'row',
           borderRadius: 10,
           backgroundColor: colors.primary[600],

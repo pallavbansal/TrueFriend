@@ -1,10 +1,16 @@
-import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
-import React from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  TextInput,
+} from 'react-native';
+import React, {useRef, useEffect} from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../../../Styles/ColorData';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import {usePubSub} from '@videosdk.live/react-native-sdk';
 
 const IconContainer = ({backgroundColor, onPress, iconName, iconColor}) => {
   return (
@@ -35,93 +41,131 @@ const SpeakerFooter = ({
   leave,
   _handleEnd,
   handleChat,
+  showinputouter,
+  message,
+  setMessage,
+  setshowinputouter,
 }) => {
-  return (
-    <View style={styles.bottomcontainer}>
-      <IconContainer
-        backgroundColor="transparent"
-        onPress={handleChat}
-        iconName={bottomSheetView === 'CHAT' ? 'cancel-presentation' : 'chat'}
-        iconColor="black"
-      />
-      <IconContainer
-        backgroundColor="transparent"
-        onPress={() => {
-          changeWebcam();
-        }}
-        iconName="change-circle"
-        iconColor="black"
-      />
-      <TouchableOpacity
-        onPress={_handleEnd}
-        style={{
-          backgroundColor: 'white',
-          borderRadius: 50,
-          padding: 15,
-        }}>
-        <LinearGradient
-          start={{x: 0, y: 0}}
-          end={{x: 1, y: 1}}
-          colors={colors.gradients.calloutergradient}
-          style={styles.gradienticon}>
+  const mpubsubRef = useRef();
+
+  const mpubsub = usePubSub('CHAT', {});
+
+  const sendMessage = () => {
+    if (message === '') return;
+    mpubsub.publish(message, {persist: true});
+    setMessage('');
+
+    // setTimeout(() => {
+    //   scrollToBottom();
+    // }, 100);
+  };
+
+  useEffect(() => {
+    mpubsubRef.current = mpubsub;
+  }, [mpubsub]);
+
+  if (showinputouter) {
+    return (
+      <View style={styles.bottomchatcontainer}>
+        <TextInput
+          style={{
+            backgroundColor: 'white',
+            borderRadius: 50,
+            padding: 15,
+            paddingHorizontal: 30,
+            flex: 1,
+          }}
+          value={message}
+          onChangeText={setMessage}
+          placeholder="Type a message"
+          placeholderTextColor="black"
+          cursorColor={'black'}
+          color={'black'}
+        />
+        <TouchableOpacity
+          onPress={sendMessage}
+          style={{
+            backgroundColor: 'white',
+            borderRadius: 50,
+            padding: 12,
+          }}>
+          <MaterialIcons name="send" size={24} color="black" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            setshowinputouter(false);
+          }}
+          style={{
+            backgroundColor: 'white',
+            borderRadius: 50,
+            padding: 12,
+          }}>
+          <MaterialIcons name="close" size={24} color="black" />
+        </TouchableOpacity>
+      </View>
+    );
+  } else {
+    return (
+      <View style={styles.bottomcontainer}>
+        <IconContainer
+          backgroundColor="transparent"
+          onPress={handleChat}
+          iconName={bottomSheetView === 'CHAT' ? 'cancel-presentation' : 'chat'}
+          iconColor="black"
+        />
+        <IconContainer
+          backgroundColor="transparent"
+          onPress={() => {
+            changeWebcam();
+          }}
+          iconName="change-circle"
+          iconColor="black"
+        />
+        <TouchableOpacity
+          onPress={_handleEnd}
+          style={{
+            backgroundColor: 'white',
+            borderRadius: 50,
+            padding: 15,
+          }}>
           <LinearGradient
             start={{x: 0, y: 0}}
             end={{x: 1, y: 1}}
-            colors={colors.gradients.callinnergradient}
-            style={styles.calliconcontainer}>
-            {/* <MaterialIcons name="tv-off" size={28} color="white" /> */}
-            <AntDesign name="home" size={28} color="white" />
+            colors={colors.gradients.calloutergradient}
+            style={styles.gradienticon}>
+            <LinearGradient
+              start={{x: 0, y: 0}}
+              end={{x: 1, y: 1}}
+              colors={colors.gradients.callinnergradient}
+              style={styles.calliconcontainer}>
+              {/* <MaterialIcons name="tv-off" size={28} color="white" /> */}
+              <AntDesign name="home" size={28} color="white" />
+            </LinearGradient>
           </LinearGradient>
-        </LinearGradient>
-      </TouchableOpacity>
-      <IconContainer
-        backgroundColor={!localMicOn ? 'primary' : 'transparent'}
-        onPress={() => {
-          toggleMic();
-        }}
-        iconName={localMicOn ? 'mic' : 'mic-off'}
-        iconColor="black"
-      />
+        </TouchableOpacity>
+        <IconContainer
+          backgroundColor={!localMicOn ? 'primary' : 'transparent'}
+          onPress={() => {
+            toggleMic();
+          }}
+          iconName={localMicOn ? 'mic' : 'mic-off'}
+          iconColor="black"
+        />
 
-      <IconContainer
-        backgroundColor={!localWebcamOn ? 'primary' : 'transparent'}
-        onPress={() => {
-          toggleWebcam();
-        }}
-        iconName={localWebcamOn ? 'videocam' : 'videocam-off'}
-        iconColor="black"
-      />
-    </View>
-  );
+        <IconContainer
+          backgroundColor={!localWebcamOn ? 'primary' : 'transparent'}
+          onPress={() => {
+            toggleWebcam();
+          }}
+          iconName={localWebcamOn ? 'videocam' : 'videocam-off'}
+          iconColor="black"
+        />
+      </View>
+    );
+  }
 };
 
 export default SpeakerFooter;
-
-// const styles = StyleSheet.create({
-//   bottomcontainer: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-evenly',
-//     alignItems: 'center',
-//     padding: 10,
-//     marginBottom: 5,
-//     borderRadius: 50,
-//     marginHorizontal: 5,
-//   },
-//   gradienticon: {
-//     height: 85,
-//     width: 85,
-//     borderRadius: 42.5,
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-//   calliconcontainer: {
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//     height: 75,
-//     width: 75,
-//     borderRadius: 40,
-//   },
-// });
 
 const styles = StyleSheet.create({
   bottomcontainer: {
@@ -134,6 +178,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     backgroundColor: 'white',
     height: 75,
+  },
+  bottomchatcontainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    gap: 5,
+    marginVertical: 5,
+    marginHorizontal: 5,
   },
   gradienticon: {
     height: 60,
