@@ -62,8 +62,8 @@ const Profile = () => {
   }
 
   function handlerecharge() {
-    // navigation.navigate('Recharge');
-    navigation.navigate('Payment');
+    navigation.navigate('Recharge');
+    // navigation.navigate('Payment');
   }
 
   if (isPending) {

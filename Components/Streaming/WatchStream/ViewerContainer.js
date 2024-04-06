@@ -1,21 +1,9 @@
 import React, {useRef, useState, useEffect} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Dimensions,
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
+import {View, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import Video from 'react-native-video';
-import AntDesign from 'react-native-vector-icons/AntDesign';
 import LinearGradient from 'react-native-linear-gradient';
 import {useMeeting} from '@videosdk.live/react-native-sdk';
-import BottomSheet from '../common/BottomSheet';
 import ChatViewer from '../common/ChatViewer';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import {colors} from '../../../Styles/ColorData';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -28,10 +16,13 @@ import {getToken, createMeeting} from '../../../Utils/Streamapi';
 import socket from '../../../Socket/Socket';
 import {useSelector} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
+import WatchSpeakerFooter from './WatchSpeakerFooter';
 
 const ViewerContainer = ({userid, streamotherdata}) => {
   const {changeMode, leave, hlsState, hlsUrls, participants} = useMeeting();
   const mydata = useSelector(state => state.Auth.userinitaldata);
+  const [showinputouter, setshowinputouter] = useState(false);
+  const [message, setMessage] = useState('');
   const navigation = useNavigation();
   const isCreator = true;
   const videoPlayer = useRef(null);
@@ -171,41 +162,32 @@ const ViewerContainer = ({userid, streamotherdata}) => {
             }}
             onError={e => console.log('error', e)}
           />
-          {friendrequest === 'Noaction' && (
+          {(friendrequest === 'Noaction' || friendrequest === 'Friends') && (
             <TouchableOpacity
               style={{
                 position: 'absolute',
-                bottom: 90,
-                right: 15,
+                bottom: 110,
+                right: 10,
                 height: 50,
                 width: 50,
                 backgroundColor: 'rgba(0,0,0,0.3)',
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: 15,
-                elevation: 5,
                 zIndex: 100,
               }}
-              onPress={handlefollow}>
-              <SimpleLineIcons name="user-follow" size={24} color="white" />
-            </TouchableOpacity>
-          )}
-          {friendrequest === 'Friends' && (
-            <TouchableOpacity
-              style={{
-                position: 'absolute',
-                bottom: 15,
-                right: 15,
-                height: 50,
-                width: 50,
-                backgroundColor: 'rgba(0,0,0,0.3)',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 15,
-                elevation: 5,
-                zIndex: 100,
-              }}>
-              <SimpleLineIcons name="user-following" size={24} color="green" />
+              onPress={
+                friendrequest === 'Noaction' ? () => handlefollow() : () => {}
+              }>
+              <SimpleLineIcons
+                name={
+                  friendrequest === 'Noaction'
+                    ? 'user-follow'
+                    : 'user-following'
+                }
+                size={24}
+                color="white"
+              />
             </TouchableOpacity>
           )}
         </View>
@@ -215,65 +197,22 @@ const ViewerContainer = ({userid, streamotherdata}) => {
         </View>
       )}
 
-      <View style={styles.bottomcontainer}>
-        <TouchableOpacity
-          style={{
-            width: 50,
-            backgroundColor: 'rgba(0,0,0,0.1)',
-            padding: 5,
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: 8,
-          }}>
-          <MaterialIcons
-            name={bottomSheetView === 'CHAT' ? 'cancel-presentation' : 'chat'}
-            size={24}
-            color="black"
-            onPress={handleChat}
-          />
-        </TouchableOpacity>
-        <View
-          style={{
-            backgroundColor: 'white',
-            borderRadius: 50,
-            padding: 15,
-          }}>
-          <TouchableOpacity
-            onPress={leave}
-            style={{
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: 60,
-              width: 60,
-              borderRadius: 40,
-            }}>
-            <AntDesign name="home" size={34} color="blue" />
-          </TouchableOpacity>
-        </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            backgroundColor: 'rgba(0,0,0,0.1)',
-            padding: 5,
-            gap: 5,
-            borderRadius: 8,
-            width: 50,
-          }}>
-          <AntDesign name="eye" size={24} color="black" />
-          <Text
-            style={{
-              fontSize: 12,
-              color: 'black',
-              fontWeight: 'bold',
-            }}>
-            {participants ? [...participants.keys()].length : 1}
-          </Text>
-        </View>
+      <WatchSpeakerFooter
+        bottomSheetView={bottomSheetView}
+        handleChat={handleChat}
+        leave={leave}
+        participants={participants}
+        showinputouter={showinputouter}
+        message={message}
+        setMessage={setMessage}
+        setshowinputouter={setshowinputouter}
+      />
+
+      <View>
         <View
           style={{
             position: 'absolute',
-            top: -90,
+            bottom: 110,
             left: 5,
           }}>
           <ProfileNavigator id={streamotherdata.user.id}>
@@ -294,7 +233,7 @@ const ViewerContainer = ({userid, streamotherdata}) => {
         <TouchableOpacity
           style={{
             position: 'absolute',
-            top: -90,
+            bottom: 110,
             right: 5,
           }}
           onPress={handleCall}>
@@ -319,30 +258,19 @@ const ViewerContainer = ({userid, streamotherdata}) => {
           style={{
             position: 'absolute',
             width: '48%',
-            height: '60%',
+            height: 300,
             bottom: 190,
             left: 5,
             flex: 1,
             backgroundColor: 'rgba(0,0,0,0.05)',
             borderRadius: 15,
           }}>
-          <ChatViewer />
+          <ChatViewer
+            setshowinputouter={setshowinputouter}
+            showinputouter={showinputouter}
+          />
         </View>
       ) : null}
-
-      {/* <BottomSheet
-        sheetBackgroundColor={'#2B3034'}
-        // sheetBackgroundColor={'transparent'}
-        draggable={false}
-        radius={12}
-        hasDraggableIcon
-        closeFunction={() => {
-          setBottomSheetView('');
-        }}
-        ref={bottomSheetRef}
-        height={Dimensions.get('window').height * 0.5}>
-        {bottomSheetView === 'CHAT' ? <ChatViewer /> : null}
-      </BottomSheet> */}
     </View>
   );
 };

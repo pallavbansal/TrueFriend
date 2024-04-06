@@ -6,6 +6,8 @@ import {
   Linking,
   SafeAreaView,
   TouchableOpacity,
+  Modal,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import TextInputContainer from './TextInput';
 import {useMeeting} from '@videosdk.live/react-native-sdk';
@@ -16,9 +18,8 @@ import colors from './colors';
 import {convertRFValue, useStandardHeight} from './spacing';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-const ChatViewer = () => {
+const ChatViewer = ({setshowinputouter, showinputouter}) => {
   const mpubsubRef = useRef();
-  const [showinput, setshowinput] = useState(false);
 
   const mpubsub = usePubSub('CHAT', {});
 
@@ -32,15 +33,18 @@ const ChatViewer = () => {
   const [message, setMessage] = useState('');
 
   const flatListRef = React.useRef();
-  const [isSending, setIsSending] = useState(false);
 
-  const sendMessage = () => {
-    mpubsub.publish(message, {persist: true});
-    setMessage('');
-    setTimeout(() => {
-      scrollToBottom();
-    }, 100);
-  };
+  // const sendMessage = () => {
+  //   mpubsub.publish(message, {persist: true});
+  //   setMessage('');
+  //   setTimeout(() => {
+  //     scrollToBottom();
+  //   }, 100);
+  // };
+  useEffect(() => {
+    scrollToBottom();
+  }, [mpubsub.messages]);
+
   const scrollToBottom = () => {
     flatListRef.current.scrollToEnd({animated: true});
   };
@@ -131,45 +135,95 @@ const ChatViewer = () => {
           />
         ) : null}
 
-        <TouchableOpacity
-          style={{
-            padding: 4,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            borderRadius: 10,
-            width: 40,
-            marginBottom: 10,
-            marginLeft: 10,
-            alignItems: 'center',
-          }}>
-          <MaterialIcons
-            name={showinput ? 'keyboard-arrow-down' : 'keyboard-arrow-up'}
-            size={28}
-            color="white"
-            onPress={() => setshowinput(prev => !prev)}
-          />
-        </TouchableOpacity>
-
-        {showinput && (
-          <View
+        {!showinputouter && (
+          <TouchableOpacity
             style={{
-              paddingHorizontal: 6,
-              flexDirection: 'row',
+              padding: 4,
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              borderRadius: 10,
+              width: 40,
+              marginBottom: 10,
+              marginLeft: 10,
+              alignItems: 'center',
             }}>
-            <View
-              style={{
-                flex: 1,
-              }}>
-              <TextInputContainer
-                message={message}
-                setMessage={setMessage}
-                isSending={isSending}
-                sendMessage={sendMessage}
-              />
-            </View>
-          </View>
+            <MaterialIcons
+              name="send"
+              size={28}
+              color="white"
+              onPress={() => {
+                setshowinputouter(true);
+              }}
+            />
+          </TouchableOpacity>
         )}
       </SafeAreaView>
     </View>
   );
 };
 export default ChatViewer;
+
+// {showinput && (
+//   <View
+//     style={{
+//       paddingHorizontal: 6,
+//       flexDirection: 'row',
+//     }}>
+//     <View
+//       style={{
+//         flex: 1,
+//         marginBottom: 10,
+//       }}>
+//       <TextInputContainer
+//         message={message}
+//         setMessage={setMessage}
+//         sendMessage={sendMessage}
+//       />
+//     </View>
+//   </View>
+// )}
+
+{
+  /* <Modal
+          animationType="slide"
+          transparent={true}
+          visible={showinput}
+          onRequestClose={() => {
+            setshowinput(!showinput);
+          }}>
+          <TouchableWithoutFeedback onPress={() => setshowinput(false)}>
+            <View
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: 'rgba(0,0,0,0.1)',
+              }}>
+              <TouchableWithoutFeedback>
+                <View
+                  style={{
+                    margin: 20,
+                    backgroundColor: 'white',
+                    borderRadius: 20,
+                    padding: 25,
+                    alignItems: 'center',
+                    shadowColor: '#000',
+                    shadowOffset: {
+                      width: 0,
+                      height: 2,
+                    },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 4,
+                    elevation: 5,
+                  }}>
+                  <TextInputContainer
+                    message={message}
+                    setMessage={setMessage}
+                    isSending={isSending}
+                    sendMessage={sendMessage}
+                  />
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal> */
+}
