@@ -15,7 +15,6 @@ import {useDispatch} from 'react-redux';
 import {LogoutRed} from '../../Store/Auth';
 import {useFetchProfile} from '../../Hooks/Query/ProfileQuery';
 import Loading from '../../Screen/Loading';
-import socket from '../../Socket/Socket';
 
 const DiscoverHeader = () => {
   const navigation = useNavigation();

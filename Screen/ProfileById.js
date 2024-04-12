@@ -169,7 +169,7 @@ const ProfileById = ({route}) => {
           <View>
             <Text style={styles.headingtext}>{finaldata.name}</Text>
           </View>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          {/* <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <View style={{flexDirection: 'row', gap: 5, alignItems: 'center'}}>
               <MaterialIcons
                 name="add-call"
@@ -186,7 +186,7 @@ const ProfileById = ({route}) => {
               />
               <Text style={styles.headingtext3}>{finaldata.email}</Text>
             </View>
-          </View>
+          </View> */}
           <View>
             <Text style={styles.headingtext2}>Short Bio</Text>
           </View>
@@ -406,14 +406,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   imagecontainer: {
-    flex: 2,
+    flex: 1.5,
     width: '100%',
     backgroundColor: 'yellow',
     position: 'relative',
   },
   biocontainer: {
     paddingHorizontal: 15,
-    flex: 1.3,
+    flex: 0.9,
     width: '100%',
     justifyContent: 'space-evenly',
   },

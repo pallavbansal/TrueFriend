@@ -43,7 +43,7 @@ export default function MeetingViewer({}) {
 
   const bottomSheetRef = useRef();
   const orientation = useOrientation();
-  const [bottomSheetView, setBottomSheetView] = useState('');
+  const [bottomSheetView, setBottomSheetView] = useState('CHAT');
 
   useEffect(() => {
     const _handleHLS = () => {
@@ -56,9 +56,9 @@ export default function MeetingViewer({}) {
           theme: 'DARK',
           orientation: 'landscape',
         });
-        startRecording({
-          quality: 'low',
-        });
+        // startRecording({
+        //   quality: 'low',
+        // });
         if (meetingId) {
           const formdata = {
             meeting_id: meetingId,
@@ -83,7 +83,7 @@ export default function MeetingViewer({}) {
 
   const _handleEnd = () => {
     if (hlsState === 'HLS_PLAYABLE') {
-      stopRecording();
+      // stopRecording();
       stopHls();
       end();
     }
@@ -91,9 +91,11 @@ export default function MeetingViewer({}) {
 
   const handleChat = () => {
     if (hlsState === 'HLS_PLAYABLE') {
-      setBottomSheetView(prev => (prev === 'CHAT' ? '' : 'CHAT'));
+      // setBottomSheetView(prev => (prev === 'CHAT' ? '' : 'CHAT'));
+      setshowinputouter(true);
     } else {
-      setBottomSheetView('');
+      // setBottomSheetView('');
+      setshowinputouter(false);
       Toast.show({
         type: 'info',
         text2: 'Stream is not started yet.',
@@ -101,6 +103,8 @@ export default function MeetingViewer({}) {
     }
     // bottomSheetRef.current.show();
   };
+
+  console.log('participants', participants);
 
   return (
     <View
@@ -236,8 +240,8 @@ export default function MeetingViewer({}) {
         <View
           style={{
             position: 'absolute',
-            width: '48%',
-            height: 300,
+            width: '60%',
+            height: 200,
             bottom: 160,
             left: 5,
             flex: 1,

@@ -20,16 +20,22 @@ export async function locationUpdate(data, token) {
 
 export async function getDiscoverProfiles(token, distance) {
   console.log('==Home getdiscoverprofiles==');
-  const response = await fetch(
-    `${url}/profile-matching/fetch?distance=${distance}`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
+
+  let link = `${url}/profile-matching/fetch`;
+
+  if (distance === -1) {
+    link = `${url}/profile-matching/fetch`;
+  } else {
+    link = `${url}/profile-matching/fetch?distance=${distance}`;
+  }
+
+  const response = await fetch(link, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     },
-  );
+  });
   if (!response.ok) {
     console.log('Error getdiscoverprofiles', response);
     throw new Error('Network response was not ok');

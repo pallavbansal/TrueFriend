@@ -33,6 +33,7 @@ import {
   StartStream,
   WatchStream,
   Call,
+  Wallet,
 } from './Screen/index';
 import Protect from './Auth/Protect';
 import socket from './Socket/Socket';
@@ -121,6 +122,10 @@ const MainNavigator = () => {
         />
         <Stack.Screen name="Profile" options={{headerShown: false}}>
           {() => <Protect Route="Profile" Component={Profile} />}
+        </Stack.Screen>
+
+        <Stack.Screen name="Wallet" options={{headerShown: false}}>
+          {() => <Protect Route="Wallet" Component={Wallet} />}
         </Stack.Screen>
 
         <Stack.Screen

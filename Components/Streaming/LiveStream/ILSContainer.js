@@ -10,7 +10,7 @@ import {useSelector} from 'react-redux';
 
 export default function ILSContainer({webcamEnabled}) {
   const mydata = useSelector(state => state.Auth.userinitaldata);
-  console.log('Mydata', mydata);
+  // console.log('Mydata', mydata);
   const [isJoined, setJoined] = useState(false);
   const mMeeting = useMeeting({});
   const mMeetingRef = useRef();

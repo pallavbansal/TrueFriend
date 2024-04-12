@@ -21,6 +21,7 @@ import WatchStream from './WatchStream';
 import Call from './Call';
 import ProfileById from './ProfileById';
 import GroupProfile from './GroupProfile';
+import Wallet from './Wallet';
 
 export {
   Discover,
@@ -46,4 +47,5 @@ export {
   StartStream,
   WatchStream,
   Call,
+  Wallet,
 };

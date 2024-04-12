@@ -46,22 +46,18 @@ const Discover = () => {
     items: [
       {
         item: '10 Km',
-        value: '10',
+        value: 10,
       },
       {
         item: '50 Km',
-        value: '50',
+        value: 50,
       },
       {
         item: '100 Km',
-        value: '100',
+        value: 100,
       },
-      // {
-      //   item: 'All',
-      //   value: '50',
-      // },
     ],
-    applied: '50',
+    applied: 100,
   });
   const {
     isPending: isDiscoverPending,
@@ -69,6 +65,16 @@ const Discover = () => {
     data: discoverData,
     isError: isDiscoverError,
   } = useFetchDiscoverProfile(filterdata.applied);
+
+  function handlesetpage(page, distance) {
+    setpageOption(page);
+    setfilterdata(prev => {
+      return {
+        ...prev,
+        applied: distance,
+      };
+    });
+  }
 
   useEffect(() => {
     if (!locationupdated) {
@@ -136,7 +142,7 @@ const Discover = () => {
           <DiscoverHeader />
 
           <View style={[styles.optioncontainer]}>
-            <TouchableOpacity onPress={() => setpageOption('Discover')}>
+            <TouchableOpacity onPress={() => handlesetpage('Discover', -1)}>
               <Text
                 style={[
                   styles.optiontext,
@@ -151,7 +157,7 @@ const Discover = () => {
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => setpageOption('Nearby')}>
+            <TouchableOpacity onPress={() => handlesetpage('Nearby', 100)}>
               <Text
                 style={[
                   styles.optiontext,
@@ -250,37 +256,36 @@ const Discover = () => {
                 numColumns={3}
                 contentContainerStyle={{paddingBottom: 80, height: '100%'}}
               />
-            ) : (
-              <FlatList
-                refreshControl={
-                  <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={() =>
-                      onRefresh(['discoverprofiles', 'fetchProfile'])
-                    }
-                    progressViewOffset={-500}
-                  />
-                }
-                data={[
-                  {
-                    user: {
-                      id: 44,
-                      name: 'Vivek',
-                      profile_picture:
-                        'https://wooing.boxinallsoftech.com/public/uploads/profile/93495_1706851876_Screenshot_2024-01-25-11-07-38-00_325fbdb1dc4eedea0ce3f5f060f574f6.jpg',
-                      online_status: 'online',
-                    },
-                  },
-                ]}
-                keyExtractor={item => item.user.id.toString()}
-                renderItem={({item, index}) => (
-                  <NoData item={item} index={index} />
-                  // <SingleUser item={item} index={index} />
-                )}
-                numColumns={1}
-                contentContainerStyle={{height: '100%', paddingBottom: 40}}
-              />
-            )}
+            ) : // <FlatList
+            //   refreshControl={
+            //     <RefreshControl
+            //       refreshing={refreshing}
+            //       onRefresh={() =>
+            //         onRefresh(['discoverprofiles', 'fetchProfile'])
+            //       }
+            //       progressViewOffset={-500}
+            //     />
+            //   }
+            //   data={[
+            //     {
+            //       user: {
+            //         id: 44,
+            //         name: 'Vivek',
+            //         profile_picture:
+            //           'https://wooing.boxinallsoftech.com/public/uploads/profile/93495_1706851876_Screenshot_2024-01-25-11-07-38-00_325fbdb1dc4eedea0ce3f5f060f574f6.jpg',
+            //         online_status: 'online',
+            //       },
+            //     },
+            //   ]}
+            //   keyExtractor={item => item.user.id.toString()}
+            //   renderItem={({item, index}) => (
+            //     <NoData item={item} index={index} />
+            //     // <SingleUser item={item} index={index} />
+            //   )}
+            //   numColumns={1}
+            //   contentContainerStyle={{height: '100%', paddingBottom: 40}}
+            // />
+            null}
           </View>
 
           <View
@@ -350,7 +355,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
     alignSelf: 'flex-start',
-    zIndex: 1,
+    zIndex: 2,
   },
   dropcontainer: {
     width: 100,
