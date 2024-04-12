@@ -124,13 +124,15 @@ const ViewerContainer = ({userid, streamotherdata}) => {
 
   const handleChat = () => {
     if (hlsState == 'HLS_PLAYABLE') {
-      setBottomSheetView(prev => (prev === 'CHAT' ? '' : 'CHAT'));
+      // setBottomSheetView(prev => (prev === 'CHAT' ? '' : 'CHAT'));
+      setshowinputouter(true);
     } else {
-      setBottomSheetView('');
+      // setBottomSheetView('');
+      setshowinputouter(false);
       Toast.show({
         type: 'info',
         text1: 'The stream has not started yet.',
-        text2: 'Please wait or try another stream.',
+        // text2: 'Please wait or try another stream.',
         visibilityTime: 2000,
       });
     }
@@ -257,8 +259,8 @@ const ViewerContainer = ({userid, streamotherdata}) => {
         <View
           style={{
             position: 'absolute',
-            width: '48%',
-            height: 300,
+            width: '60%',
+            height: 200,
             bottom: 190,
             left: 5,
             flex: 1,

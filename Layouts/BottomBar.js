@@ -79,6 +79,23 @@ const routes = [
       );
     },
   },
+  {
+    name: 'Wallet',
+    label: 'Wallet',
+    icon: focused => {
+      return focused ? (
+        <MaterialCommunityIcons
+          name="wallet"
+          size={26}
+          color={colors.login.headingtext}
+        />
+      ) : (
+        <GradientText>
+          <MaterialCommunityIcons name="wallet" size={26} />
+        </GradientText>
+      );
+    },
+  },
 ];
 
 function BottomBar() {

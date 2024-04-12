@@ -61,11 +61,6 @@ const Profile = () => {
     });
   }
 
-  function handlerecharge() {
-    navigation.navigate('Recharge');
-    // navigation.navigate('Payment');
-  }
-
   if (isPending) {
     return <Loading />;
   }
@@ -122,21 +117,6 @@ const Profile = () => {
               gap: 10,
             }}>
             <Text style={styles.headingtext}>{finaldata.name}</Text>
-            <TouchableOpacity
-              onPress={handlerecharge}
-              style={{
-                backgroundColor: colors.arrow.primary,
-                padding: 7,
-                paddingHorizontal: 15,
-                borderRadius: 50,
-              }}>
-              <Text
-                style={{
-                  color: 'white',
-                }}>
-                Recharge
-              </Text>
-            </TouchableOpacity>
           </View>
           <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
             <View style={{flexDirection: 'row', gap: 5, alignItems: 'center'}}>

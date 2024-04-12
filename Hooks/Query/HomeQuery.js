@@ -10,7 +10,7 @@ export const useLocationUpdate = () => {
   return {isPending, error, mutate, reset};
 };
 
-export const useFetchDiscoverProfile = (distance = 50) => {
+export const useFetchDiscoverProfile = distance => {
   const token = useSelector(state => state.Auth.token);
   const {isPending, error, data, isError} = useQuery({
     queryFn: () => getDiscoverProfiles(token, distance),

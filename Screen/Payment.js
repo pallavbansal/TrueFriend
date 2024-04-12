@@ -15,41 +15,27 @@ import {useNavigation} from '@react-navigation/native';
 import RazorpayCheckout from 'react-native-razorpay';
 import GradientButton from '../Components/Common/GradientButton';
 import {useSelector} from 'react-redux';
+import Toast from 'react-native-toast-message';
 import {RAZORPAY_KEY, RAZORPAY_SECRET_KEY} from '@env';
 
 const Payment = () => {
   const navigation = useNavigation();
   const profiledata = useSelector(state => state.Auth.userinitaldata);
   const [inputValue, setInputValue] = useState('');
-  const [currentbalance, setCurrentbalance] = useState(0);
+  const [currentbalance, setCurrentbalance] = useState(10000);
 
   function handlepayclick() {
-    var options = {
-      description: 'Recharge',
-      image: 'https://i.imgur.com/3g7nmJC.jpg',
-      currency: 'INR',
-      key: RAZORPAY_KEY,
-      amount: parseInt(inputValue) * 100,
-      name: 'Wooing',
-      order_id: '',
-      prefill: {
-        email: profiledata.email,
-        contact: profiledata.mobile_number,
-        name: profiledata.name,
-      },
-      theme: {color: '#53a20e'},
-    };
-    RazorpayCheckout.open(options)
-      .then(data => {
-        // handle success
-        console.log('success', data);
-        alert(`Success: ${data.razorpay_payment_id}`);
-      })
-      .catch(error => {
-        // handle failure
-        // console.log('error', error);
-        // alert(`Error: ${error.code} | ${error.description}`);
-      });
+    Toast.show({
+      type: 'error',
+      position: 'top',
+      text1: 'Payment Failed',
+      text2: 'Your payment is failed',
+      visibilityTime: 2000,
+    });
+    navigation.reset({
+      index: 0,
+      routes: [{name: 'Discover'}],
+    });
   }
 
   return (
@@ -73,7 +59,7 @@ const Payment = () => {
             Payment
           </Text>
           <Text style={styles.headingtext2}>
-            Complete your payment to enjoy the most
+            Convert your tokens to real money
           </Text>
           {/* <Text
             style={[
@@ -120,7 +106,11 @@ const Payment = () => {
         <View style={{marginTop: 20, alignItems: 'center'}}>
           <TouchableOpacity
             onPress={handlepayclick}
-            disabled={inputValue === ''}>
+            disabled={
+              inputValue === '' ||
+              parseInt(inputValue.trim()) > currentbalance ||
+              parseInt(inputValue.trim()) < 100
+            }>
             <GradientButton style={styles.submitbutton}>
               <Text style={styles.submittext}>Pay Now</Text>
             </GradientButton>

@@ -8,115 +8,179 @@ import {colors} from '../Styles/ColorData';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
+import RazorpayCheckout from 'react-native-razorpay';
+import {RAZORPAY_KEY} from '@env';
+import {useGetOrderId} from '../Hooks/Query/WalletQuery';
+import Loading from './Loading';
+import Toast from 'react-native-toast-message';
+import {useSelector} from 'react-redux';
 
 const plandata = [
   {
     id: 1,
     name: 'Starter X',
     coins: '10K Coins',
-    cost: '₹250',
-    icon: 'diamond',
+    cost: 250,
   },
   {
     id: 2,
     name: 'Buddy Pro',
     coins: '20K Coins',
-    cost: '₹500',
-    icon: 'diamond',
+    cost: 500,
   },
   {
     id: 3,
     name: 'Advanced U',
     coins: '30K Coins',
-    cost: '₹700',
-    icon: 'diamond',
+    cost: 700,
   },
   {
     id: 4,
     name: 'Master M',
     coins: '50K Coins',
-    cost: '₹1000',
-    icon: 'diamond',
+    cost: 1000,
   },
   {
     id: 5,
     name: 'Elite E',
     coins: '100K Coins',
-    cost: '₹1500',
-    icon: 'diamond',
+    cost: 1500,
   },
   {
     id: 6,
     name: 'Champion C',
     coins: '130K Coins',
-    cost: '₹2000',
-    icon: 'diamond',
+    cost: 2000,
   },
   {
     id: 7,
     name: 'Legend L',
     coins: '150K Coins',
-    cost: '₹2500',
-    icon: 'diamond',
+    cost: 2500,
   },
   {
     id: 8,
     name: 'Titan T',
     coins: '200K Coins',
-    cost: '₹3000',
-    icon: 'diamond',
+    cost: 3000,
   },
   {
     id: 9,
     name: 'Supreme S',
     coins: '230K Coins',
-    cost: '₹3500',
-    icon: 'diamond',
+    cost: 3500,
   },
   {
     id: 10,
     name: 'Ultimate U',
     coins: '250K Coins',
-    cost: '₹4000',
-    icon: 'diamond',
+    cost: 4000,
   },
   {
     id: 11,
     name: 'Pinnacle P',
     coins: '300K Coins',
-    cost: '₹4500',
-    icon: 'diamond',
+    cost: 4500,
   },
   {
     id: 12,
     name: 'Zenith Z',
     coins: '350K Coins',
-    cost: '₹5000',
-    icon: 'diamond',
+    cost: 5000,
   },
   {
     id: 13,
     name: 'Nirvana N',
     coins: '700K Coins',
-    cost: '₹9000',
-    icon: 'diamond',
+    cost: 9000,
   },
   {
     id: 14,
     name: 'Infinity I',
     coins: '1000K Coins',
-    cost: '₹14000',
-    icon: 'diamond',
+    cost: 14000,
   },
 ];
 
 const Recharge = () => {
   const navigation = useNavigation();
-  const [selectedplan, setselectedplan] = useState(0);
+  const profiledata = useSelector(state => state.Auth.userinitaldata);
+  const [selectedplan, setselectedplan] = useState({});
+  const {
+    isPending: OrderIdPending,
+    error,
+    data: OrderIdData,
+    isError,
+  } = useGetOrderId();
 
   const handleplanclick = item => {
-    setselectedplan(item.id);
+    if (OrderIdPending) return;
+    setselectedplan({
+      ...item,
+      order_id: OrderIdData.order_id,
+    });
   };
+
+  if (OrderIdPending) {
+    return <Loading />;
+  }
+
+  function handlepayclick() {
+    if (!selectedplan.id) {
+      return;
+    }
+    var options = {
+      description: 'Recharge',
+      image: 'https://i.imgur.com/3g7nmJC.jpg',
+      currency: 'INR',
+      key: RAZORPAY_KEY,
+      amount: selectedplan.cost * 100,
+      name: 'Wooing',
+      prefill: {
+        email: profiledata.email,
+        contact: profiledata.mobile_number,
+        name: profiledata.name,
+      },
+      theme: {color: '#53a20e'},
+      notes: {
+        type: 'recharge',
+        userId: profiledata.id,
+        planId: selectedplan.id,
+      },
+    };
+    RazorpayCheckout.open(options)
+      .then(data => {
+        // handle success
+        // console.log('success payment', data);
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          text1: 'Payment Success',
+          text2: 'Your payment is successful',
+          visibilityTime: 2000,
+        });
+        navigation.reset({
+          index: 0,
+          routes: [{name: 'Discover'}],
+        });
+      })
+      .catch(error => {
+        // handle failure
+        console.log('error payment', error);
+        const paymentId = error.error.metadata.payment_id;
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Payment Failed',
+          text2: 'Your payment is failed',
+          visibilityTime: 2000,
+        });
+        navigation.reset({
+          index: 0,
+          routes: [{name: 'Discover'}],
+        });
+      });
+  }
 
   return (
     <GradientScreen>
@@ -221,7 +285,7 @@ const Recharge = () => {
             data={plandata}
             keyExtractor={item => item.id.toString()}
             renderItem={({item, index}) =>
-              selectedplan === item.id ? (
+              selectedplan.id === item.id ? (
                 <LinearGradient
                   start={{x: 0, y: 0}}
                   end={{x: 1, y: 0}}
@@ -235,7 +299,7 @@ const Recharge = () => {
                   <View style={styles.planouter}>
                     <View style={styles.planicon}>
                       <MaterialIcons
-                        name={item.icon}
+                        name="diamond"
                         size={48}
                         color={colors.recharge.primary}
                       />
@@ -245,7 +309,7 @@ const Recharge = () => {
                       <Text style={styles.headingtextcoin}>{item.coins}</Text>
                     </View>
                     <View style={styles.plancost}>
-                      <Text style={styles.headingtext4}>{item.cost}</Text>
+                      <Text style={styles.headingtext4}>{'₹' + item.cost}</Text>
                     </View>
                   </View>
                 </LinearGradient>
@@ -256,7 +320,7 @@ const Recharge = () => {
                   onPress={() => handleplanclick(item)}>
                   <View style={styles.planicon}>
                     <MaterialIcons
-                      name={item.icon}
+                      name="diamond"
                       size={48}
                       color={colors.recharge.primary}
                     />
@@ -266,7 +330,7 @@ const Recharge = () => {
                     <Text style={styles.headingtextcoin}>{item.coins}</Text>
                   </View>
                   <View style={styles.plancost}>
-                    <Text style={styles.headingtext4}>{item.cost}</Text>
+                    <Text style={styles.headingtext4}>{'₹' + item.cost}</Text>
                   </View>
                 </TouchableOpacity>
               )
@@ -282,7 +346,7 @@ const Recharge = () => {
             alignItems: 'center',
             marginBottom: 10,
           }}>
-          <TouchableOpacity style={{marginTop: 20}}>
+          <TouchableOpacity style={{marginTop: 20}} onPress={handlepayclick}>
             <GradientButton style={styles.submitbutton}>
               <Text style={styles.submittext}>Continue</Text>
             </GradientButton>

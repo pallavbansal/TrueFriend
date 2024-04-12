@@ -11,6 +11,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../../../Styles/ColorData';
 import {usePubSub} from '@videosdk.live/react-native-sdk';
+import {useMeeting} from '@videosdk.live/react-native-sdk';
 
 const IconContainer = ({backgroundColor, onPress, iconName, iconColor}) => {
   return (
@@ -46,6 +47,14 @@ const SpeakerFooter = ({
   setMessage,
   setshowinputouter,
 }) => {
+  const {participants} = useMeeting({
+    onParticipantJoined: participant => {
+      console.log('participant joined', participant);
+    },
+    onParticipantLeft: participant => {
+      console.log('participant left', participant);
+    },
+  });
   const mpubsubRef = useRef();
 
   const mpubsub = usePubSub('CHAT', {});
@@ -63,6 +72,8 @@ const SpeakerFooter = ({
   useEffect(() => {
     mpubsubRef.current = mpubsub;
   }, [mpubsub]);
+
+  console.log('showinputouter', participants);
 
   if (showinputouter) {
     return (
@@ -110,7 +121,8 @@ const SpeakerFooter = ({
         <IconContainer
           backgroundColor="transparent"
           onPress={handleChat}
-          iconName={bottomSheetView === 'CHAT' ? 'cancel-presentation' : 'chat'}
+          // iconName={bottomSheetView === 'CHAT' ? 'cancel-presentation' : 'chat'}
+          iconName="send"
           iconColor="black"
         />
         <IconContainer

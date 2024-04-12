@@ -14,9 +14,9 @@ import {useMeeting} from '@videosdk.live/react-native-sdk';
 import Hyperlink from 'react-native-hyperlink';
 import moment from 'moment';
 import {usePubSub} from '@videosdk.live/react-native-sdk';
-import colors from './colors';
 import {convertRFValue, useStandardHeight} from './spacing';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {colors} from '../../../../Styles/ColorData';
 
 const ChatViewer = ({setshowinputouter, showinputouter}) => {
   const mpubsubRef = useRef();
@@ -77,7 +77,17 @@ const ChatViewer = ({setshowinputouter, showinputouter}) => {
         {mpubsub.messages ? (
           <FlatList
             ref={flatListRef}
-            data={mpubsub.messages}
+            // data={mpubsub.messages}
+            data={[
+              {
+                message:
+                  'Welcome to the Wooing LiveStream! Warning: Pornographic, violent, or otherwise inappropriate content is strictly prohibited. Enjoy the show!',
+                senderName: 'Wooing',
+                senderId: localParticipantId,
+                timestamp: new Date(),
+              },
+              ...mpubsub.messages,
+            ]}
             showsVerticalScrollIndicator={false}
             renderItem={({item, i}) => {
               const {message, senderId, timestamp, senderName} = item;
@@ -87,7 +97,7 @@ const ChatViewer = ({setshowinputouter, showinputouter}) => {
                 <View
                   key={i}
                   style={{
-                    backgroundColor: colors.primary[600],
+                    // backgroundColor: colors.primary[600],
                     paddingVertical: 4,
                     paddingHorizontal: 10,
                     marginVertical: 3,
@@ -99,7 +109,10 @@ const ChatViewer = ({setshowinputouter, showinputouter}) => {
                   <Text
                     style={{
                       fontSize: convertRFValue(8),
-                      color: '#9A9FA5',
+                      // color: '#9A9FA5',
+                      color: localSender
+                        ? colors.arrow.tertiary
+                        : colors.text.primary,
                       fontWeight: 'bold',
                     }}>
                     {localSender ? 'You' : senderName}
@@ -111,7 +124,10 @@ const ChatViewer = ({setshowinputouter, showinputouter}) => {
                     <Text
                       style={{
                         fontSize: convertRFValue(10),
-                        color: 'white',
+                        // color: 'black',
+                        color: localSender
+                          ? colors.arrow.tertiary
+                          : colors.text.primary,
                       }}>
                       {message}
                     </Text>
@@ -135,7 +151,7 @@ const ChatViewer = ({setshowinputouter, showinputouter}) => {
           />
         ) : null}
 
-        {!showinputouter && (
+        {/* {!showinputouter && (
           <TouchableOpacity
             style={{
               padding: 4,
@@ -155,7 +171,7 @@ const ChatViewer = ({setshowinputouter, showinputouter}) => {
               }}
             />
           </TouchableOpacity>
-        )}
+        )} */}
       </SafeAreaView>
     </View>
   );

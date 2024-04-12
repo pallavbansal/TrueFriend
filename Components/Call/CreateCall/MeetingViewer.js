@@ -31,6 +31,7 @@ export default function MeetingViewer({finaldata}) {
     onMeetingJoined, // Add this
     onMeetingLeft, // Add this
     onMeetingStateChanged, // Add this
+    meetingId,
   } = useMeeting({
     // onError: data => {
     //   const {code, message} = data;
@@ -41,13 +42,13 @@ export default function MeetingViewer({finaldata}) {
     //   });
     // },
     onMeetingJoined: () => {
-      console.log('Meeting joined----------');
+      console.log('Meeting joined----------', meetingId);
     },
     onMeetingLeft: () => {
-      console.log('Meeting left---------');
+      console.log('Meeting left---------', meetingId);
     },
     onMeetingStateChanged: data => {
-      console.log('Meeting state changed------------', data);
+      console.log('Meeting state changed------------', data, meetingId);
     },
   });
 
@@ -73,13 +74,13 @@ export default function MeetingViewer({finaldata}) {
       if (nonLocalParticipantIds.length > 0) {
         setOtherId(nonLocalParticipantIds[0]);
         setWaiting(false);
-        startRecording({
-          layout: {
-            type: 'GRID',
-            gridSize: 2,
-          },
-          quality: 'low',
-        });
+        // startRecording({
+        //   layout: {
+        //     type: 'GRID',
+        //     gridSize: 2,
+        //   },
+        //   quality: 'low',
+        // });
       }
     }
   }, [localParticipant, participants]);
@@ -104,7 +105,7 @@ export default function MeetingViewer({finaldata}) {
   // };
 
   const makenull = () => {
-    stopRecording();
+    // stopRecording();
     setLocalId(null);
     setOtherId(null);
   };

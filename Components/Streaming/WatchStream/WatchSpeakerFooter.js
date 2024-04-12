@@ -85,7 +85,8 @@ const WatchSpeakerFooter = ({
             borderRadius: 8,
           }}>
           <MaterialIcons
-            name={bottomSheetView === 'CHAT' ? 'cancel-presentation' : 'chat'}
+            // name={bottomSheetView === 'CHAT' ? 'cancel-presentation' : 'chat'}
+            name="send"
             size={24}
             color="black"
             onPress={handleChat}
