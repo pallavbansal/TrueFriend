@@ -6,6 +6,7 @@ import {
   FlatList,
   ScrollView,
   RefreshControl,
+  Modal,
 } from 'react-native';
 import {useFetchProfileById} from '../Hooks/Query/ProfileQuery';
 import React, {useEffect, useState} from 'react';
@@ -44,28 +45,22 @@ const ProfileById = ({route}) => {
     data: requestStatusdata,
     isError: isRequestStatusError,
   } = useRequestCurrentStatus(userid);
-  const [selectedmediatype, setselectedmediatype] = useState('pictures');
+  const [selectedmediatype, setselectedmediatype] = useState('post');
   const [showdetailmodel, setshowdetailmodel] = useState({
     show: false,
     data: null,
   });
   const {mutate: sendrequest} = useSendRequest();
-  const [picturedata2, setpicturedata2] = useState([]);
-  const [videodata2, setvideodata2] = useState([]);
+  const [postdata, setpostdata] = useState([]);
+  const [otherdata, setotherdata] = useState([]);
 
   useEffect(() => {
     if (profiledata) {
-      setpicturedata2([]);
-      setvideodata2([]);
-      profiledata.data.profile.media.map(item => {
-        item.post_media.map(item2 => {
-          if (item2.media_type === '1') {
-            setpicturedata2(prev => [...prev, item2]);
-          } else {
-            setvideodata2(prev => [...prev, item2]);
-          }
-        });
+      setotherdata({
+        profile_picture: profiledata.data.profile.profile_picture,
+        name: profiledata.data.profile.name,
       });
+      setpostdata(profiledata.data.profile.media);
     }
   }, [profiledata]);
 
@@ -93,6 +88,8 @@ const ProfileById = ({route}) => {
       data: null,
     });
   }
+
+  function handlepostdelete(post_id) {}
 
   // acceptrequest,sendrequest,rejectrequest
   function requestaction(option) {
@@ -149,6 +146,7 @@ const ProfileById = ({route}) => {
       Marital_Status: finaldata.marital_status.toUpperCase(),
     },
   ];
+  // console.log('finaldata', finaldata);
 
   // 'fetchProfileById', 'requestCurrentStatus'
 
@@ -163,30 +161,14 @@ const ProfileById = ({route}) => {
             request_status={request_status}
             setrequest_status={setrequest_status}
             requestaction={requestaction}
+            call_amount={finaldata.call_amount}
           />
         </View>
         <View style={styles.biocontainer}>
           <View>
             <Text style={styles.headingtext}>{finaldata.name}</Text>
           </View>
-          {/* <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <View style={{flexDirection: 'row', gap: 5, alignItems: 'center'}}>
-              <MaterialIcons
-                name="add-call"
-                size={18}
-                color={colors.login.headingtext2}
-              />
-              <Text style={styles.headingtext3}>{finaldata.phone_number}</Text>
-            </View>
-            <View style={{flexDirection: 'row', gap: 5, alignItems: 'center'}}>
-              <MaterialIcons
-                name="email"
-                size={18}
-                color={colors.login.headingtext2}
-              />
-              <Text style={styles.headingtext3}>{finaldata.email}</Text>
-            </View>
-          </View> */}
+
           <View>
             <Text style={styles.headingtext2}>Short Bio</Text>
           </View>
@@ -246,10 +228,7 @@ const ProfileById = ({route}) => {
           <View
             style={[
               styles.medialistcontainer,
-              selectedmediatype === 'pictures' && picturedata2.length > 3
-                ? {alignItems: 'center'}
-                : {},
-              selectedmediatype === 'videos' && videodata2.length > 3
+              selectedmediatype === 'post' && postdata.length > 3
                 ? {alignItems: 'center'}
                 : {},
             ]}>
@@ -296,8 +275,8 @@ const ProfileById = ({route}) => {
               </View>
             )}
 
-            {selectedmediatype === 'pictures' &&
-              (picturedata2.length > 0 ? (
+            {selectedmediatype === 'post' &&
+              (postdata.length > 0 ? (
                 <FlatList
                   refreshControl={
                     <RefreshControl
@@ -308,7 +287,7 @@ const ProfileById = ({route}) => {
                       progressViewOffset={-1000}
                     />
                   }
-                  data={picturedata2}
+                  data={postdata}
                   keyExtractor={item => item.id.toString()}
                   renderItem={({item, index}) => (
                     <TouchableOpacity
@@ -318,7 +297,14 @@ const ProfileById = ({route}) => {
                           data: item,
                         })
                       }>
-                      <SingleMedia item={item} index={index} />
+                      <SingleMedia
+                        item={
+                          item.post_media.find(
+                            media => media.media_type === '1',
+                          ) || item.post_media[0]
+                        }
+                        index={index}
+                      />
                     </TouchableOpacity>
                   )}
                   onEndReachedThreshold={0.1}
@@ -335,61 +321,37 @@ const ProfileById = ({route}) => {
                     fontWeight: '900',
                     textAlign: 'center',
                   }}>
-                  No Pictures
-                </Text>
-              ))}
-
-            {selectedmediatype === 'videos' &&
-              (videodata2.length > 0 ? (
-                <FlatList
-                  refreshControl={
-                    <RefreshControl
-                      refreshing={refreshing}
-                      onRefresh={() =>
-                        onRefresh(['fetchProfileById', 'requestCurrentStatus'])
-                      }
-                      progressViewOffset={-1000}
-                    />
-                  }
-                  data={videodata2}
-                  keyExtractor={item => item.id.toString()}
-                  renderItem={({item, index}) => (
-                    <TouchableOpacity
-                      onPress={() =>
-                        setshowdetailmodel({
-                          show: true,
-                          data: item,
-                        })
-                      }>
-                      <SingleMedia item={item} index={index} />
-                    </TouchableOpacity>
-                  )}
-                  onEndReachedThreshold={0.1}
-                  showsVerticalScrollIndicator={false}
-                  numColumns={4}
-                  contentContainerStyle={{paddingBottom: 80}}
-                />
-              ) : (
-                <Text
-                  style={{
-                    color: colors.login.headingtext2,
-                    marginTop: 50,
-                    fontSize: 20,
-                    fontWeight: '900',
-                    textAlign: 'center',
-                  }}>
-                  No Videos
+                  No Posts
                 </Text>
               ))}
           </View>
         </View>
-        {showdetailmodel.show && (
-          <DetailMedia
-            data={showdetailmodel.data}
-            close={closedetailmodel}
-            ismyid={false}
-          />
-        )}
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={showdetailmodel.show}
+          onRequestClose={() => {
+            setshowdetailmodel({
+              show: false,
+              data: null,
+            });
+          }}>
+          <GradientScreen>
+            <View
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <DetailMedia
+                item={showdetailmodel.data}
+                otherdata={otherdata}
+                ismyid={false}
+                handlepostdelete={handlepostdelete}
+              />
+            </View>
+          </GradientScreen>
+        </Modal>
         <BottomBar />
       </View>
     </GradientScreen>
@@ -406,7 +368,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   imagecontainer: {
-    flex: 1.5,
+    flex: 1.6,
     width: '100%',
     backgroundColor: 'yellow',
     position: 'relative',

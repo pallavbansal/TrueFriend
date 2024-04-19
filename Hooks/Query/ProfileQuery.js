@@ -3,6 +3,7 @@ import {
   fetchProfile,
   updateProfile,
   fetchProfileById,
+  deleteSocialFeed,
 } from '../../Services/ProfileServices';
 import {useMutation, useQuery} from '@tanstack/react-query';
 import {useSelector} from 'react-redux';
@@ -38,6 +39,14 @@ export const useUpdateProfile = () => {
   const token = useSelector(state => state.Auth.token);
   const {isPending, error, mutate, reset} = useMutation({
     mutationFn: ({data}) => updateProfile(data, token),
+  });
+  return {isPending, error, mutate, reset};
+};
+
+export const useDeleteSocialFeed = () => {
+  const token = useSelector(state => state.Auth.token);
+  const {isPending, error, mutate, reset} = useMutation({
+    mutationFn: ({data}) => deleteSocialFeed(data, token),
   });
   return {isPending, error, mutate, reset};
 };

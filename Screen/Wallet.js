@@ -1,54 +1,34 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import {View, StyleSheet, ScrollView, TouchableOpacity} from 'react-native';
 import BottomBar from '../Layouts/BottomBar';
 import GradientScreen from '../Layouts/GradientScreen';
-import {colors} from '../Styles/ColorData';
-import LinearGradient from 'react-native-linear-gradient';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import WalletTopBalance from '../Components/Wallet/WalletTopBalance';
 import WalletOptionsList from '../Components/Wallet/WalletOptionsList';
-
-const options = [
-  {
-    id: 1,
-    name: 'Account Details',
-    icon: 'account-circle',
-  },
-  {
-    id: 2,
-    name: 'Withdrawal History',
-    icon: 'history',
-  },
-  {
-    id: 3,
-    name: 'Recharge History',
-    icon: 'payment',
-  },
-  {
-    id: 4,
-    name: 'Visit Profile',
-    icon: 'person',
-  },
-  {
-    id: 5,
-    name: 'Raise a Ticket',
-    icon: 'help-outline',
-  },
-];
+import {colors} from '../Styles/ColorData';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {useNavigation} from '@react-navigation/native';
 
 const Wallet = () => {
+  const navigation = useNavigation();
   return (
     <GradientScreen>
       <View
         style={{
           flex: 1,
         }}>
+        <View style={styles.headerbackcontainer}>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.goBack();
+            }}>
+            <MaterialIcons
+              name="arrow-back"
+              size={24}
+              color={colors.arrow.primary}
+              style={{marginLeft: 20, marginTop: 10}}
+            />
+          </TouchableOpacity>
+        </View>
         <ScrollView contentContainerStyle={styles.container}>
           <WalletTopBalance />
           <WalletOptionsList />
@@ -65,7 +45,7 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     alignItems: 'center',
-    gap: 20,
+    gap: 10,
     paddingBottom: 60,
   },
 });

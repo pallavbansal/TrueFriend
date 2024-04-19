@@ -65,6 +65,7 @@ const expensiveTransform = data => {
         profile_picture: user.profile_picture,
         type: 'SINGLE',
         chatfetchid: item.id,
+        call_amount: parseInt(user.call_amount),
         unseenmsg: 0,
       };
     } else if (item.type === 'GROUP') {

@@ -6,9 +6,12 @@ import {useNavigation} from '@react-navigation/native';
 import {colors} from '../../Styles/ColorData';
 import socket from '../../Socket/Socket';
 import {useSelector} from 'react-redux';
+import Toast from 'react-native-toast-message';
 import {getToken, createMeeting} from '../../Utils/Streamapi';
-
-const SingleFriend = ({data, hideunseen, handleChatClick}) => {
+import {useCreateStream} from '../../Hooks/Query/StreamQuery';
+import Rates from './Rates';
+const SingleFriend = ({data, hideunseen, handleChatClick, balance}) => {
+  const {isPending, error, mutate, reset} = useCreateStream();
   const mydata = useSelector(state => state.Auth.userinitaldata);
   const navigation = useNavigation();
   const isCreator = true;
@@ -21,43 +24,80 @@ const SingleFriend = ({data, hideunseen, handleChatClick}) => {
       type: data.type,
       grouproomid: data.grouproomid,
       chatfetchid: data.chatfetchid,
+      call_amount: data.call_amount,
+      balance: balance,
     };
     handleChatClick(finaldata);
     navigation.navigate('Chat', finaldata);
   };
 
   const handleCall = async () => {
+    if (parseInt(balance) < parseInt(data.call_amount)) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        text1: 'Insufficient Balance',
+        text2:
+          'You need at least ' +
+          data.call_amount +
+          ' coins to make a 1 minute call.',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
+      return;
+    }
+
     const token = await getToken();
     let meetingId = '';
     if (isCreator) {
       meetingId = await createMeeting({token});
     }
 
-    const finaldata = {
-      caller: {
-        userid: mydata.id,
-        name: mydata.name,
-        imageUrl: mydata.profile_picture,
-      },
-      reciever: {
-        name: data.name,
-        id: data.id,
-      },
-      meetingId: meetingId,
-      callaction: 'outgoing',
-      type: 'audio',
+    if (meetingId == '') {
+      return;
+    }
+
+    const formdata = {
+      meeting_id: meetingId,
+      type: 'AUDIO',
+      receiver_user_id: data.id,
     };
-    navigation.navigate('Call', {
-      name: mydata.name.trim(),
-      token: token,
-      meetingId: meetingId,
-      micEnabled: true,
-      webcamEnabled: false,
-      isCreator: isCreator,
-      mode: 'CONFERENCE',
-      finaldata: finaldata,
-    });
-    socket.emit('call', finaldata);
+
+    mutate(
+      {
+        data: formdata,
+      },
+      {
+        onSuccess: data => {
+          console.log('start call meetingid push success', data);
+          const finaldata = {
+            caller: {
+              userid: mydata.id,
+              name: mydata.name,
+              imageUrl: mydata.profile_picture,
+            },
+            reciever: {
+              name: data.name,
+              id: data.id,
+            },
+            meetingId: meetingId,
+            callaction: 'outgoing',
+            type: 'audio',
+          };
+          navigation.navigate('Call', {
+            name: mydata.name.trim(),
+            token: token,
+            meetingId: meetingId,
+            micEnabled: true,
+            webcamEnabled: false,
+            isCreator: isCreator,
+            mode: 'CONFERENCE',
+            finaldata: finaldata,
+          });
+          socket.emit('call', finaldata);
+        },
+      },
+    );
   };
 
   const handlenavigate = () => {
@@ -109,7 +149,19 @@ const SingleFriend = ({data, hideunseen, handleChatClick}) => {
           </TouchableOpacity>
         )}
         <View style={{flex: 1}}>
-          <Text style={styles.text1}>{data.name}</Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}>
+            <Text style={styles.text1}>{data.name}</Text>
+            <View>
+              {data.type == 'SINGLE' && (
+                <Rates call_amount={data.call_amount} />
+              )}
+            </View>
+          </View>
 
           <View
             style={{
@@ -129,13 +181,16 @@ const SingleFriend = ({data, hideunseen, handleChatClick}) => {
             </TouchableOpacity>
 
             {data.type == 'SINGLE' && (
-              <TouchableOpacity style={styles.callbutton} onPress={handleCall}>
+              <TouchableOpacity
+                style={styles.callbutton}
+                onPress={handleCall}
+                disabled={isPending}>
                 <Text
                   style={{
                     color: 'white',
                     fontWeight: '500',
                   }}>
-                  Call
+                  {isPending ? 'Calling...' : 'Call'}
                 </Text>
               </TouchableOpacity>
             )}

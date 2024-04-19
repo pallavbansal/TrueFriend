@@ -198,6 +198,9 @@ const ChatBottom = ({
     <View style={styles.bottomcontainer}>
       {showattachmentoptions && (
         <View style={styles.attachmentcontainer}>
+          <TouchableOpacity onPress={() => setshowattachmentoptions(false)}>
+            <AntDesign name="closecircle" size={24} color="white" />
+          </TouchableOpacity>
           <TouchableOpacity onPress={() => handleImageUpload('image')}>
             <MaterialIcons name="image" size={40} color="white" />
           </TouchableOpacity>
@@ -261,13 +264,13 @@ const ChatBottom = ({
           backgroundColor: colors.text.primary,
           gap: 10,
         }}>
-        <TouchableOpacity style={{marginLeft: 10}}>
+        {/* <TouchableOpacity style={{marginLeft: 10}}>
           <MaterialIcons
             name="emoji-emotions"
             size={24}
             color={colors.arrow.secondary}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TextInput
           placeholder="Type a message"
           placeholderTextColor={colors.login.headingtext2}
@@ -304,7 +307,6 @@ export default ChatBottom;
 
 const styles = StyleSheet.create({
   bottomcontainer: {
-    // backgroundColor: 'red',
     position: 'fixed',
     bottom: 0,
   },
@@ -321,6 +323,7 @@ const styles = StyleSheet.create({
     left: 10,
     borderRadius: 20,
     flexDirection: 'column',
+    alignItems: 'center',
     gap: 20,
     padding: 15,
     backgroundColor: colors.arrow.secondary,

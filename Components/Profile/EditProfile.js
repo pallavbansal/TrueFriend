@@ -186,10 +186,10 @@ const EditProfile = ({setshoweditmodel, initialdata}) => {
     address: '',
     image: '',
     bio: '',
+    call_amount: '',
   });
 
   useEffect(() => {
-    console.log('initialdata', initialdata);
     setselecteddata(initialdata);
     setRegisterData({
       name: initialdata?.name ? initialdata.name : '',
@@ -203,6 +203,7 @@ const EditProfile = ({setshoweditmodel, initialdata}) => {
       address: initialdata?.address ? initialdata.address : '',
       image: '',
       bio: initialdata?.bio ? initialdata.bio : '',
+      call_amount: initialdata?.call_amount ? initialdata.call_amount : '',
     });
     setImage('');
   }, [initialdata]);
@@ -278,13 +279,21 @@ const EditProfile = ({setshoweditmodel, initialdata}) => {
   };
 
   const handleUpdate = () => {
-    if (
-      registerdata.phone.length < 10 ||
-      registerdata.phone.length > 10 ||
-      registerdata.bio.length < 1
-    ) {
+    if (registerdata.phone.length < 10 || registerdata.phone.length > 10) {
       setshowerrors(true);
       return;
+    }
+
+    if (registerdata.bio.length < 1) {
+      registerdata.bio = "Let's make some memorable moments together.";
+    }
+
+    if (registerdata.bio.length > 45) {
+      registerdata.bio = registerdata.bio.substring(0, 45);
+    }
+
+    if (parseInt(registerdata.call_amount) < 2000) {
+      registerdata.call_amount = 2000;
     }
 
     setshowerrors(false);
@@ -299,6 +308,7 @@ const EditProfile = ({setshoweditmodel, initialdata}) => {
       religion: religiondata.value,
       drinking: drinkingdata.value,
       smoking: smokingdata.value,
+      call_amount: registerdata.call_amount,
     };
     console.log('xxxxxxxxxxxxxx data', formdata);
     mutate(
@@ -306,7 +316,12 @@ const EditProfile = ({setshoweditmodel, initialdata}) => {
       {
         onSuccess: data => {
           console.log('yyyyyyyyyyyyyyyyyy data', data);
-          queryClient.invalidateQueries({queryKey: ['fetchProfile']});
+          queryClient.invalidateQueries({
+            queryKey: ['fetchProfile'],
+          });
+          queryClient.invalidateQueries({
+            queryKey: ['getWallet'],
+          });
           setshoweditmodel(false);
         },
         onError: error => {
@@ -396,6 +411,23 @@ const EditProfile = ({setshoweditmodel, initialdata}) => {
                   onChangeText={text =>
                     setRegisterData({...registerdata, bio: text})
                   }
+                />
+              </View>
+            </GradientInput>
+            <GradientInput style={styles.gradientborder}>
+              <View style={styles.inputcontainer}>
+                <TextInput
+                  placeholder="Call Rates (per minute)"
+                  keyboardType="number-pad"
+                  value={registerdata.call_amount}
+                  placeholderTextColor={colors.login.headingtext2}
+                  cursorColor={colors.login.headingtext2}
+                  style={{color: colors.login.headingtext2, flex: 1}}
+                  onChangeText={text => {
+                    if (/^[0-9]*$/.test(text)) {
+                      setRegisterData({...registerdata, call_amount: text});
+                    }
+                  }}
                 />
               </View>
             </GradientInput>

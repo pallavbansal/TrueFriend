@@ -27,12 +27,13 @@ import {
 } from '../Hooks/Query/HomeQuery';
 import MyLoadingIndicator from '../Components/Common/MyLoadingIndicator';
 import {useRefreshData} from '../Hooks/Custom/useRefreshData';
+import Toast from 'react-native-toast-message';
 const Discover = () => {
   const navigation = useNavigation();
   const {refreshing, onRefresh} = useRefreshData();
   const {
     mutate: locationUpdate,
-    isPending: isLocationPending,
+    isPending: isLocationUpdatePending,
     error: locationError,
     reset: locationReset,
   } = useLocationUpdate();
@@ -40,6 +41,11 @@ const Discover = () => {
   console.log(useSelector(state => state.Auth.token));
   console.log('My User ID', myuserid);
   const [locationupdated, setlocationupdated] = useState(false);
+  const [locationpermission, setlocationpermission] = useState({
+    code: 2, // 0 = ok, 1 = location permission off for this app, 2 = device location off
+    msg: '',
+    msg2: '',
+  });
   const [pageoption, setpageOption] = useState('Discover');
   const [showfilter, setshowfilter] = useState(false);
   const [filterdata, setfilterdata] = useState({
@@ -57,7 +63,7 @@ const Discover = () => {
         value: 100,
       },
     ],
-    applied: 100,
+    applied: -1,
   });
   const {
     isPending: isDiscoverPending,
@@ -66,8 +72,8 @@ const Discover = () => {
     isError: isDiscoverError,
   } = useFetchDiscoverProfile(filterdata.applied);
 
-  function handlesetpage(page, distance) {
-    setpageOption(page);
+  function handlediscoverclick(distance) {
+    setpageOption('Discover');
     setfilterdata(prev => {
       return {
         ...prev,
@@ -76,11 +82,48 @@ const Discover = () => {
     });
   }
 
-  useEffect(() => {
-    if (!locationupdated) {
-      handlelocation();
+  function handlenearbyclick(distance) {
+    if (locationupdated) {
+      setpageOption('Nearby');
+      setfilterdata(prev => {
+        return {
+          ...prev,
+          applied: distance,
+        };
+      });
+      return;
     }
-  }, [locationupdated]);
+    Geolocation.getCurrentPosition(
+      position => {
+        setpageOption('Nearby');
+        setfilterdata(prev => {
+          return {
+            ...prev,
+            applied: distance,
+          };
+        });
+        handlelocation();
+      },
+      error => {
+        Toast.show({
+          type: 'error',
+          text1:
+            error.code === 1 ? 'Location Permission Denied' : 'Location Off',
+          text2:
+            error.code === 1
+              ? 'Please enable location permission for this app'
+              : 'Please enable location in your device',
+          autoHide: true,
+          visibilityTime: 2000,
+        });
+      },
+      {enableHighAccuracy: false, timeout: 100, maximumAge: 1000},
+    );
+  }
+
+  useEffect(() => {
+    handlelocation();
+  }, []);
 
   useEffect(() => {
     console.log('trying to connect to socket server in discover.js');
@@ -98,12 +141,11 @@ const Discover = () => {
     return <Loading />;
   }
 
-  function handlelocation() {
-    console.log('location update start');
+  async function handlelocation() {
     Geolocation.getCurrentPosition(
       position => {
         const {latitude, longitude} = position.coords;
-        console.log(latitude, longitude);
+
         locationUpdate(
           {
             data: {
@@ -113,14 +155,25 @@ const Discover = () => {
           },
           {
             onSuccess: data => {
-              console.log('location updated Success', data);
+              // console.log('location updated Success', data);
               setlocationupdated(true);
+              // setlocationpermission({
+              //   code: 0,
+              // });
             },
           },
         );
       },
       error => {
-        // console.error(error);
+        // console.log('-----------------------------------------', error);
+        // setlocationpermission({
+        //   code: error.code,
+        //   msg: error.code === 1 ? 'Location Permission Denied' : 'Location Off',
+        //   msg2:
+        //     error.code === 1
+        //       ? 'Please enable location permission for this app'
+        //       : 'Please enable location in your device',
+        // });
       },
       {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
     );
@@ -139,10 +192,10 @@ const Discover = () => {
       <View style={styles.screen}>
         <View style={styles.screencontainer}>
           <MyLoadingIndicator isRefreshing={refreshing} />
-          <DiscoverHeader />
+          <DiscoverHeader pageoption={pageoption} />
 
           <View style={[styles.optioncontainer]}>
-            <TouchableOpacity onPress={() => handlesetpage('Discover', -1)}>
+            <TouchableOpacity onPress={() => handlediscoverclick(-1)}>
               <Text
                 style={[
                   styles.optiontext,
@@ -157,7 +210,9 @@ const Discover = () => {
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => handlesetpage('Nearby', 100)}>
+            <TouchableOpacity
+              onPress={() => handlenearbyclick(100)}
+              disabled={isLocationUpdatePending}>
               <Text
                 style={[
                   styles.optiontext,

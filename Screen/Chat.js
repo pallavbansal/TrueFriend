@@ -19,6 +19,8 @@ const Chat = ({route}) => {
     type: chattype,
     grouproomid,
     chatfetchid,
+    call_amount,
+    balance,
   } = route.params;
   const myuserid = useSelector(state => state.Auth.userid);
   const {name: myname} = useSelector(state => state.Auth.userinitaldata);
@@ -100,6 +102,8 @@ const Chat = ({route}) => {
           imageUrl={imageUrl}
           userid={userid}
           chattype={chattype}
+          call_amount={call_amount}
+          balance={balance}
         />
         <ScrollView
           ref={scrollViewRef}

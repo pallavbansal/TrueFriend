@@ -17,9 +17,12 @@ import socket from '../../../Socket/Socket';
 import {useSelector} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
 import WatchSpeakerFooter from './WatchSpeakerFooter';
+import {useCreateStream} from '../../../Hooks/Query/StreamQuery';
+import {useGetWallet} from '../../../Hooks/Query/WalletQuery';
 
 const ViewerContainer = ({userid, streamotherdata}) => {
   const {changeMode, leave, hlsState, hlsUrls, participants} = useMeeting();
+
   const mydata = useSelector(state => state.Auth.userinitaldata);
   const [showinputouter, setshowinputouter] = useState(false);
   const [message, setMessage] = useState('');
@@ -31,12 +34,22 @@ const ViewerContainer = ({userid, streamotherdata}) => {
   const [friendrequest, setFriendRequest] = useState('');
   const {isPending, error, mutate, reset} = useSendRequest();
   const {
+    isPending: isPendingCreate,
+    error: errorCreate,
+    mutate: mutateCreate,
+    reset: resetCreate,
+  } = useCreateStream();
+
+  const {
     data: requestStatus,
     error: requestError,
     isPending: requestPending,
   } = useRequestCurrentStatus(streamotherdata.user.id);
 
-  console.log('requestStatus', streamotherdata);
+  const {data: mywallet, isPending: mywalletPending} = useGetWallet(mydata.id);
+  const {data: otherwallet, isPending: otherwalletPending} = useGetWallet(
+    streamotherdata.user.id,
+  );
 
   useEffect(() => {
     if (requestStatus) {
@@ -79,43 +92,79 @@ const ViewerContainer = ({userid, streamotherdata}) => {
   };
 
   const handleCall = async () => {
-    if (hlsState == 'HLS_PLAYABLE') {
+    if (hlsState == 'HLS_PLAYABLE' && !mywalletPending && !otherwalletPending) {
+      const balance = parseInt(mywallet?.data?.user?.balance) || 0;
+      const call_amount = parseInt(otherwallet?.data?.user?.call_amount) || 0;
+      if (parseInt(balance) < parseInt(call_amount)) {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Insufficient Balance',
+          text2:
+            'You need at least ' +
+            call_amount +
+            ' coins to make a 1 minute call.',
+          visibilityTime: 2000,
+          autoHide: true,
+        });
+        return;
+      }
+
       const token = await getToken();
       let meetingId = '';
       if (isCreator) {
         meetingId = await createMeeting({token});
       }
+      if (meetingId == '') {
+        return;
+      }
 
-      const finaldata = {
-        caller: {
-          userid: mydata.id,
-          name: mydata.name,
-          imageUrl: mydata.profile_picture,
-        },
-        reciever: {
-          name: streamotherdata.user.name,
-          id: streamotherdata.user.id,
-        },
-        meetingId: meetingId,
-        callaction: 'outgoing',
-        type: 'audio',
+      const formdata = {
+        meeting_id: meetingId,
+        type: 'AUDIO',
+        receiver_user_id: streamotherdata.user.id,
       };
-      leave();
-      navigation.navigate('Call', {
-        name: mydata.name.trim(),
-        token: token,
-        meetingId: meetingId,
-        micEnabled: true,
-        webcamEnabled: false,
-        isCreator: isCreator,
-        mode: 'CONFERENCE',
-        finaldata: finaldata,
-      });
-      socket.emit('call', finaldata);
+
+      mutateCreate(
+        {
+          data: formdata,
+        },
+        {
+          onSuccess: data => {
+            console.log('call success', data);
+            const finaldata = {
+              caller: {
+                userid: mydata.id,
+                name: mydata.name,
+                imageUrl: mydata.profile_picture,
+              },
+              reciever: {
+                name: streamotherdata.user.name,
+                id: streamotherdata.user.id,
+              },
+              meetingId: meetingId,
+              callaction: 'outgoing',
+              type: 'audio',
+            };
+            leave();
+            navigation.navigate('Call', {
+              name: mydata.name.trim(),
+              token: token,
+              meetingId: meetingId,
+              micEnabled: true,
+              webcamEnabled: false,
+              isCreator: isCreator,
+              mode: 'CONFERENCE',
+              finaldata: finaldata,
+            });
+            socket.emit('call', finaldata);
+          },
+        },
+      );
     } else {
       Toast.show({
         type: 'info',
-        text1: 'The stream has not started yet.',
+        text1: 'Loading Stream...',
         text2: 'Please wait or try another stream.',
         visibilityTime: 2000,
       });
@@ -238,7 +287,8 @@ const ViewerContainer = ({userid, streamotherdata}) => {
             bottom: 110,
             right: 5,
           }}
-          onPress={handleCall}>
+          onPress={handleCall}
+          disabled={isPendingCreate || mywalletPending || otherwalletPending}>
           <LinearGradient
             start={{x: 0, y: 0}}
             end={{x: 1, y: 1}}
