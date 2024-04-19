@@ -3,6 +3,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../../Styles/ColorData';
 import React from 'react';
+import CallRates from './CallRates';
 
 const ProfileTop = ({
   finaldata,
@@ -10,6 +11,7 @@ const ProfileTop = ({
   ismyid,
   request_status,
   requestaction,
+  call_amount,
 }) => {
   return (
     <>
@@ -115,7 +117,10 @@ const ProfileTop = ({
             position: 'absolute',
             right: 10,
             bottom: -20,
+            flexDirection: 'row',
+            gap: 10,
           }}>
+          <CallRates call_amount={call_amount} />
           <View
             style={{
               backgroundColor: colors.profile.edit,
@@ -139,7 +144,10 @@ const ProfileTop = ({
             position: 'absolute',
             right: 10,
             bottom: -15,
+            flexDirection: 'row',
+            gap: 10,
           }}>
+          <CallRates call_amount={call_amount} />
           <View
             style={[
               styles.requestbutton,

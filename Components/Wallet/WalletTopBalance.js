@@ -4,8 +4,13 @@ import {colors} from '../../Styles/ColorData';
 import LinearGradient from 'react-native-linear-gradient';
 import {useNavigation} from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {useGetWallet} from '../../Hooks/Query/WalletQuery';
+import {useSelector} from 'react-redux';
+
 const WalletTopBalance = () => {
   const navigation = useNavigation();
+  const myuserid = useSelector(state => state.Auth.userid);
+  const {isPending, error, data, isError} = useGetWallet(myuserid);
 
   function handlerecharge() {
     navigation.navigate('Payment');
@@ -42,7 +47,9 @@ const WalletTopBalance = () => {
               size={24}
               color={colors.recharge.primary}
             />
-            <Text style={styles.headingtext2}>10000</Text>
+            <Text style={styles.headingtext2}>
+              {isPending ? 'Loading...' : data?.data?.user?.balance || 0}
+            </Text>
           </View>
 
           <Text style={styles.headingtext3}>Available Balance</Text>

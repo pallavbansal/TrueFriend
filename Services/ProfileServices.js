@@ -64,6 +64,7 @@ export async function updateProfile(data, token) {
   formData.append('religion', data.religion);
   formData.append('drinking', data.drinking);
   formData.append('smoking', data.smoking);
+  formData.append('call_amount', data.call_amount);
   if (data.profile_picture.path) {
     formData.append('profile_picture', {
       uri: data.profile_picture.path,
@@ -89,4 +90,20 @@ export async function updateProfile(data, token) {
     console.log('response', response);
     return response.json();
   } catch (error) {}
+}
+
+export async function deleteSocialFeed(data, token) {
+  console.log('==Profile  deleteSocialFeed==', data.id);
+  const response = await fetch(`${url}/post/delete?post_id=${data.id}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    console.log('Error deleteSocialFeed', response);
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
 }

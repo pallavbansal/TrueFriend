@@ -17,12 +17,13 @@ import GradientButton from '../Components/Common/GradientButton';
 import {useSelector} from 'react-redux';
 import Toast from 'react-native-toast-message';
 import {RAZORPAY_KEY, RAZORPAY_SECRET_KEY} from '@env';
+import {useGetWallet} from '../Hooks/Query/WalletQuery';
 
 const Payment = () => {
   const navigation = useNavigation();
-  const profiledata = useSelector(state => state.Auth.userinitaldata);
+  const myuserid = useSelector(state => state.Auth.userid);
+  const {isPending, error, data, isError} = useGetWallet(myuserid);
   const [inputValue, setInputValue] = useState('');
-  const [currentbalance, setCurrentbalance] = useState(10000);
 
   function handlepayclick() {
     Toast.show({
@@ -75,7 +76,9 @@ const Payment = () => {
         <View style={styles.statscontainer}>
           <View style={{alignItems: 'center', flexDirection: 'row', gap: 10}}>
             <Text style={styles.headingtext2}>Current Balance</Text>
-            <Text style={styles.headingtext3}>₹ {currentbalance}</Text>
+            <Text style={styles.headingtext3}>
+              {isPending ? 'Loading...' : data?.data?.user?.balance || 0}
+            </Text>
           </View>
         </View>
 

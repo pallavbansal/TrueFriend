@@ -10,7 +10,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
 import RazorpayCheckout from 'react-native-razorpay';
 import {RAZORPAY_KEY} from '@env';
-import {useGetOrderId} from '../Hooks/Query/WalletQuery';
+import {useGetOrderId, useFetchPackageData} from '../Hooks/Query/WalletQuery';
 import Loading from './Loading';
 import Toast from 'react-native-toast-message';
 import {useSelector} from 'react-redux';
@@ -112,6 +112,12 @@ const Recharge = () => {
     data: OrderIdData,
     isError,
   } = useGetOrderId();
+  const {
+    isPending: PlanPending,
+    error: PlanError,
+    data: PlanData,
+    isError: PlanIsError,
+  } = useFetchPackageData();
 
   const handleplanclick = item => {
     if (OrderIdPending) return;
@@ -121,9 +127,11 @@ const Recharge = () => {
     });
   };
 
-  if (OrderIdPending) {
+  if (OrderIdPending || PlanPending) {
     return <Loading />;
   }
+
+  console.log('plandata', PlanData.data);
 
   function handlepayclick() {
     if (!selectedplan.id) {
@@ -134,7 +142,7 @@ const Recharge = () => {
       image: 'https://i.imgur.com/3g7nmJC.jpg',
       currency: 'INR',
       key: RAZORPAY_KEY,
-      amount: selectedplan.cost * 100,
+      amount: selectedplan.price * 100,
       name: 'Wooing',
       prefill: {
         email: profiledata.email,
@@ -151,7 +159,7 @@ const Recharge = () => {
     RazorpayCheckout.open(options)
       .then(data => {
         // handle success
-        // console.log('success payment', data);
+        console.log('success payment', data);
         Toast.show({
           type: 'success',
           position: 'top',
@@ -282,7 +290,9 @@ const Recharge = () => {
 
         <View style={styles.plancontainer}>
           <FlatList
-            data={plandata}
+            data={PlanData.data.packages.filter(
+              item => item.status === 'active',
+            )}
             keyExtractor={item => item.id.toString()}
             renderItem={({item, index}) =>
               selectedplan.id === item.id ? (
@@ -306,10 +316,14 @@ const Recharge = () => {
                     </View>
                     <View style={styles.plantext}>
                       <Text style={styles.headingtext3}>{item.name}</Text>
-                      <Text style={styles.headingtextcoin}>{item.coins}</Text>
+                      <Text style={styles.headingtextcoin}>
+                        {item.diamonds}
+                      </Text>
                     </View>
                     <View style={styles.plancost}>
-                      <Text style={styles.headingtext4}>{'₹' + item.cost}</Text>
+                      <Text style={styles.headingtext4}>
+                        {'₹' + item.price}
+                      </Text>
                     </View>
                   </View>
                 </LinearGradient>
@@ -327,10 +341,10 @@ const Recharge = () => {
                   </View>
                   <View style={styles.plantext}>
                     <Text style={styles.headingtext3}>{item.name}</Text>
-                    <Text style={styles.headingtextcoin}>{item.coins}</Text>
+                    <Text style={styles.headingtextcoin}>{item.diamonds}</Text>
                   </View>
                   <View style={styles.plancost}>
-                    <Text style={styles.headingtext4}>{'₹' + item.cost}</Text>
+                    <Text style={styles.headingtext4}>{'₹' + item.price}</Text>
                   </View>
                 </TouchableOpacity>
               )

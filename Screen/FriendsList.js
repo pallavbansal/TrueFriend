@@ -29,6 +29,7 @@ import {
   useFetchFriendRequests,
   useFetchChattingFriends,
 } from '../Hooks/Query/RequestQuery';
+import {useGetWallet} from '../Hooks/Query/WalletQuery';
 import {useRefreshData} from '../Hooks/Custom/useRefreshData';
 
 const FriendsList = () => {
@@ -68,6 +69,8 @@ const FriendsList = () => {
     error: chattingfriendserror,
     isError: chattingfriendsisError,
   } = useFetchChattingFriends();
+
+  const {data: walletdata, isPending: walletpending} = useGetWallet(myuserid);
 
   useEffect(() => {
     if (requestdata2?.data?.friends) {
@@ -211,7 +214,12 @@ const FriendsList = () => {
   //   return <FriendsListSkeleton />;
   // }
 
-  if (requestdatapending || friendsdatapending || chattingfriendspending) {
+  if (
+    requestdatapending ||
+    friendsdatapending ||
+    chattingfriendspending ||
+    walletpending
+  ) {
     return <Loading />;
   }
 
@@ -351,6 +359,7 @@ const FriendsList = () => {
                     index={index}
                     hideunseen={true}
                     handleChatClick={handleChatClick}
+                    balance={walletdata?.data?.user?.balance || 0}
                   />
                 )}
                 onEndReachedThreshold={0.1}
@@ -425,6 +434,7 @@ const FriendsList = () => {
                     index={index}
                     hideunseen={false}
                     handleChatClick={handleChatClick}
+                    balance={walletdata?.data?.user?.balance || 0}
                   />
                 )}
                 onEndReachedThreshold={0.1}

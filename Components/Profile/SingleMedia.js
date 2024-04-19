@@ -5,6 +5,7 @@ import {colors} from '../../Styles/ColorData';
 import Video from 'react-native-video';
 
 const SingleUser = ({item}) => {
+  // console.log('SingleUser', item);
   return (
     <LinearGradient
       colors={colors.gradients.buttongradient}

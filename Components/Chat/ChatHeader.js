@@ -12,8 +12,18 @@ import {useNavigation} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 import socket from '../../Socket/Socket';
 import ProfileNavigator from '../Common/ProfileNavigator';
+import {useCreateStream} from '../../Hooks/Query/StreamQuery';
+import Toast from 'react-native-toast-message';
 
-const ChatHeader = ({name, imageUrl, userid, chattype}) => {
+const ChatHeader = ({
+  name,
+  imageUrl,
+  userid,
+  chattype,
+  call_amount,
+  balance,
+}) => {
+  const {isPending, error, mutate, reset} = useCreateStream();
   const mydata = useSelector(state => state.Auth.userinitaldata);
   const navigation = useNavigation();
   const [optionsdialog, setoptionsdialog] = useState(false);
@@ -58,72 +68,138 @@ const ChatHeader = ({name, imageUrl, userid, chattype}) => {
     console.log(item);
   };
 
+  function checkminbalance() {
+    if (parseInt(balance) < parseInt(call_amount)) {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        text1: 'Insufficient Balance',
+        text2:
+          'You need at least ' +
+          call_amount +
+          ' coins to make a 1 minute call.',
+        visibilityTime: 2000,
+        autoHide: true,
+      });
+      return false;
+    }
+    return true;
+  }
+
   const handleaudiocall = async () => {
+    const pass = checkminbalance();
+    if (!pass) {
+      return;
+    }
+
     const token = await getToken();
     let meetingId = '';
     if (isCreator) {
       meetingId = await createMeeting({token});
     }
-    const finaldata = {
-      caller: {
-        userid: mydata.id,
-        name: mydata.name,
-        imageUrl: mydata.profile_picture,
-      },
-      reciever: {
-        name: name,
-        id: userid,
-      },
-      meetingId: meetingId,
-      callaction: 'outgoing',
-      type: 'audio',
+    if (meetingId == '') {
+      return;
+    }
+    const formdata = {
+      meeting_id: meetingId,
+      type: 'AUDIO',
+      receiver_user_id: userid,
     };
+    mutate(
+      {
+        data: formdata,
+      },
+      {
+        onSuccess: data => {
+          console.log('start call meetingid push success', data);
+          const finaldata = {
+            caller: {
+              userid: mydata.id,
+              name: mydata.name,
+              imageUrl: mydata.profile_picture,
+            },
+            reciever: {
+              name: name,
+              id: userid,
+            },
+            meetingId: meetingId,
+            callaction: 'outgoing',
+            type: 'audio',
+          };
 
-    navigation.navigate('Call', {
-      name: mydata.name.trim(),
-      token: token,
-      meetingId: meetingId,
-      micEnabled: true,
-      webcamEnabled: false,
-      isCreator: isCreator,
-      mode: 'CONFERENCE',
-      finaldata: finaldata,
-    });
-    socket.emit('call', finaldata);
+          navigation.navigate('Call', {
+            name: mydata.name.trim(),
+            token: token,
+            meetingId: meetingId,
+            micEnabled: true,
+            webcamEnabled: false,
+            isCreator: isCreator,
+            mode: 'CONFERENCE',
+            finaldata: finaldata,
+          });
+          socket.emit('call', finaldata);
+        },
+      },
+    );
   };
 
   const handlevideocall = async () => {
+    const pass = checkminbalance();
+    if (!pass) {
+      return;
+    }
     const token = await getToken();
     let meetingId = '';
     if (isCreator) {
       meetingId = await createMeeting({token});
     }
-    const finaldata = {
-      caller: {
-        userid: mydata.id,
-        name: mydata.name,
-        imageUrl: mydata.profile_picture,
-      },
-      reciever: {
-        name: name,
-        id: userid,
-      },
-      meetingId: meetingId,
-      callaction: 'outgoing',
-      type: 'video',
+
+    if (meetingId == '') {
+      return;
+    }
+
+    const formdata = {
+      meeting_id: meetingId,
+      type: 'VIDEO',
+      receiver_user_id: userid,
     };
 
-    navigation.navigate('Call', {
-      name: mydata.name.trim(),
-      token: token,
-      meetingId: meetingId,
-      micEnabled: true,
-      webcamEnabled: true,
-      isCreator: isCreator,
-      mode: 'CONFERENCE',
-      finaldata: finaldata,
-    });
-    socket.emit('call', finaldata);
+    mutate(
+      {
+        data: formdata,
+      },
+      {
+        onSuccess: data => {
+          console.log('start call meetingid push success', data);
+          const finaldata = {
+            caller: {
+              userid: mydata.id,
+              name: mydata.name,
+              imageUrl: mydata.profile_picture,
+            },
+            reciever: {
+              name: name,
+              id: userid,
+            },
+            meetingId: meetingId,
+            callaction: 'outgoing',
+            type: 'video',
+          };
+
+          navigation.navigate('Call', {
+            name: mydata.name.trim(),
+            token: token,
+            meetingId: meetingId,
+            micEnabled: true,
+            webcamEnabled: true,
+            isCreator: isCreator,
+            mode: 'CONFERENCE',
+            finaldata: finaldata,
+          });
+          socket.emit('call', finaldata);
+        },
+      },
+    );
   };
 
   const handlenavigate = () => {
@@ -175,12 +251,12 @@ const ChatHeader = ({name, imageUrl, userid, chattype}) => {
             marginLeft: 'auto',
           }}>
           {chattype == 'SINGLE' && (
-            <TouchableOpacity onPress={handleaudiocall}>
+            <TouchableOpacity onPress={handleaudiocall} disabled={isPending}>
               <Ionicons name="call" size={24} color="white" />
             </TouchableOpacity>
           )}
           {chattype == 'SINGLE' && (
-            <TouchableOpacity onPress={handlevideocall}>
+            <TouchableOpacity onPress={handlevideocall} disabled={isPending}>
               <FontAwesome5 name="video" size={24} color="white" />
             </TouchableOpacity>
           )}

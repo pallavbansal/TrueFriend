@@ -6,6 +6,7 @@ import {
   FlatList,
   ScrollView,
   RefreshControl,
+  Modal,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import BottomBar from '../Layouts/BottomBar';
@@ -20,45 +21,60 @@ import DetailMedia from '../Components/Profile/DetailMedia';
 import Loading from './Loading';
 import {useRefreshData} from '../Hooks/Custom/useRefreshData';
 import MyLoadingIndicator from '../Components/Common/MyLoadingIndicator';
-import {useNavigation} from '@react-navigation/native';
+import {useDeleteSocialFeed} from '../Hooks/Query/ProfileQuery';
 
 const Profile = () => {
   const {isPending, error, data: profiledata, isError} = useFetchProfile();
-  const navigation = useNavigation();
+  const {
+    isPending: isDeletePending,
+    error: deleteError,
+    mutate: deleteMutate,
+    reset: deleteReset,
+  } = useDeleteSocialFeed();
   const {refreshing, onRefresh} = useRefreshData();
-  const [selectedmediatype, setselectedmediatype] = useState('pictures');
+  const [selectedmediatype, setselectedmediatype] = useState('post');
   const [showeditmodel, setshoweditmodel] = useState(false);
   const [showdetailmodel, setshowdetailmodel] = useState({
     show: false,
     data: null,
   });
-  const [picturedata2, setpicturedata2] = useState([]);
-  const [videodata2, setvideodata2] = useState([]);
+  const [postdata, setpostdata] = useState([]);
+  const [otherdata, setotherdata] = useState([]);
 
   useEffect(() => {
     if (profiledata) {
-      setpicturedata2([]);
-      setvideodata2([]);
-      profiledata.data.profile.media.map(item => {
-        item.post_media.map(item2 => {
-          if (item2.media_type === '1') {
-            setpicturedata2(prev => [...prev, item2]);
-          } else {
-            setvideodata2(prev => [...prev, item2]);
-          }
-        });
+      setotherdata({
+        profile_picture: profiledata.data.profile.profile_picture,
+        name: profiledata.data.profile.name,
       });
+      setpostdata(profiledata.data.profile.media);
     }
   }, [profiledata]);
 
+  function handlepostdelete(post_id) {
+    const formdata = {
+      id: post_id,
+    };
+    deleteMutate(
+      {data: formdata},
+      {
+        onSuccess: data => {
+          console.log('post delete success data', data);
+          setpostdata(prev => prev.filter(item => item.id !== post_id));
+          setshowdetailmodel({
+            show: false,
+            data: null,
+          });
+        },
+        onError: error => {
+          console.log('post delete error', error);
+        },
+      },
+    );
+  }
+
   function handleeditprofile() {
     setshoweditmodel(true);
-  }
-  function closedetailmodel() {
-    setshowdetailmodel({
-      show: false,
-      data: null,
-    });
   }
 
   if (isPending) {
@@ -89,6 +105,7 @@ const Profile = () => {
       Marital_Status: finaldata.marital_status.toUpperCase(),
     },
   ];
+
   if (showeditmodel) {
     return (
       <EditProfile
@@ -107,6 +124,7 @@ const Profile = () => {
             finaldata={finaldata}
             handleeditprofile={handleeditprofile}
             ismyid={true}
+            call_amount={finaldata.call_amount}
           />
         </View>
         <View style={styles.biocontainer}>
@@ -163,42 +181,25 @@ const Profile = () => {
                 Bio
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setselectedmediatype('pictures')}>
+            <TouchableOpacity onPress={() => setselectedmediatype('post')}>
               <Text
                 style={[
                   styles.optiontext,
                   {
                     color:
-                      selectedmediatype === 'pictures'
+                      selectedmediatype === 'post'
                         ? colors.arrow.tertiary
                         : colors.arrow.primary,
                   },
                 ]}>
-                Pictures
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setselectedmediatype('videos')}>
-              <Text
-                style={[
-                  styles.optiontext,
-                  {
-                    color:
-                      selectedmediatype === 'videos'
-                        ? colors.arrow.tertiary
-                        : colors.arrow.primary,
-                  },
-                ]}>
-                Videos
+                Posts
               </Text>
             </TouchableOpacity>
           </View>
           <View
             style={[
               styles.medialistcontainer,
-              selectedmediatype === 'pictures' && picturedata2.length > 3
-                ? {alignItems: 'center'}
-                : {},
-              selectedmediatype === 'videos' && videodata2.length > 3
+              selectedmediatype === 'post' && postdata.length > 3
                 ? {alignItems: 'center'}
                 : {},
             ]}>
@@ -236,8 +237,8 @@ const Profile = () => {
               </View>
             )}
 
-            {selectedmediatype === 'pictures' &&
-              (picturedata2.length > 0 ? (
+            {selectedmediatype === 'post' &&
+              (postdata.length > 0 ? (
                 <FlatList
                   refreshControl={
                     <RefreshControl
@@ -246,7 +247,7 @@ const Profile = () => {
                       progressViewOffset={-1000}
                     />
                   }
-                  data={picturedata2}
+                  data={postdata}
                   keyExtractor={item => item.id.toString()}
                   renderItem={({item, index}) => (
                     <TouchableOpacity
@@ -256,7 +257,14 @@ const Profile = () => {
                           data: item,
                         })
                       }>
-                      <SingleMedia item={item} index={index} />
+                      <SingleMedia
+                        item={
+                          item.post_media.find(
+                            media => media.media_type === '1',
+                          ) || item.post_media[0]
+                        }
+                        index={index}
+                      />
                     </TouchableOpacity>
                   )}
                   onEndReachedThreshold={0.1}
@@ -273,59 +281,39 @@ const Profile = () => {
                     fontWeight: '900',
                     textAlign: 'center',
                   }}>
-                  No Pictures
-                </Text>
-              ))}
-
-            {selectedmediatype === 'videos' &&
-              (videodata2.length > 0 ? (
-                <FlatList
-                  refreshControl={
-                    <RefreshControl
-                      refreshing={refreshing}
-                      onRefresh={() => onRefresh(['fetchProfile'])}
-                      progressViewOffset={-1000}
-                    />
-                  }
-                  data={videodata2}
-                  keyExtractor={item => item.id.toString()}
-                  renderItem={({item, index}) => (
-                    <TouchableOpacity
-                      onPress={() =>
-                        setshowdetailmodel({
-                          show: true,
-                          data: item,
-                        })
-                      }>
-                      <SingleMedia item={item} index={index} />
-                    </TouchableOpacity>
-                  )}
-                  onEndReachedThreshold={0.1}
-                  showsVerticalScrollIndicator={false}
-                  numColumns={4}
-                  contentContainerStyle={{paddingBottom: 80}}
-                />
-              ) : (
-                <Text
-                  style={{
-                    color: colors.login.headingtext2,
-                    marginTop: 50,
-                    fontSize: 20,
-                    fontWeight: '900',
-                    textAlign: 'center',
-                  }}>
-                  No Videos
+                  No Posts
                 </Text>
               ))}
           </View>
         </View>
-        {showdetailmodel.show && (
-          <DetailMedia
-            data={showdetailmodel.data}
-            close={closedetailmodel}
-            ismyid={true}
-          />
-        )}
+
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={showdetailmodel.show}
+          onRequestClose={() => {
+            setshowdetailmodel({
+              show: false,
+              data: null,
+            });
+          }}>
+          <GradientScreen>
+            <View
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <DetailMedia
+                item={showdetailmodel.data}
+                otherdata={otherdata}
+                ismyid={true}
+                handlepostdelete={handlepostdelete}
+              />
+            </View>
+          </GradientScreen>
+        </Modal>
+
         <BottomBar />
       </View>
     </GradientScreen>
@@ -342,7 +330,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   imagecontainer: {
-    flex: 2,
+    flex: 1.6,
     width: '100%',
     backgroundColor: 'yellow',
     position: 'relative',
