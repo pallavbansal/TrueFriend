@@ -1,6 +1,6 @@
 import {
   createStream,
-  endStream,
+  endCallOrStream,
   getStreamMeetingId,
   getStream,
   getAdjacentStream,
@@ -24,13 +24,12 @@ export const useGetMeetingId = () => {
   return {isPending, error, mutate, reset};
 };
 
-export const useEndStream = () => {
+export const useEndCallOrStream = () => {
   const token = useSelector(state => state.Auth.token);
-  const {isPending, error, data, isError} = useQuery({
-    queryFn: () => endStream(token),
-    queryKey: ['endstream', token],
+  const {isPending, error, mutate, reset} = useMutation({
+    mutationFn: ({data}) => endCallOrStream(data, token),
   });
-  return {isPending, error, data, isError};
+  return {isPending, error, mutate, reset};
 };
 
 export const useFetchStreams = () => {

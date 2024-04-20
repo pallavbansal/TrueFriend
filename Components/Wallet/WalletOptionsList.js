@@ -15,30 +15,43 @@ const options = [
   },
   {
     id: 2,
-    name: 'Withdrawal History',
-    description: 'See withdrawals',
-    icon: 'history',
+    name: 'Payment History',
+    description: 'See payment transactions',
+    icon: 'money',
   },
   {
     id: 3,
-    name: 'Recharge History',
-    description: 'See recharges',
-    icon: 'payment',
+    name: 'Diamond History',
+    description: 'See diamond transactions',
+    icon: 'diamond',
   },
+
+  // {
+  //   id: 2,
+  //   name: 'Withdrawal History',
+  //   description: 'See withdrawals',
+  //   icon: 'history',
+  // },
+  // {
+  //   id: 3,
+  //   name: 'Recharge History',
+  //   description: 'See recharges',
+  //   icon: 'payment',
+  // },
+  // {
+  //   id: 4,
+  //   name: 'Call Transaction',
+  //   description: 'See call transactions',
+  //   icon: 'call',
+  // },
   {
     id: 4,
-    name: 'Call Transaction',
-    description: 'See call transactions',
-    icon: 'call',
-  },
-  {
-    id: 5,
     name: 'Visit Profile',
     description: 'Go to profile',
     icon: 'person',
   },
   {
-    id: 6,
+    id: 5,
     name: 'Rate Us',
     description: 'Rate on Play Store',
     icon: 'star-rate',
@@ -57,21 +70,16 @@ const WalletOptionsList = () => {
     } else if (id === 2) {
       setModalVisible({
         visible: true,
-        type: 'withdrawal',
+        type: 'payment',
       });
     } else if (id === 3) {
       setModalVisible({
         visible: true,
-        type: 'recharge',
+        type: 'diamond',
       });
     } else if (id === 4) {
-      setModalVisible({
-        visible: true,
-        type: 'call',
-      });
-    } else if (id === 5) {
       navigation.navigate('Profile');
-    } else if (id === 6) {
+    } else if (id === 5) {
       Linking.openURL(
         'https://play.google.com/store/apps/details?id=com.example.app',
       );

@@ -34,14 +34,15 @@ export async function getStreamMeetingId(data, token) {
   return response.json();
 }
 
-export async function endStream(token) {
+export async function endCallOrStream(data, token) {
   console.log('==Stream endstream==');
   const response = await fetch(`${url}/profile/fetch`, {
-    method: 'GET',
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
+    body: JSON.stringify(data),
   });
   if (!response.ok) {
     console.log('Error endstream', response);

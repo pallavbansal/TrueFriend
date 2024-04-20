@@ -57,6 +57,21 @@ const SingleFriend = ({data, hideunseen, handleChatClick, balance}) => {
       return;
     }
 
+    console.log(token, meetingId);
+    const finaldata = {
+      caller: {
+        userid: mydata.id,
+        name: mydata.name,
+        imageUrl: mydata.profile_picture,
+      },
+      reciever: {
+        name: data.name,
+        id: data.id,
+      },
+      meetingId: meetingId,
+      callaction: 'outgoing',
+      type: 'audio',
+    };
     const formdata = {
       meeting_id: meetingId,
       type: 'AUDIO',
@@ -70,20 +85,6 @@ const SingleFriend = ({data, hideunseen, handleChatClick, balance}) => {
       {
         onSuccess: data => {
           console.log('start call meetingid push success', data);
-          const finaldata = {
-            caller: {
-              userid: mydata.id,
-              name: mydata.name,
-              imageUrl: mydata.profile_picture,
-            },
-            reciever: {
-              name: data.name,
-              id: data.id,
-            },
-            meetingId: meetingId,
-            callaction: 'outgoing',
-            type: 'audio',
-          };
           navigation.navigate('Call', {
             name: mydata.name.trim(),
             token: token,

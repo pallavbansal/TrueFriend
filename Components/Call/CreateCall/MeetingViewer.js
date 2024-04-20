@@ -7,8 +7,10 @@ import {useOrientation} from './useOrientation';
 import ParticipantView from './ParticipantView';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import WaitingToJoinView from './WaitingToJoinView';
+import {useEndCallOrStream} from '../../../Hooks/Query/StreamQuery';
 
 export default function MeetingViewer({finaldata}) {
+  const {isPending, error, mutate, reset} = useEndCallOrStream();
   const callerid = finaldata.caller.userid;
   const receiverid = finaldata.reciever.id;
   console.log('finaldata in meetingviewer :', callerid, receiverid);
@@ -42,13 +44,29 @@ export default function MeetingViewer({finaldata}) {
     //   });
     // },
     onMeetingJoined: () => {
-      console.log('Meeting joined----------', meetingId);
+      console.log('CALL Meeting joined----------', meetingId);
     },
     onMeetingLeft: () => {
-      console.log('Meeting left---------', meetingId);
+      console.log('CALL Meeting left---------', meetingId);
+      const formdata = {
+        stream_id: meetingId,
+      };
+      mutate(
+        {data: formdata},
+        {
+          onSuccess: data => {
+            console.log('call end success', data);
+          },
+        },
+        {
+          onError: error => {
+            console.log('call end error', error);
+          },
+        },
+      );
     },
     onMeetingStateChanged: data => {
-      console.log('Meeting state changed------------', data, meetingId);
+      console.log('CALL Meeting state changed------------', data, meetingId);
     },
   });
 

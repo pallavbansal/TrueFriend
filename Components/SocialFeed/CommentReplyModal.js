@@ -107,6 +107,9 @@ const CommentReplyModal = ({data, commentid, addreplyincomment}) => {
                 cursorColor={colors.login.headingtext2}
                 style={{color: colors.login.headingtext2, flex: 1}}
                 autoFocus={true}
+                onSubmitEditing={handleaddreply}
+                blurOnSubmit={false}
+                returnKeyType="send"
               />
               <Ionicons
                 name="send"

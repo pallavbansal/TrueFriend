@@ -100,6 +100,20 @@ const ChatHeader = ({
     if (meetingId == '') {
       return;
     }
+    const finaldata = {
+      caller: {
+        userid: mydata.id,
+        name: mydata.name,
+        imageUrl: mydata.profile_picture,
+      },
+      reciever: {
+        name: name,
+        id: userid,
+      },
+      meetingId: meetingId,
+      callaction: 'outgoing',
+      type: 'audio',
+    };
     const formdata = {
       meeting_id: meetingId,
       type: 'AUDIO',
@@ -112,20 +126,6 @@ const ChatHeader = ({
       {
         onSuccess: data => {
           console.log('start call meetingid push success', data);
-          const finaldata = {
-            caller: {
-              userid: mydata.id,
-              name: mydata.name,
-              imageUrl: mydata.profile_picture,
-            },
-            reciever: {
-              name: name,
-              id: userid,
-            },
-            meetingId: meetingId,
-            callaction: 'outgoing',
-            type: 'audio',
-          };
 
           navigation.navigate('Call', {
             name: mydata.name.trim(),
@@ -157,6 +157,20 @@ const ChatHeader = ({
     if (meetingId == '') {
       return;
     }
+    const finaldata = {
+      caller: {
+        userid: mydata.id,
+        name: mydata.name,
+        imageUrl: mydata.profile_picture,
+      },
+      reciever: {
+        name: name,
+        id: userid,
+      },
+      meetingId: meetingId,
+      callaction: 'outgoing',
+      type: 'video',
+    };
 
     const formdata = {
       meeting_id: meetingId,
@@ -171,20 +185,6 @@ const ChatHeader = ({
       {
         onSuccess: data => {
           console.log('start call meetingid push success', data);
-          const finaldata = {
-            caller: {
-              userid: mydata.id,
-              name: mydata.name,
-              imageUrl: mydata.profile_picture,
-            },
-            reciever: {
-              name: name,
-              id: userid,
-            },
-            meetingId: meetingId,
-            callaction: 'outgoing',
-            type: 'video',
-          };
 
           navigation.navigate('Call', {
             name: mydata.name.trim(),

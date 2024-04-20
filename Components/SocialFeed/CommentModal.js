@@ -1,4 +1,14 @@
-import {View, Text, StyleSheet, TextInput, FlatList, Image} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  FlatList,
+  Image,
+  Keyboard,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+} from 'react-native';
 import GradientInput from '../Common/GradientInput';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import React, {useState, useEffect} from 'react';
@@ -187,13 +197,18 @@ const CommentModal = ({feed}) => {
               cursorColor={colors.login.headingtext2}
               style={{color: colors.login.headingtext2, flex: 1}}
               autoFocus={true}
+              onSubmitEditing={handleaddcomment}
+              blurOnSubmit={false}
+              returnKeyType="send"
             />
-            <Ionicons
-              name="send"
-              size={18}
-              color={colors.text.secondary}
-              onPress={handleaddcomment}
-            />
+            <TouchableWithoutFeedback onPress={handleaddcomment}>
+              <Ionicons
+                name="send"
+                size={18}
+                color={colors.text.secondary}
+                // onPress={handleaddcomment}
+              />
+            </TouchableWithoutFeedback>
           </View>
         </GradientInput>
       </View>

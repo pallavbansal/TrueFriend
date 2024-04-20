@@ -118,7 +118,20 @@ const ViewerContainer = ({userid, streamotherdata}) => {
       if (meetingId == '') {
         return;
       }
-
+      const finaldata = {
+        caller: {
+          userid: mydata.id,
+          name: mydata.name,
+          imageUrl: mydata.profile_picture,
+        },
+        reciever: {
+          name: streamotherdata.user.name,
+          id: streamotherdata.user.id,
+        },
+        meetingId: meetingId,
+        callaction: 'outgoing',
+        type: 'audio',
+      };
       const formdata = {
         meeting_id: meetingId,
         type: 'AUDIO',
@@ -132,20 +145,6 @@ const ViewerContainer = ({userid, streamotherdata}) => {
         {
           onSuccess: data => {
             console.log('call success', data);
-            const finaldata = {
-              caller: {
-                userid: mydata.id,
-                name: mydata.name,
-                imageUrl: mydata.profile_picture,
-              },
-              reciever: {
-                name: streamotherdata.user.name,
-                id: streamotherdata.user.id,
-              },
-              meetingId: meetingId,
-              callaction: 'outgoing',
-              type: 'audio',
-            };
             leave();
             navigation.navigate('Call', {
               name: mydata.name.trim(),

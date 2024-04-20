@@ -18,7 +18,7 @@ export async function getPackages(token) {
 }
 
 export async function buyPackages(token, data) {
-  console.log('==Wallet buyPackages==');
+  console.log('==Wallet buyPackages==', data);
   const response = await fetch(`${url}/wallet/buy-package`, {
     method: 'POST',
     headers: {
@@ -50,14 +50,40 @@ export async function getWallet(token, user_id) {
   return response.json();
 }
 
-export async function getOrderId(token) {
-  const response = await new Promise(resolve => {
-    setTimeout(() => {
-      resolve({
-        order_id: Math.floor(Math.random() * 1000000).toString(), // generates a random number between 0 and 999999
-      });
-    }, 100); // delay of 1 second
-  });
+export async function getDiamondTransaction(token, pageparam) {
+  console.log('==Wallet getDiamondTransaction==');
+  const response = await fetch(
+    `${url}/profile/fetch-transactions?page=${pageparam}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  if (!response.ok) {
+    console.log('Error getDiamondTransaction', response);
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
+}
 
-  return response;
+export async function getPaymentTransactions(token, pageparam) {
+  console.log('==Wallet getpaymentTransactions==');
+  const response = await fetch(
+    `${url}/profile/fetch-payment-transactions?page=${pageparam}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  if (!response.ok) {
+    console.log('Error getPaymentTransactions', response);
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
 }
