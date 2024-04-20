@@ -73,6 +73,20 @@ const FriendsList = () => {
   const {data: walletdata, isPending: walletpending} = useGetWallet(myuserid);
 
   useEffect(() => {
+    console.log('trying to connect to socket server in friendlist.js');
+    socket.emit('register', myuserid);
+  }, []);
+
+  useEffect(() => {
+    console.log('trying to connect to socket server in friendlist.js');
+    socket.on('connect', () => {
+      socket.emit('register', myuserid, response => {
+        console.log('Registration response in friends list:', response);
+      });
+    });
+  }, []);
+
+  useEffect(() => {
     if (requestdata2?.data?.friends) {
       setfilteredrequestdata(requestdata2.data.friends);
     }
@@ -175,15 +189,6 @@ const FriendsList = () => {
     };
   }, []);
 
-  useEffect(() => {
-    console.log('trying to connect to socket server in friendlist.js');
-    socket.on('connect', () => {
-      console.log('connected to socket server in friendlist.js');
-      console.log('socket id:', socket.id, socket.connected);
-      socket.emit('register', myuserid);
-    });
-  }, []);
-
   const handleChatClick = data => {
     console.log('data in handle chat', data);
     console.log(filteredchattingfriendsdata);
@@ -201,19 +206,6 @@ const FriendsList = () => {
     });
   };
 
-  // if (!socketconnected) {
-  //   setTimeout(() => {
-  //     navigation.navigate('Discover');
-  //     Toast.show({
-  //       type: 'error',
-  //       text1: 'Error',
-  //       text2: 'Network Error, Please try again later.',
-  //       visibilityTime: 2000,
-  //     });
-  //   }, 2000);
-  //   return <FriendsListSkeleton />;
-  // }
-
   if (
     requestdatapending ||
     friendsdatapending ||
@@ -222,8 +214,6 @@ const FriendsList = () => {
   ) {
     return <Loading />;
   }
-
-  // console.log('friendsdata2', chattingfriendsdata);
 
   return (
     <GradientScreen>
@@ -242,7 +232,7 @@ const FriendsList = () => {
             />
           </TouchableOpacity>
 
-          {selectedoptiontype === 'friends' && (
+          {selectedoptiontype !== 'requests' && (
             <TouchableOpacity
               style={{
                 flexDirection: 'row',

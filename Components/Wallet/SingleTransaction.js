@@ -22,8 +22,10 @@ const SingleTransaction = ({data, setModalVisible}) => {
     }
   };
 
-  let description = data.amount >= 0 ? 'Received on' : 'Sent on';
-  description = description + ' ' + data.date + ' at ' + data.time;
+  // let description = data.amount >= 0 ? 'Received on' : 'Sent on';
+  // description = description + ' ' + data.date + ' at ' + data.time;
+
+  let description = `${data.date} at ${data.time}`;
 
   return (
     <View style={styles.optioncard2}>
@@ -73,7 +75,8 @@ const SingleTransaction = ({data, setModalVisible}) => {
           }}>
           <Text style={styles.headingtext3}>{description}</Text>
           <Text style={styles.headingtext3}>
-            {data.amount >= 0 ? 'In' : 'Out'}
+            {/* {data.amount >= 0 ? 'In' : 'Out'} */}
+            {data.type}
           </Text>
         </View>
         <View

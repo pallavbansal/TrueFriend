@@ -1,8 +1,9 @@
 import {
   getPackages,
   buyPackages,
-  getOrderId,
   getWallet,
+  getDiamondTransaction,
+  getPaymentTransactions,
 } from '../../Services/WalletServices';
 import {useMutation, useQuery, useInfiniteQuery} from '@tanstack/react-query';
 import {useSelector} from 'react-redux';
@@ -18,10 +19,10 @@ export const useFetchPackageData = () => {
 
 export const useBuyPackage = () => {
   const token = useSelector(state => state.Auth.token);
-  const {mutate, reset} = useMutation({
+  const {mutate, reset, isPending, error} = useMutation({
     mutationFn: ({data}) => buyPackages(token, data),
   });
-  return {mutate, reset};
+  return {mutate, reset, isPending, error};
 };
 
 export const useGetWallet = user_id => {
@@ -34,11 +35,70 @@ export const useGetWallet = user_id => {
   return {isPending, error, data, isError};
 };
 
-export const useGetOrderId = () => {
+export const useFetchDiamondTransactions = () => {
   const token = useSelector(state => state.Auth.token);
-  const {isPending, error, data, isError} = useQuery({
-    queryFn: () => getOrderId(token),
-    queryKey: ['getOrderId', token],
+  const {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isPending,
+    isFetching,
+  } = useInfiniteQuery({
+    queryKey: ['diamondtransactions'],
+    initialPageParam: 1,
+    queryFn: ({pageParam}) => getDiamondTransaction(token, pageParam),
+    getNextPageParam: lastPage => {
+      if (!lastPage.data.transactions.next_page_url) return undefined;
+      const match =
+        lastPage.data.transactions.next_page_url.match(/page=(\d+)/);
+      const page = match ? Number(match[1]) : undefined;
+      return page;
+    },
   });
-  return {isPending, error, data, isError};
+
+  return {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isPending,
+    isFetching,
+  };
+};
+
+export const useFetchPaymentTransactions = () => {
+  const token = useSelector(state => state.Auth.token);
+  const {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isPending,
+    isFetching,
+  } = useInfiniteQuery({
+    queryKey: ['paymenttransactions'],
+    initialPageParam: 1,
+    queryFn: ({pageParam}) => getPaymentTransactions(token, pageParam),
+    getNextPageParam: lastPage => {
+      if (!lastPage.data.transactions.next_page_url) return undefined;
+      const match =
+        lastPage.data.transactions.next_page_url.match(/page=(\d+)/);
+      const page = match ? Number(match[1]) : undefined;
+      return page;
+    },
+  });
+
+  return {
+    data,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isPending,
+    isFetching,
+  };
 };

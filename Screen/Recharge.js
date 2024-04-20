@@ -10,108 +10,17 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
 import RazorpayCheckout from 'react-native-razorpay';
 import {RAZORPAY_KEY} from '@env';
-import {useGetOrderId, useFetchPackageData} from '../Hooks/Query/WalletQuery';
+import {useFetchPackageData, useBuyPackage} from '../Hooks/Query/WalletQuery';
 import Loading from './Loading';
 import Toast from 'react-native-toast-message';
 import {useSelector} from 'react-redux';
 
-const plandata = [
-  {
-    id: 1,
-    name: 'Starter X',
-    coins: '10K Coins',
-    cost: 250,
-  },
-  {
-    id: 2,
-    name: 'Buddy Pro',
-    coins: '20K Coins',
-    cost: 500,
-  },
-  {
-    id: 3,
-    name: 'Advanced U',
-    coins: '30K Coins',
-    cost: 700,
-  },
-  {
-    id: 4,
-    name: 'Master M',
-    coins: '50K Coins',
-    cost: 1000,
-  },
-  {
-    id: 5,
-    name: 'Elite E',
-    coins: '100K Coins',
-    cost: 1500,
-  },
-  {
-    id: 6,
-    name: 'Champion C',
-    coins: '130K Coins',
-    cost: 2000,
-  },
-  {
-    id: 7,
-    name: 'Legend L',
-    coins: '150K Coins',
-    cost: 2500,
-  },
-  {
-    id: 8,
-    name: 'Titan T',
-    coins: '200K Coins',
-    cost: 3000,
-  },
-  {
-    id: 9,
-    name: 'Supreme S',
-    coins: '230K Coins',
-    cost: 3500,
-  },
-  {
-    id: 10,
-    name: 'Ultimate U',
-    coins: '250K Coins',
-    cost: 4000,
-  },
-  {
-    id: 11,
-    name: 'Pinnacle P',
-    coins: '300K Coins',
-    cost: 4500,
-  },
-  {
-    id: 12,
-    name: 'Zenith Z',
-    coins: '350K Coins',
-    cost: 5000,
-  },
-  {
-    id: 13,
-    name: 'Nirvana N',
-    coins: '700K Coins',
-    cost: 9000,
-  },
-  {
-    id: 14,
-    name: 'Infinity I',
-    coins: '1000K Coins',
-    cost: 14000,
-  },
-];
-
 const Recharge = () => {
   const navigation = useNavigation();
   const profiledata = useSelector(state => state.Auth.userinitaldata);
+  // console.log('profiledata', profiledata);
   const [selectedplan, setselectedplan] = useState({});
-  const {
-    isPending: OrderIdPending,
-    error,
-    data: OrderIdData,
-    isError,
-  } = useGetOrderId();
+
   const {
     isPending: PlanPending,
     error: PlanError,
@@ -119,19 +28,57 @@ const Recharge = () => {
     isError: PlanIsError,
   } = useFetchPackageData();
 
+  const {
+    mutate: BuyPackageMutate,
+    isPending: BuyPackagePending,
+    reset: BuyPackageReset,
+    error: BuyPackageError,
+  } = useBuyPackage();
+
   const handleplanclick = item => {
-    if (OrderIdPending) return;
-    setselectedplan({
-      ...item,
-      order_id: OrderIdData.order_id,
-    });
+    if (BuyPackagePending) return;
+    setselectedplan(item);
   };
 
-  if (OrderIdPending || PlanPending) {
+  if (PlanPending) {
     return <Loading />;
   }
 
-  console.log('plandata', PlanData.data);
+  function handleSendTransactionBackend(transaction_id, status) {
+    console.log('transaction_id', transaction_id, status);
+    const formdata = {
+      transaction_id: transaction_id,
+    };
+    BuyPackageMutate(
+      {data: formdata},
+      {
+        onSuccess: data => {
+          console.log('payment success send in backend', data);
+          if (status === 'success') {
+            Toast.show({
+              type: 'success',
+              position: 'top',
+              text1: 'Payment Success',
+              text2: 'Your payment is successful',
+              visibilityTime: 2000,
+            });
+          } else {
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              text1: 'Payment Failed',
+              text2: 'Your payment is failed',
+              visibilityTime: 2000,
+            });
+          }
+          navigation.reset({
+            index: 0,
+            routes: [{name: 'Discover'}],
+          });
+        },
+      },
+    );
+  }
 
   function handlepayclick() {
     if (!selectedplan.id) {
@@ -139,14 +86,15 @@ const Recharge = () => {
     }
     var options = {
       description: 'Recharge',
-      image: 'https://i.imgur.com/3g7nmJC.jpg',
+      // image: 'https://i.imgur.com/3g7nmJC.jpg',
+      image: profiledata.profile_picture,
       currency: 'INR',
       key: RAZORPAY_KEY,
       amount: selectedplan.price * 100,
       name: 'Wooing',
       prefill: {
         email: profiledata.email,
-        contact: profiledata.mobile_number,
+        // contact: profiledata.mobile_number,
         name: profiledata.name,
       },
       theme: {color: '#53a20e'},
@@ -155,38 +103,14 @@ const Recharge = () => {
         userId: profiledata.id,
         planId: selectedplan.id,
       },
+      remember_customer: false,
     };
     RazorpayCheckout.open(options)
       .then(data => {
-        // handle success
-        console.log('success payment', data);
-        Toast.show({
-          type: 'success',
-          position: 'top',
-          text1: 'Payment Success',
-          text2: 'Your payment is successful',
-          visibilityTime: 2000,
-        });
-        navigation.reset({
-          index: 0,
-          routes: [{name: 'Discover'}],
-        });
+        handleSendTransactionBackend(data.razorpay_payment_id, 'success');
       })
       .catch(error => {
-        // handle failure
-        console.log('error payment', error);
-        const paymentId = error.error.metadata.payment_id;
-        Toast.show({
-          type: 'error',
-          position: 'top',
-          text1: 'Payment Failed',
-          text2: 'Your payment is failed',
-          visibilityTime: 2000,
-        });
-        navigation.reset({
-          index: 0,
-          routes: [{name: 'Discover'}],
-        });
+        handleSendTransactionBackend(error.error.metadata.payment_id, 'failed');
       });
   }
 
