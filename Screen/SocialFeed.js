@@ -21,6 +21,7 @@ import DetailFeed from '../Components/SocialFeed/DetailFeed';
 // import {useQueryClient} from '@tanstack/react-query';
 import {useRefreshData} from '../Hooks/Custom/useRefreshData';
 import MyLoadingIndicator from '../Components/Common/MyLoadingIndicator';
+import SocialFeedSkeleton from '../Skeletons/SocialFeedSkeleton';
 
 const SocialFeed = () => {
   const navigation = useNavigation();
@@ -80,7 +81,8 @@ const SocialFeed = () => {
   }, [data]);
 
   if (isPending) {
-    return <Loading />;
+    // return <Loading />;
+    return <SocialFeedSkeleton />;
   }
 
   return (

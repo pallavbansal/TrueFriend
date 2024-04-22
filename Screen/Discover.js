@@ -1,21 +1,10 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-  RefreshControl,
-} from 'react-native';
+import {View, StyleSheet, FlatList, RefreshControl} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import BottomBar from '../Layouts/BottomBar';
-import {useNavigation} from '@react-navigation/native';
 import DiscoverHeader from '../Components/Discover/DiscoverHeader';
 import LinearGradient from 'react-native-linear-gradient';
 import {colors} from '../Styles/ColorData';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import Loading from './Loading';
-import Entypo from 'react-native-vector-icons/Entypo';
-import GradientInput from '../Components/Common/GradientInput';
+import StartStream from '../Components/Discover/StartStream';
 import SingleUser from '../Components/Discover/SingleUser';
 import Geolocation from '@react-native-community/geolocation';
 import NoData from '../Components/Common/NoData';
@@ -28,8 +17,44 @@ import {
 import MyLoadingIndicator from '../Components/Common/MyLoadingIndicator';
 import {useRefreshData} from '../Hooks/Custom/useRefreshData';
 import Toast from 'react-native-toast-message';
+import DiscoverSkeleton from '../Skeletons/DiscoverSkeleton';
+import OptionsContainer from '../Components/Discover/OptionsContainer';
+import RectangleSkeleton from '../SkeletonSmall/RectangleSkeleton';
+
+const emptyData = [
+  {
+    user: {
+      id: 1,
+    },
+  },
+  {
+    user: {
+      id: 2,
+    },
+  },
+  {
+    user: {
+      id: 3,
+    },
+  },
+  {
+    user: {
+      id: 4,
+    },
+  },
+  {
+    user: {
+      id: 5,
+    },
+  },
+  {
+    user: {
+      id: 6,
+    },
+  },
+];
+
 const Discover = () => {
-  const navigation = useNavigation();
   const {refreshing, onRefresh} = useRefreshData();
   const {
     mutate: locationUpdate,
@@ -137,9 +162,10 @@ const Discover = () => {
     // };
   }, []);
 
-  if (isDiscoverPending) {
-    return <Loading />;
-  }
+  // if (isDiscoverPending) {
+  //   // return <Loading />;
+  //   return <DiscoverSkeleton />;
+  // }
 
   async function handlelocation() {
     Geolocation.getCurrentPosition(
@@ -193,189 +219,57 @@ const Discover = () => {
         <View style={styles.screencontainer}>
           <MyLoadingIndicator isRefreshing={refreshing} />
           <DiscoverHeader pageoption={pageoption} />
-
-          <View style={[styles.optioncontainer]}>
-            <TouchableOpacity onPress={() => handlediscoverclick(-1)}>
-              <Text
-                style={[
-                  styles.optiontext,
-                  {
-                    color:
-                      pageoption === 'Discover'
-                        ? colors.arrow.tertiary
-                        : colors.text.primary,
-                  },
-                ]}>
-                Discover
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => handlenearbyclick(100)}
-              disabled={isLocationUpdatePending}>
-              <Text
-                style={[
-                  styles.optiontext,
-                  {
-                    color:
-                      pageoption === 'Nearby'
-                        ? colors.arrow.tertiary
-                        : colors.text.primary,
-                  },
-                ]}>
-                Nearby
-              </Text>
-            </TouchableOpacity>
-
-            <View
-              style={{
-                position: 'relative',
-                marginLeft: 'auto',
-                marginRight: 10,
-              }}>
-              {pageoption === 'Nearby' && (
-                <TouchableOpacity onPress={handleFilter}>
-                  <MaterialIcons
-                    name="filter-list"
-                    size={24}
-                    color={colors.text.primary}
-                    style={{
-                      marginLeft: 'auto',
-                    }}
-                  />
-                </TouchableOpacity>
-              )}
-              {pageoption === 'Nearby' && showfilter && (
-                <GradientInput style={styles.gradientborder2}>
-                  <View style={styles.dropcontainer}>
-                    {filterdata.items.map((item, index) => (
-                      <View key={index} style={styles.singleitem}>
-                        <TouchableOpacity
-                          onPress={() => {
-                            setfilterdata(prev => {
-                              return {
-                                ...prev,
-                                applied: item.value,
-                              };
-                            });
-                            setshowfilter(false);
-                          }}>
-                          <Text
-                            style={[
-                              styles.itemtext,
-                              {
-                                color:
-                                  filterdata.applied === item.value
-                                    ? colors.arrow.tertiary
-                                    : colors.login.headingtext2,
-                              },
-                            ]}>
-                            {item.item}
-                          </Text>
-                        </TouchableOpacity>
-                      </View>
-                    ))}
-                  </View>
-                </GradientInput>
-              )}
-            </View>
-          </View>
+          <OptionsContainer
+            handlediscoverclick={handlediscoverclick}
+            handlenearbyclick={handlenearbyclick}
+            isLocationUpdatePending={isLocationUpdatePending}
+            handleFilter={handleFilter}
+            showfilter={showfilter}
+            filterdata={filterdata}
+            setfilterdata={setfilterdata}
+            setshowfilter={setshowfilter}
+            pageoption={pageoption}
+          />
 
           <View
             style={{
               marginBottom: 120,
               alignItems:
                 discoverData?.data?.profiles?.length > 2 ? 'center' : 'stretch',
-              // backgroundColor: 'black',
+
               height: '100%',
               paddingBottom: 70,
             }}>
-            {discoverData?.data?.profiles.length > 0 ? (
-              <FlatList
-                refreshControl={
-                  <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={() =>
-                      onRefresh(['discoverprofiles', 'fetchProfile'])
-                    }
-                    progressViewOffset={-500}
-                  />
-                }
-                data={discoverData?.data?.profiles}
-                keyExtractor={item => item.user.id.toString()}
-                renderItem={({item, index}) => (
+            <FlatList
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={() =>
+                    onRefresh(['discoverprofiles', 'fetchProfile'])
+                  }
+                  progressViewOffset={-500}
+                />
+              }
+              data={
+                isDiscoverPending ? emptyData : discoverData?.data?.profiles
+              }
+              keyExtractor={item => item.user.id.toString()}
+              renderItem={({item, index}) =>
+                isDiscoverPending ? (
+                  <RectangleSkeleton />
+                ) : (
                   <SingleUser item={item} index={index} />
-                )}
-                onEndReachedThreshold={0.1}
-                showsVerticalScrollIndicator={false}
-                numColumns={3}
-                contentContainerStyle={{paddingBottom: 80, height: '100%'}}
-              />
-            ) : // <FlatList
-            //   refreshControl={
-            //     <RefreshControl
-            //       refreshing={refreshing}
-            //       onRefresh={() =>
-            //         onRefresh(['discoverprofiles', 'fetchProfile'])
-            //       }
-            //       progressViewOffset={-500}
-            //     />
-            //   }
-            //   data={[
-            //     {
-            //       user: {
-            //         id: 44,
-            //         name: 'Vivek',
-            //         profile_picture:
-            //           'https://wooing.boxinallsoftech.com/public/uploads/profile/93495_1706851876_Screenshot_2024-01-25-11-07-38-00_325fbdb1dc4eedea0ce3f5f060f574f6.jpg',
-            //         online_status: 'online',
-            //       },
-            //     },
-            //   ]}
-            //   keyExtractor={item => item.user.id.toString()}
-            //   renderItem={({item, index}) => (
-            //     <NoData item={item} index={index} />
-            //     // <SingleUser item={item} index={index} />
-            //   )}
-            //   numColumns={1}
-            //   contentContainerStyle={{height: '100%', paddingBottom: 40}}
-            // />
-            null}
+                )
+              }
+              onEndReachedThreshold={0.1}
+              showsVerticalScrollIndicator={false}
+              numColumns={3}
+              contentContainerStyle={{paddingBottom: 80, height: '100%'}}
+              ListEmptyComponent={() => <NoData />}
+            />
           </View>
 
-          <View
-            style={{
-              position: 'absolute',
-              bottom: 75,
-              right: 20,
-              padding: 6,
-              borderRadius: 48,
-              backgroundColor: colors.text.primarylight,
-              elevation: 50,
-            }}>
-            <TouchableOpacity
-              style={{
-                backgroundColor: colors.text.primary,
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 40,
-                width: 74,
-                height: 74,
-                elevation: 50,
-              }}
-              onPress={() =>
-                navigation.navigate('StartStream', {
-                  isCreator: true,
-                })
-              }>
-              <Entypo
-                name="video-camera"
-                size={40}
-                color={colors.arrow.secondary}
-              />
-            </TouchableOpacity>
-          </View>
-
+          <StartStream />
           <BottomBar />
         </View>
       </View>

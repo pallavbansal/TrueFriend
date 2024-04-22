@@ -70,6 +70,7 @@ const WalletModal = ({modalVisible, setModalVisible}) => {
     const {date, time} = timedate(item.created_at);
     let type = '';
     let user = {};
+    let amount = 0;
 
     if (item.purpose === 'CALL_DEDUCTION' || item.purpose === 'CALL_CREDIT') {
       type = 'call';

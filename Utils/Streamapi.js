@@ -1,7 +1,7 @@
 const API_BASE_URL = 'https://api.videosdk.live/v2';
 
 export const getToken = async () => {
-  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlrZXkiOiIxMGNhMzJkYy01NWRjLTQwOTUtYTZiMC1iNDY2ZDhiNTY5YjkiLCJwZXJtaXNzaW9ucyI6WyJhbGxvd19qb2luIl0sImlhdCI6MTcxMjU2OTIwMywiZXhwIjoxNzQ0MTA1MjAzfQ.gEsOIkDIUKjFQCM6HP1PvMHhORcG8pOXpMK_3yXt_H4';
+  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlrZXkiOiI1NTAzMGU5OC02MGEwLTQ4MGUtODQ5OC01NzRjOGVmMjJjYTkiLCJwZXJtaXNzaW9ucyI6WyJhbGxvd19qb2luIl0sImlhdCI6MTcxMzc4MjIwMCwiZXhwIjoxODcxNTcwMjAwfQ.-BQxNCVT2F16M3a7WQnAisH5lxaXrLDZ53AfZqNz3Ls';
 };
 
 export const createMeeting = async ({token}) => {

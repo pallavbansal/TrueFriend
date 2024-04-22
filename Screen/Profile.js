@@ -22,6 +22,7 @@ import Loading from './Loading';
 import {useRefreshData} from '../Hooks/Custom/useRefreshData';
 import MyLoadingIndicator from '../Components/Common/MyLoadingIndicator';
 import {useDeleteSocialFeed} from '../Hooks/Query/ProfileQuery';
+import ProfileSkeleton from '../Skeletons/ProfileSkeleton';
 
 const Profile = () => {
   const {isPending, error, data: profiledata, isError} = useFetchProfile();
@@ -78,7 +79,8 @@ const Profile = () => {
   }
 
   if (isPending) {
-    return <Loading />;
+    // return <Loading />;
+    return <ProfileSkeleton />;
   }
 
   const finaldata = profiledata.data.profile;
@@ -237,53 +239,53 @@ const Profile = () => {
               </View>
             )}
 
-            {selectedmediatype === 'post' &&
-              (postdata.length > 0 ? (
-                <FlatList
-                  refreshControl={
-                    <RefreshControl
-                      refreshing={refreshing}
-                      onRefresh={() => onRefresh(['fetchProfile'])}
-                      progressViewOffset={-1000}
+            {selectedmediatype === 'post' && (
+              <FlatList
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={() => onRefresh(['fetchProfile'])}
+                    progressViewOffset={-1000}
+                  />
+                }
+                data={postdata}
+                keyExtractor={item => item.id.toString()}
+                renderItem={({item, index}) => (
+                  <TouchableOpacity
+                    onPress={() =>
+                      setshowdetailmodel({
+                        show: true,
+                        data: item,
+                      })
+                    }>
+                    <SingleMedia
+                      item={
+                        item.post_media.find(
+                          media => media.media_type === '1',
+                        ) || item.post_media[0]
+                      }
+                      index={index}
                     />
-                  }
-                  data={postdata}
-                  keyExtractor={item => item.id.toString()}
-                  renderItem={({item, index}) => (
-                    <TouchableOpacity
-                      onPress={() =>
-                        setshowdetailmodel({
-                          show: true,
-                          data: item,
-                        })
-                      }>
-                      <SingleMedia
-                        item={
-                          item.post_media.find(
-                            media => media.media_type === '1',
-                          ) || item.post_media[0]
-                        }
-                        index={index}
-                      />
-                    </TouchableOpacity>
-                  )}
-                  onEndReachedThreshold={0.1}
-                  showsVerticalScrollIndicator={false}
-                  numColumns={4}
-                  contentContainerStyle={{paddingBottom: 80}}
-                />
-              ) : (
-                <Text
-                  style={{
-                    color: colors.login.headingtext2,
-                    marginTop: 50,
-                    fontSize: 20,
-                    fontWeight: '900',
-                    textAlign: 'center',
-                  }}>
-                  No Posts
-                </Text>
-              ))}
+                  </TouchableOpacity>
+                )}
+                onEndReachedThreshold={0.1}
+                showsVerticalScrollIndicator={false}
+                numColumns={4}
+                contentContainerStyle={{paddingBottom: 80}}
+                ListEmptyComponent={() => (
+                  <Text
+                    style={{
+                      color: colors.login.headingtext2,
+                      marginTop: 50,
+                      fontSize: 20,
+                      fontWeight: '900',
+                      textAlign: 'center',
+                    }}>
+                    No Posts
+                  </Text>
+                )}
+              />
+            )}
           </View>
         </View>
 
