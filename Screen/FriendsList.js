@@ -19,8 +19,6 @@ import SingleFriend from '../Components/FriendList/SingleFriend';
 import SingleRequest from '../Components/FriendList/SingleRequest';
 import socket from '../Socket/Socket';
 import {useSelector} from 'react-redux';
-import Toast from 'react-native-toast-message';
-import FriendsListSkeleton from '../Layouts/Skeletions/FriendsListSkeleton';
 import CreateGroupModal from '../Components/FriendList/CreateGroupModal';
 import MyLoadingIndicator from '../Components/Common/MyLoadingIndicator';
 import Loading from './Loading';
@@ -31,6 +29,7 @@ import {
 } from '../Hooks/Query/RequestQuery';
 import {useGetWallet} from '../Hooks/Query/WalletQuery';
 import {useRefreshData} from '../Hooks/Custom/useRefreshData';
+import FriendsListSkeleton from '../Skeletons/FriendsListSkeleton';
 
 const FriendsList = () => {
   const navigation = useNavigation();
@@ -212,7 +211,8 @@ const FriendsList = () => {
     chattingfriendspending ||
     walletpending
   ) {
-    return <Loading />;
+    // return <Loading />;
+    return <FriendsListSkeleton />;
   }
 
   return (
@@ -331,121 +331,117 @@ const FriendsList = () => {
 
         <View style={styles.friendlistcontainer}>
           {selectedoptiontype === 'friends' ? (
-            filteredfriendsdata.filter(item => item.id !== myuserid).length >
-            0 ? (
-              <FlatList
-                refreshControl={
-                  <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={() => onRefresh(['fetchFriends'])}
-                    progressViewOffset={-500}
-                  />
-                }
-                data={filteredfriendsdata.filter(item => item.id !== myuserid)}
-                keyExtractor={item => item.id.toString()}
-                renderItem={({item, index}) => (
-                  <SingleFriend
-                    data={item}
-                    index={index}
-                    hideunseen={true}
-                    handleChatClick={handleChatClick}
-                    balance={walletdata?.data?.user?.balance || 0}
-                  />
-                )}
-                onEndReachedThreshold={0.1}
-                showsVerticalScrollIndicator={false}
-                numColumns={1}
-                contentContainerStyle={{paddingBottom: 250}}
-              />
-            ) : (
-              <Text
-                style={{
-                  color: colors.login.headingtext2,
-                  marginTop: 80,
-                  fontSize: 20,
-                  fontWeight: '900',
-                  textAlign: 'center',
-                }}>
-                No Friends Found
-              </Text>
-            )
+            <FlatList
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={() => onRefresh(['fetchFriends'])}
+                  progressViewOffset={-500}
+                />
+              }
+              data={filteredfriendsdata.filter(item => item.id !== myuserid)}
+              keyExtractor={item => item.id.toString()}
+              renderItem={({item, index}) => (
+                <SingleFriend
+                  data={item}
+                  index={index}
+                  hideunseen={true}
+                  handleChatClick={handleChatClick}
+                  balance={walletdata?.data?.user?.balance || 0}
+                />
+              )}
+              onEndReachedThreshold={0.1}
+              showsVerticalScrollIndicator={false}
+              numColumns={1}
+              contentContainerStyle={{paddingBottom: 250}}
+              ListEmptyComponent={() => (
+                <Text
+                  style={{
+                    color: colors.login.headingtext2,
+                    marginTop: 80,
+                    fontSize: 20,
+                    fontWeight: '900',
+                    textAlign: 'center',
+                  }}>
+                  No Requests Found
+                </Text>
+              )}
+            />
           ) : selectedoptiontype === 'requests' ? (
-            filteredrequestdata.length > 0 ? (
-              <FlatList
-                refreshControl={
-                  <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={() => onRefresh(['fetchFriendRequests'])}
-                    progressViewOffset={-500}
-                  />
-                }
-                data={filteredrequestdata}
-                keyExtractor={item => item.friend_id.toString()}
-                renderItem={({item, index}) => (
-                  <SingleRequest
-                    data={item}
-                    index={index}
-                    setfilteredrequestdata={setfilteredrequestdata}
-                  />
-                )}
-                onEndReachedThreshold={0.1}
-                showsVerticalScrollIndicator={false}
-                numColumns={1}
-                contentContainerStyle={{paddingBottom: 250}}
-              />
-            ) : (
-              <Text
-                style={{
-                  color: colors.login.headingtext2,
-                  marginTop: 80,
-                  fontSize: 20,
-                  fontWeight: '900',
-                  textAlign: 'center',
-                }}>
-                No Requests Found
-              </Text>
-            )
+            <FlatList
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={() => onRefresh(['fetchFriendRequests'])}
+                  progressViewOffset={-500}
+                />
+              }
+              data={filteredrequestdata}
+              keyExtractor={item => item.friend_id.toString()}
+              renderItem={({item, index}) => (
+                <SingleRequest
+                  data={item}
+                  index={index}
+                  setfilteredrequestdata={setfilteredrequestdata}
+                />
+              )}
+              onEndReachedThreshold={0.1}
+              showsVerticalScrollIndicator={false}
+              numColumns={1}
+              contentContainerStyle={{paddingBottom: 250}}
+              ListEmptyComponent={() => (
+                <Text
+                  style={{
+                    color: colors.login.headingtext2,
+                    marginTop: 80,
+                    fontSize: 20,
+                    fontWeight: '900',
+                    textAlign: 'center',
+                  }}>
+                  No Requests Found
+                </Text>
+              )}
+            />
           ) : selectedoptiontype === 'chats' ? (
-            filteredchattingfriendsdata.length > 0 ? (
-              <FlatList
-                refreshControl={
-                  <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={() => onRefresh(['fetchChattingFriends'])}
-                    progressViewOffset={-500}
-                  />
-                }
-                data={filteredchattingfriendsdata}
-                keyExtractor={(item, index) => index.toString()}
-                // keyExtractor={item => item.id.toString()}
-                renderItem={({item, index}) => (
-                  <SingleFriend
-                    data={item}
-                    index={index}
-                    hideunseen={false}
-                    handleChatClick={handleChatClick}
-                    balance={walletdata?.data?.user?.balance || 0}
-                  />
-                )}
-                onEndReachedThreshold={0.1}
-                showsVerticalScrollIndicator={false}
-                numColumns={1}
-                contentContainerStyle={{
-                  paddingBottom: 250,
-                }}
-              />
-            ) : (
-              <Text
-                style={{
-                  color: colors.login.headingtext2,
-                  marginTop: 80,
-                  fontSize: 20,
-                  fontWeight: '900',
-                  textAlign: 'center',
-                }}>
-                No Chats Found
-              </Text>
-            )
+            <FlatList
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={() => onRefresh(['fetchChattingFriends'])}
+                  progressViewOffset={-500}
+                />
+              }
+              data={filteredchattingfriendsdata}
+              keyExtractor={(item, index) => index.toString()}
+              // keyExtractor={item => item.id.toString()}
+              renderItem={({item, index}) => (
+                <SingleFriend
+                  data={item}
+                  index={index}
+                  hideunseen={false}
+                  handleChatClick={handleChatClick}
+                  balance={walletdata?.data?.user?.balance || 0}
+                />
+              )}
+              onEndReachedThreshold={0.1}
+              showsVerticalScrollIndicator={false}
+              numColumns={1}
+              contentContainerStyle={{
+                paddingBottom: 250,
+              }}
+              ListEmptyComponent={() => (
+                <Text
+                  style={{
+                    color: colors.login.headingtext2,
+                    marginTop: 80,
+                    fontSize: 20,
+                    fontWeight: '900',
+                    textAlign: 'center',
+                  }}>
+                  No Chats Found
+                </Text>
+              )}
+            />
           ) : null}
         </View>
         <CreateGroupModal
