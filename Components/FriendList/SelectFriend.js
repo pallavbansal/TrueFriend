@@ -71,7 +71,8 @@ const styles = StyleSheet.create({
   },
 
   text1: {
-    color: 'white',
+    // color: 'white',
+    color: colors.arrow.secondary,
     fontSize: 16,
     fontWeight: '900',
   },

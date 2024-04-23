@@ -67,10 +67,10 @@ const WalletModal = ({modalVisible, setModalVisible}) => {
   };
 
   const transformDiamondData = item => {
+    console.log('Diamond item', item);
     const {date, time} = timedate(item.created_at);
     let type = '';
     let user = {};
-    let amount = 0;
 
     if (item.purpose === 'CALL_DEDUCTION' || item.purpose === 'CALL_CREDIT') {
       type = 'call';
@@ -162,13 +162,13 @@ const WalletModal = ({modalVisible, setModalVisible}) => {
       type == 'diamond' &&
       (diamondisFetchingNextPage || diamondisPending || diamondisFetching)
     ) {
-      return <ActivityIndicator size="large" color={colors.text.primary} />;
+      return <ActivityIndicator size="large" color={colors.arrow.secondary} />;
     }
     if (
       type == 'payment' &&
       (paymentisFetchingNextPage || paymentisFetching || paymentisPending)
     ) {
-      return <ActivityIndicator size="large" color={colors.text.primary} />;
+      return <ActivityIndicator size="large" color={colors.arrow.secondary} />;
     }
     return null;
   };
@@ -230,7 +230,8 @@ const WalletModal = ({modalVisible, setModalVisible}) => {
               }}>
               <Text
                 style={{
-                  color: 'white',
+                  // color: 'white',
+                  color: colors.arrow.secondary,
                   fontSize: 20,
                   fontWeight: 'bold',
                 }}>
@@ -252,7 +253,7 @@ const WalletModal = ({modalVisible, setModalVisible}) => {
               }}>
               <Text
                 style={{
-                  color: colors.text.primary,
+                  color: colors.arrow.secondary,
                   fontSize: 20,
                   fontWeight: 'bold',
                   marginVertical: '60%',
@@ -282,7 +283,8 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    backgroundColor: colors.arrow.secondary,
+    // backgroundColor: colors.arrow.secondary,
+    backgroundColor: colors.text.primary,
     overflow: 'hidden',
   },
 });
