@@ -19,7 +19,8 @@ import {useRefreshData} from '../Hooks/Custom/useRefreshData';
 import Toast from 'react-native-toast-message';
 import DiscoverSkeleton from '../Skeletons/DiscoverSkeleton';
 import OptionsContainer from '../Components/Discover/OptionsContainer';
-import useLocationStatus from '../Hooks/Custom/useLocationStatus';
+import RectangleSkeleton from '../SkeletonSmall/RectangleSkeleton';
+// import ProfileIconSkeleton from '../SkeletonSmall/ProfileSkeleton';
 
 const emptyData = [
   {
@@ -62,12 +63,15 @@ const Discover = () => {
     error: locationError,
     reset: locationReset,
   } = useLocationUpdate();
-  const {isLocationEnabledData, locationPermissionGranted, enableLocation} =
-    useLocationStatus();
   const myuserid = useSelector(state => state.Auth.userid);
   console.log(useSelector(state => state.Auth.token));
   console.log('My User ID', myuserid);
-
+  const [locationupdated, setlocationupdated] = useState(false);
+  const [locationpermission, setlocationpermission] = useState({
+    code: 2, // 0 = ok, 1 = location permission off for this app, 2 = device location off
+    msg: '',
+    msg2: '',
+  });
   const [pageoption, setpageOption] = useState('Discover');
   const [showfilter, setshowfilter] = useState(false);
   const [filterdata, setfilterdata] = useState({
@@ -104,8 +108,8 @@ const Discover = () => {
     });
   }
 
-  async function handlenearbyclick(distance) {
-    if (isLocationEnabledData && locationPermissionGranted) {
+  function handlenearbyclick(distance) {
+    if (locationupdated) {
       setpageOption('Nearby');
       setfilterdata(prev => {
         return {
@@ -113,19 +117,39 @@ const Discover = () => {
           applied: distance,
         };
       });
-      handlelocation();
-    } else {
-      await enableLocation();
-      setpageOption('Nearby');
-      setfilterdata(prev => {
-        return {
-          ...prev,
-          applied: distance,
-        };
-      });
-      handlelocation();
+      return;
     }
+    Geolocation.getCurrentPosition(
+      position => {
+        setpageOption('Nearby');
+        setfilterdata(prev => {
+          return {
+            ...prev,
+            applied: distance,
+          };
+        });
+        handlelocation();
+      },
+      error => {
+        Toast.show({
+          type: 'error',
+          text1:
+            error.code === 1 ? 'Location Permission Denied' : 'Location Off',
+          text2:
+            error.code === 1
+              ? 'Please enable location permission for this app'
+              : 'Please enable location in your device',
+          autoHide: true,
+          visibilityTime: 2000,
+        });
+      },
+      {enableHighAccuracy: false, timeout: 100, maximumAge: 1000},
+    );
   }
+
+  useEffect(() => {
+    handlelocation();
+  }, []);
 
   useEffect(() => {
     console.log('trying to connect to socket server in discover.js');
@@ -139,30 +163,52 @@ const Discover = () => {
     // };
   }, []);
 
+  // if (isDiscoverPending) {
+  //   // return <Loading />;
+  //   return <DiscoverSkeleton />;
+  // }
+
   async function handlelocation() {
     Geolocation.getCurrentPosition(
       position => {
         const {latitude, longitude} = position.coords;
 
-        locationUpdate({
-          data: {
-            latitude: latitude,
-            longitude: longitude,
+        locationUpdate(
+          {
+            data: {
+              latitude: latitude,
+              longitude: longitude,
+            },
           },
-        });
+          {
+            onSuccess: data => {
+              // console.log('location updated Success', data);
+              setlocationupdated(true);
+              // setlocationpermission({
+              //   code: 0,
+              // });
+            },
+          },
+        );
       },
-      error => {},
-      {enableHighAccuracy: false, timeout: 20000, maximumAge: 1000},
+      error => {
+        // console.log('-----------------------------------------', error);
+        // setlocationpermission({
+        //   code: error.code,
+        //   msg: error.code === 1 ? 'Location Permission Denied' : 'Location Off',
+        //   msg2:
+        //     error.code === 1
+        //       ? 'Please enable location permission for this app'
+        //       : 'Please enable location in your device',
+        // });
+      },
+      {enableHighAccuracy: true, timeout: 20000, maximumAge: 1000},
     );
   }
 
   const handleFilter = () => {
     setshowfilter(!showfilter);
   };
-
-  if (isDiscoverPending) {
-    return <DiscoverSkeleton />;
-  }
 
   return (
     <LinearGradient
@@ -205,11 +251,17 @@ const Discover = () => {
                   progressViewOffset={-500}
                 />
               }
-              data={discoverData?.data?.profiles}
+              data={
+                isDiscoverPending ? emptyData : discoverData?.data?.profiles
+              }
               keyExtractor={item => item.user.id.toString()}
-              renderItem={({item, index}) => (
-                <SingleUser item={item} index={index} />
-              )}
+              renderItem={({item, index}) =>
+                isDiscoverPending ? (
+                  <RectangleSkeleton />
+                ) : (
+                  <SingleUser item={item} index={index} />
+                )
+              }
               onEndReachedThreshold={0.1}
               showsVerticalScrollIndicator={false}
               numColumns={3}

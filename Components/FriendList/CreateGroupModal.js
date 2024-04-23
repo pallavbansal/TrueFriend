@@ -147,9 +147,10 @@ export default CreateGroupModal;
 const styles = StyleSheet.create({
   GroupModal: {
     flex: 1,
-    backgroundColor: colors.arrow.secondary,
-    marginTop: 100,
-    marginHorizontal: 10,
+    // backgroundColor: colors.arrow.secondary,
+    backgroundColor: colors.text.primary,
+    marginTop: 10,
+    marginHorizontal: 5,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
   },

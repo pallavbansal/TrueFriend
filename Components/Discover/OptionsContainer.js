@@ -32,9 +32,7 @@ const OptionsContainer = ({
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        onPress={() => handlenearbyclick(100)}
-        disabled={isLocationUpdatePending}>
+      <TouchableOpacity onPress={() => handlenearbyclick(100)}>
         <Text
           style={[
             styles.optiontext,

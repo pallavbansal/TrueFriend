@@ -7,51 +7,33 @@ import {useNavigation} from '@react-navigation/native';
 import WalletModal from './WalletModal';
 
 const options = [
+  // {
+  //   id: 1,
+  //   name: 'Account Details',
+  //   description: 'View account',
+  //   icon: 'account-circle',
+  // },
   {
     id: 1,
-    name: 'Account Details',
-    description: 'View account',
-    icon: 'account-circle',
-  },
-  {
-    id: 2,
     name: 'Payment History',
     description: 'See payment transactions',
     icon: 'money',
   },
   {
-    id: 3,
+    id: 2,
     name: 'Diamond History',
     description: 'See diamond transactions',
     icon: 'diamond',
   },
 
   // {
-  //   id: 2,
-  //   name: 'Withdrawal History',
-  //   description: 'See withdrawals',
-  //   icon: 'history',
-  // },
-  // {
-  //   id: 3,
-  //   name: 'Recharge History',
-  //   description: 'See recharges',
-  //   icon: 'payment',
-  // },
-  // {
   //   id: 4,
-  //   name: 'Call Transaction',
-  //   description: 'See call transactions',
-  //   icon: 'call',
+  //   name: 'Visit Profile',
+  //   description: 'Go to profile',
+  //   icon: 'person',
   // },
   {
-    id: 4,
-    name: 'Visit Profile',
-    description: 'Go to profile',
-    icon: 'person',
-  },
-  {
-    id: 5,
+    id: 3,
     name: 'Rate Us',
     description: 'Rate on Play Store',
     icon: 'star-rate',
@@ -67,19 +49,16 @@ const WalletOptionsList = () => {
 
   function handleOptionClick(id) {
     if (id === 1) {
-    } else if (id === 2) {
       setModalVisible({
         visible: true,
         type: 'payment',
       });
-    } else if (id === 3) {
+    } else if (id === 2) {
       setModalVisible({
         visible: true,
         type: 'diamond',
       });
-    } else if (id === 4) {
-      navigation.navigate('Profile');
-    } else if (id === 5) {
+    } else if (id === 3) {
       Linking.openURL(
         'https://play.google.com/store/apps/details?id=com.example.app',
       );
@@ -123,7 +102,7 @@ const WalletOptionsList = () => {
               </View>
               <View
                 style={{
-                  height: 1.2,
+                  height: 1,
                   width: '100%',
                   backgroundColor: colors.arrow.primary,
                   marginVertical: 5,

@@ -104,6 +104,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
+    borderColor: colors.arrow.secondary,
+    borderWidth: 1,
   },
   headingtext: {
     fontFamily: 'Lexend',
