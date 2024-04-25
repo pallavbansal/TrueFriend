@@ -1,14 +1,15 @@
 import BackgroundService from 'react-native-background-actions';
-import {getToken} from '../Utils/Streamapi';
 import Sound from 'react-native-sound';
 import socket from './Socket';
 import {notificationHandler} from './Notification';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 let ringtone;
+
 const connectToSocket = async () => {
   const myuserid = JSON.parse(await AsyncStorage.getItem('userid'));
   console.log('===myuserid in background services===:', myuserid);
+
   socket.on('connect', () => {
     console.log('Socket connection opened for background service');
     socket.emit('register', myuserid);
@@ -17,6 +18,11 @@ const connectToSocket = async () => {
   socket.on('call', data => {
     console.log('Received call in socket oncall in background :', data);
     handleCall(data);
+  });
+
+  socket.on('chat message', data => {
+    console.log('Received message in socket onmessage in background :', data);
+    handleMessage(data);
   });
 
   socket.on('error', error => {
@@ -28,21 +34,26 @@ const connectToSocket = async () => {
   });
 };
 
+const handleMessage = data => {
+  console.log('Received message in background :', data);
+  notificationHandler(
+    'Incoming Message',
+    `You have an incoming message from ${data.sender.name}`,
+    new Date(Date.now() + 15000),
+    data,
+  );
+};
+
 const handleCall = data => {
   console.log('Received call in background :', data);
   if (data.callaction === 'incoming') {
-    console.log('incoming :', data);
-    // ringtone.setVolume(1);
-    // ringtone.play();
-
+    // console.log('incoming :', data);
     notificationHandler(
       'Incoming Call',
       `You have an incoming call from ${data.caller.name}`,
       new Date(Date.now() + 15000),
+      data,
     );
-
-    // const timeoutId = setTimeout(() => handleReject(data), 15000);
-    // return () => clearTimeout(timeoutId);
   } else if (data.callaction === 'incoming-rejected') {
     console.log('incoming-rejected :', data);
   }
@@ -53,12 +64,12 @@ const handleCallAccept = async data => {
   socket.emit('call', {...data, callaction: 'accepted'});
 
   try {
-    const token = await getToken();
+    // const token = await getToken(); // Assuming you have a function to get the token
     const finalData = {
       routeName: 'Call',
       params: {
         name: data?.reciever?.name.trim(),
-        token: token,
+        // token: token,
         meetingId: data.meetingId,
         micEnabled: true,
         webcamEnabled: data.type === 'video' ? true : false,
@@ -66,6 +77,7 @@ const handleCallAccept = async data => {
         mode: 'CONFERENCE',
       },
     };
+    // Navigate to the call screen with finalData
   } catch (error) {
     console.error('Error navigating to call screen:', error);
   }
@@ -106,9 +118,7 @@ const socketInBackground = async () => {
 };
 
 const startBackgroundSocketService = async () => {
-  console.log('in start background');
   if (BackgroundService.isRunning()) {
-    console.log('Background socket service is already running');
     return;
   }
 

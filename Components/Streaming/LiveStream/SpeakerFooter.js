@@ -73,7 +73,7 @@ const SpeakerFooter = ({
     mpubsubRef.current = mpubsub;
   }, [mpubsub]);
 
-  console.log('showinputouter', participants);
+  // console.log('showinputouter', participants);
 
   if (showinputouter) {
     return (
@@ -92,6 +92,9 @@ const SpeakerFooter = ({
           placeholderTextColor="black"
           cursorColor={'black'}
           color={'black'}
+          onSubmitEditing={sendMessage}
+          blurOnSubmit={false}
+          returnKeyType="send"
         />
         <TouchableOpacity
           onPress={sendMessage}

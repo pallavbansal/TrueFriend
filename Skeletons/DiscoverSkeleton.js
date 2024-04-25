@@ -54,7 +54,7 @@ const DiscoverSkeleton = ({cardCount = 1}) => {
             ]}>
             <View style={styles.gradient} />
           </Animated.View>
-          <View style={styles.profileImage} />
+          {/* <View style={styles.profileImage} />
           <View style={styles.buttonContainer}>
             <View style={styles.button} />
             <View style={styles.button} />
@@ -67,7 +67,7 @@ const DiscoverSkeleton = ({cardCount = 1}) => {
                 <View style={styles.rectangle} />
               </View>
             ))}
-          </View>
+          </View> */}
         </Animated.View>
       ))}
     </View>
@@ -133,6 +133,6 @@ const styles = StyleSheet.create({
   gradient: {
     flex: 1,
     backgroundColor: skeletonComponentColor,
-    opacity: 0.2,
+    opacity: 0.4,
   },
 });

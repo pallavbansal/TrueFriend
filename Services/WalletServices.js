@@ -34,6 +34,23 @@ export async function buyPackages(token, data) {
   return response.json();
 }
 
+export async function requestPayout(token, data) {
+  console.log('==Wallet buyPackages==', data);
+  const response = await fetch(`${url}/profile/request-payout`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    console.log('Error buyPackages', response);
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
+}
+
 export async function getWallet(token, user_id) {
   console.log('==Wallet getWallet==');
   const response = await fetch(`${url}/profile/fetch-rate?user_id=${user_id}`, {

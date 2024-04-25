@@ -17,7 +17,6 @@ const SingleUser = ({item}) => {
 
   const handlewatchstream = async () => {
     const token = await getToken();
-    console.log('singleuser', id);
     const formdata = {
       user_id: id,
     };
@@ -35,6 +34,10 @@ const SingleUser = ({item}) => {
               navigation.navigate('Discover');
             }
             if (data.data.stream?.meeting_id) {
+              console.log(
+                'Stream Data-------------------------------',
+                data.data.stream,
+              );
               navigation.navigate('WatchStream', {
                 id: id,
                 token: token,

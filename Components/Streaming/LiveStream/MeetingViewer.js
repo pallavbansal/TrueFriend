@@ -46,42 +46,49 @@ export default function MeetingViewer({}) {
   const [bottomSheetView, setBottomSheetView] = useState('CHAT');
 
   useEffect(() => {
+    console.log('hlsState in start', hlsState);
     const _handleHLS = () => {
-      if (!hlsState || hlsState === 'HLS_STOPPED') {
-        startHls({
-          layout: {
-            type: 'SPOTLIGHT',
-            priority: 'PIN',
-          },
-          theme: 'DARK',
-          orientation: 'landscape',
-        });
-        // startRecording({
-        //   quality: 'low',
-        // });
-        if (meetingId) {
-          const formdata = {
-            meeting_id: meetingId,
-            type: 'STREAM',
-          };
-          console.log(meetingId, formdata);
-          mutate(
-            {
-              data: formdata,
-            },
-            {
-              onSuccess: data => {
-                console.log('start stream meetingid push success', data);
-              },
-            },
-          );
-        }
-      }
+      startHls({
+        layout: {
+          type: 'SPOTLIGHT',
+          priority: 'PIN',
+        },
+        theme: 'DARK',
+        orientation: 'landscape',
+      });
+      // startRecording({
+      //   quality: 'low',
+      // });
     };
-    _handleHLS();
+    if (!hlsState || hlsState === 'HLS_STOPPED') {
+      _handleHLS();
+    }
+  }, [hlsState]);
+
+  useEffect(() => {
+    if (hlsState === 'HLS_STARTED') {
+      if (meetingId) {
+        const formdata = {
+          meeting_id: meetingId,
+          type: 'STREAM',
+        };
+        console.log(meetingId, formdata);
+        mutate(
+          {
+            data: formdata,
+          },
+          {
+            onSuccess: data => {
+              console.log('start stream meetingid push success', data);
+            },
+          },
+        );
+      }
+    }
   }, [hlsState]);
 
   const _handleEnd = () => {
+    console.log('hlsState', hlsState);
     if (hlsState === 'HLS_PLAYABLE') {
       // stopRecording();
       stopHls();
@@ -104,7 +111,7 @@ export default function MeetingViewer({}) {
     // bottomSheetRef.current.show();
   };
 
-  console.log('participants', participants);
+  // console.log('participants', participants);
 
   return (
     <View
@@ -125,9 +132,10 @@ export default function MeetingViewer({}) {
         }}>
         <View style={{flexDirection: 'row'}}>
           {/* hlsState === 'HLS_PLAYABLE' */}
-          {(hlsState === 'HLS_STARTED' ||
-            hlsState === 'HLS_STOPPING' ||
-            hlsState === 'HLS_STARTING') && (
+          {hlsState === 'HLS_STARTED' ||
+          hlsState === 'HLS_STOPPING' ||
+          hlsState === 'HLS_STARTING' ||
+          hlsState === 'HLS_PLAYABLE' ? (
             <TouchableOpacity
               onPress={() => {
                 _handleEnd();
@@ -153,9 +161,7 @@ export default function MeetingViewer({}) {
                   : null}
               </Text>
             </TouchableOpacity>
-          )}
-
-          {/* </View></View> : null
+          ) : (
             <TouchableOpacity
               onPress={() => {
                 // _handleHLS();
@@ -170,9 +176,10 @@ export default function MeetingViewer({}) {
                   color: '#FF5D5D',
                   fontWeight: 'bold',
                 }}>
-                Go Live
+                Going Live
               </Text>
-            </TouchableOpacity> */}
+            </TouchableOpacity>
+          )}
         </View>
       </View>
       <View

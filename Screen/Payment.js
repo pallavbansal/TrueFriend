@@ -17,26 +17,57 @@ import GradientButton from '../Components/Common/GradientButton';
 import {useSelector} from 'react-redux';
 import Toast from 'react-native-toast-message';
 import {RAZORPAY_KEY, RAZORPAY_SECRET_KEY} from '@env';
+import {useRequestPayout} from '../Hooks/Query/WalletQuery';
 import {useGetWallet} from '../Hooks/Query/WalletQuery';
 
 const Payment = () => {
   const navigation = useNavigation();
   const myuserid = useSelector(state => state.Auth.userid);
   const {isPending, error, data, isError} = useGetWallet(myuserid);
+  const currentbalance = data?.data?.user?.balance || 0;
+  const {
+    mutate: paymutate,
+    reset: payreset,
+    isPending: payisPending,
+    error: payerror,
+  } = useRequestPayout();
   const [inputValue, setInputValue] = useState('');
 
   function handlepayclick() {
-    Toast.show({
-      type: 'error',
-      position: 'top',
-      text1: 'Payment Failed',
-      text2: 'Your payment is failed',
-      visibilityTime: 2000,
-    });
-    navigation.reset({
-      index: 0,
-      routes: [{name: 'Discover'}],
-    });
+    if (
+      inputValue === '' ||
+      parseInt(inputValue.trim()) > currentbalance ||
+      parseInt(inputValue.trim()) < 100
+    ) {
+      return;
+    }
+
+    const formdata = {
+      diamonds: inputValue,
+    };
+
+    paymutate(
+      {data: formdata},
+      {
+        onSuccess: data => {
+          console.log('on success payout request', data);
+        },
+        onError: error => {
+          console.log('on error payout request', error);
+          Toast.show({
+            type: 'error',
+            position: 'top',
+            text1: 'Payment Failed',
+            text2: 'Your payment is failed',
+            visibilityTime: 2000,
+          });
+          navigation.reset({
+            index: 0,
+            routes: [{name: 'Discover'}],
+          });
+        },
+      },
+    );
   }
 
   return (
