@@ -5,6 +5,7 @@ import {
   FlatList,
   TouchableOpacity,
   RefreshControl,
+  Modal,
 } from 'react-native';
 import React, {useState, useRef, useEffect, useCallback} from 'react';
 import GradientText from '../Components/Common/GradientText';
@@ -18,7 +19,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useFetchSocialFeedPosts} from '../Hooks/Query/FeedQuery';
 import Loading from './Loading';
 import DetailFeed from '../Components/SocialFeed/DetailFeed';
-// import {useQueryClient} from '@tanstack/react-query';
+import DetailMedia from '../Components/Profile/DetailMedia';
 import {useRefreshData} from '../Hooks/Custom/useRefreshData';
 import MyLoadingIndicator from '../Components/Common/MyLoadingIndicator';
 import SocialFeedSkeleton from '../Skeletons/SocialFeedSkeleton';
@@ -34,7 +35,9 @@ const SocialFeed = () => {
   const [showdetailfeed, setShowDetailFeed] = useState({
     show: false,
     data: {},
+    otherdata: {},
   });
+
   const {
     data,
     error,
@@ -176,9 +179,32 @@ const SocialFeed = () => {
         <BottomBar />
       </View>
 
-      {showdetailfeed.show && (
+      {/* {showdetailfeed.show && (
         <DetailFeed data={showdetailfeed.data} close={closeDetailFeed} />
-      )}
+      )} */}
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={showdetailfeed.show}
+        onRequestClose={() => {
+          setShowDetailFeed({show: false, data: {}, otherdata: {}});
+        }}>
+        <GradientScreen>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <DetailMedia
+              item={showdetailfeed.data}
+              otherdata={showdetailfeed.otherdata}
+              ismyid={false}
+              handlepostdelete={() => {}}
+            />
+          </View>
+        </GradientScreen>
+      </Modal>
     </GradientScreen>
   );
 };

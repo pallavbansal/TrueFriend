@@ -18,6 +18,7 @@ import MyLoadingIndicator from '../Components/Common/MyLoadingIndicator';
 import {useRefreshData} from '../Hooks/Custom/useRefreshData';
 import Toast from 'react-native-toast-message';
 import DiscoverSkeleton from '../Skeletons/DiscoverSkeleton';
+import RectangleSkeleton from '../SkeletonSmall/RectangleSkeleton';
 import OptionsContainer from '../Components/Discover/OptionsContainer';
 import useLocationStatus from '../Hooks/Custom/useLocationStatus';
 
@@ -160,10 +161,10 @@ const Discover = () => {
     setshowfilter(!showfilter);
   };
 
-  if (isDiscoverPending) {
-    return <DiscoverSkeleton />;
-  }
-
+  // if (isDiscoverPending) {
+  //   return <DiscoverSkeleton />;
+  // }
+  // return <DiscoverSkeleton />;
   return (
     <LinearGradient
       start={{x: 0, y: 0}}
@@ -190,8 +191,9 @@ const Discover = () => {
             style={{
               marginBottom: 120,
               alignItems:
-                discoverData?.data?.profiles?.length > 2 ? 'center' : 'stretch',
-
+                isDiscoverPending || discoverData?.data?.profiles?.length > 2
+                  ? 'center'
+                  : 'stretch',
               height: '100%',
               paddingBottom: 70,
             }}>
@@ -205,11 +207,28 @@ const Discover = () => {
                   progressViewOffset={-500}
                 />
               }
-              data={discoverData?.data?.profiles}
+              // discoverData?.data?.profiles
+              data={
+                isDiscoverPending ? emptyData : discoverData?.data?.profiles
+              }
               keyExtractor={item => item.user.id.toString()}
-              renderItem={({item, index}) => (
-                <SingleUser item={item} index={index} />
-              )}
+              renderItem={({item, index}) =>
+                isDiscoverPending ? (
+                  <RectangleSkeleton
+                    containerStyle={styles.containerstyle}
+                    skeletonCardStyle={styles.skeletonCardstyle}
+                    skeletonBackgroundColor="rgba(0,0,0,0.7)"
+                    skeletonComponentColor="rgba(0,0,0,0.3)"
+                  />
+                ) : (
+                  <SingleUser
+                    item={item}
+                    index={index}
+                    myuserid={myuserid}
+                    socket={socket}
+                  />
+                )
+              }
               onEndReachedThreshold={0.1}
               showsVerticalScrollIndicator={false}
               numColumns={3}
@@ -229,6 +248,25 @@ const Discover = () => {
 export default Discover;
 
 const styles = StyleSheet.create({
+  containerstyle: {
+    height: 134,
+    width: 109,
+    margin: 3,
+    padding: 2,
+    marginBottom: 10,
+    borderRadius: 12,
+    alignItems: 'center',
+    backgroundColor: 'red',
+  },
+  skeletonCardstyle: {
+    width: '100%',
+    flex: 1,
+    borderRadius: 10,
+    padding: 5,
+    elevation: 2,
+    justifyContent: 'center',
+  },
+
   screen: {
     flex: 1,
   },

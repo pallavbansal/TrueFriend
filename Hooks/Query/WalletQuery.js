@@ -4,6 +4,7 @@ import {
   getWallet,
   getDiamondTransaction,
   getPaymentTransactions,
+  requestPayout,
 } from '../../Services/WalletServices';
 import {useMutation, useQuery, useInfiniteQuery} from '@tanstack/react-query';
 import {useSelector} from 'react-redux';
@@ -21,6 +22,14 @@ export const useBuyPackage = () => {
   const token = useSelector(state => state.Auth.token);
   const {mutate, reset, isPending, error} = useMutation({
     mutationFn: ({data}) => buyPackages(token, data),
+  });
+  return {mutate, reset, isPending, error};
+};
+
+export const useRequestPayout = () => {
+  const token = useSelector(state => state.Auth.token);
+  const {mutate, reset, isPending, error} = useMutation({
+    mutationFn: ({data}) => requestPayout(token, data),
   });
   return {mutate, reset, isPending, error};
 };

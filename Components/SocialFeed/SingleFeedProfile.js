@@ -20,6 +20,7 @@ import {useLikePost, useDislikePost} from '../../Hooks/Query/FeedQuery';
 import CommentModal from './CommentModal';
 import {useNavigation} from '@react-navigation/native';
 import ProfileNavigator from '../Common/ProfileNavigator';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 import {Dimensions} from 'react-native';
 const windowWidth = Dimensions.get('window').width;
@@ -34,8 +35,6 @@ const SingleFeedProfile = ({
   viewableItems,
   setShowDetailFeed,
 }) => {
-  // console.log(viewableItems, 'viewableItems');
-  // console.log('item', item);
   const navigation = useNavigation();
   const {id, caption} = item;
   const {mutate: likePost} = useLikePost();
@@ -56,6 +55,18 @@ const SingleFeedProfile = ({
   };
   const handleLoad = () => {
     setIsLoading(false);
+  };
+
+  const handleDetaildata = data => {
+    const otherdata = {
+      profile_picture: data.user.profile_picture,
+      name: data.user.name,
+    };
+    setShowDetailFeed({
+      show: true,
+      data: data,
+      otherdata: otherdata,
+    });
   };
 
   const handlelike = () => {
@@ -212,20 +223,15 @@ const SingleFeedProfile = ({
                       }}
                       resizeMode="contain"
                     />
-                    {/* <TouchableOpacity
+                    <TouchableOpacity
                       style={styles.expandbutton}
-                      onPress={() =>
-                        setShowDetailFeed({
-                          show: true,
-                          data: item,
-                        })
-                      }>
+                      onPress={() => handleDetaildata(item)}>
                       <FontAwesome5
                         name={'expand'}
                         size={18}
                         color={colors.profile.edit}
                       />
-                    </TouchableOpacity> */}
+                    </TouchableOpacity>
                   </View>
                 ) : (
                   <Pressable onPress={handlePlayPausein}>
@@ -289,20 +295,15 @@ const SingleFeedProfile = ({
                       />
                     </TouchableOpacity>
 
-                    {/* <TouchableOpacity
+                    <TouchableOpacity
                       style={styles.expandbutton}
-                      onPress={() =>
-                        setShowDetailFeed({
-                          show: true,
-                          data: item,
-                        })
-                      }>
+                      onPress={() => handleDetaildata(item)}>
                       <FontAwesome5
                         name={'expand'}
                         size={18}
                         color={colors.profile.edit}
                       />
-                    </TouchableOpacity> */}
+                    </TouchableOpacity>
                   </Pressable>
                 )}
               </View>

@@ -72,7 +72,7 @@ const SpeakerFooter = ({
             end={{x: 1, y: 1}}
             colors={colors.gradients.callinnergradient}
             style={styles.calliconcontainer}>
-            <Ionicons name="call" size={24} color="white" />
+            <Ionicons name="home" size={24} color="white" />
           </LinearGradient>
         </LinearGradient>
       </TouchableOpacity>

@@ -164,7 +164,7 @@ const OfflineViewerContainer = ({streamotherdata, downstreamUrl}) => {
               end={{x: 1, y: 1}}
               colors={colors.gradients.callinnergradient}
               style={styles.calliconcontainer}>
-              <Ionicons name="call" size={28} color="white" />
+              <Ionicons name="home" size={28} color="white" />
             </LinearGradient>
           </LinearGradient>
         </TouchableOpacity>

@@ -1,13 +1,23 @@
 import React, {useRef, useEffect} from 'react';
 import {View, StyleSheet, Animated, Easing} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import {colors} from '../Styles/ColorData';
+// const skeletonBackgroundColor = '#f5f5f5';
+// const skeletonComponentColor = '#e0e0e0';
+// const skeletonBackgroundColor = 'rgba(0,0,0,0.7)';
+// const skeletonComponentColor = 'rgba(0,0,0,0.3)';
 
-const skeletonBackgroundColor = '#f5f5f5';
-const shimmerColor = '#f5f5f5';
-
-const DiscoverSkeleton = ({cardCount = 1}) => {
+const RectangleSkeleton = ({
+  cardCount = 1,
+  containerStyle,
+  skeletonCardStyle,
+  skeletonBackgroundColor = 'rgba(0,0,0,0.7)',
+  skeletonComponentColor = 'rgba(0,0,0,0.3)',
+}) => {
   const containerWidth = 400;
+
   const animatedValues = useRef(
-    Array.from({length: cardCount}, () => new Animated.Value(0)),
+    Array.from({length: cardCount}, (_, index) => new Animated.Value(0)),
   ).current;
 
   const startShimmerAnimation = index => {
@@ -15,7 +25,7 @@ const DiscoverSkeleton = ({cardCount = 1}) => {
     Animated.loop(
       Animated.timing(animatedValues[index], {
         toValue: 1,
-        duration: 1200,
+        duration: 1000,
         easing: Easing.linear,
         useNativeDriver: true,
       }),
@@ -27,12 +37,15 @@ const DiscoverSkeleton = ({cardCount = 1}) => {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={colors.gradients.buttongradient}
+      style={[styles.container, containerStyle]}>
       {animatedValues.map((animatedValue, index) => (
         <Animated.View
           key={index}
           style={[
             styles.skeletonCard,
+            skeletonCardStyle,
             {
               backgroundColor: skeletonBackgroundColor,
               overflow: 'hidden',
@@ -52,45 +65,41 @@ const DiscoverSkeleton = ({cardCount = 1}) => {
                 ],
               },
             ]}>
-            <View style={styles.gradient} />
+            <View
+              style={[
+                styles.gradient,
+                {
+                  backgroundColor: skeletonComponentColor,
+                },
+              ]}
+            />
           </Animated.View>
-          <Animated.View
-            style={[
-              styles.profileImage,
-              {
-                opacity: animatedValue.interpolate({
-                  inputRange: [0, 0.5, 1],
-                  outputRange: [0.5, 1, 0.5],
-                }),
-              },
-            ]}
-          />
         </Animated.View>
       ))}
-    </View>
+    </LinearGradient>
   );
 };
 
-export default DiscoverSkeleton;
+export default RectangleSkeleton;
 
 const styles = StyleSheet.create({
   container: {
     height: 134,
     width: 109,
     margin: 3,
+    padding: 2,
+    marginBottom: 10,
+    borderRadius: 12,
+    alignItems: 'center',
+    backgroundColor: 'red',
   },
   skeletonCard: {
     width: '100%',
-    height: '100%',
+    flex: 1,
     borderRadius: 10,
     padding: 5,
     elevation: 2,
-  },
-  profileImage: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0, 0, 0, 0.25)',
-    borderRadius: 10,
+    justifyContent: 'center',
   },
   gradientContainer: {
     position: 'absolute',
@@ -101,7 +110,7 @@ const styles = StyleSheet.create({
   },
   gradient: {
     flex: 1,
-    backgroundColor: shimmerColor,
-    opacity: 1,
+    // backgroundColor: skeletonComponentColor,
+    opacity: 0.4,
   },
 });

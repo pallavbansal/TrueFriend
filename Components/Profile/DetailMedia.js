@@ -215,7 +215,7 @@ const DetailMedia = ({item, otherdata, ismyid, handlepostdelete}) => {
         </View>
       )}
 
-      <View style={styles.actioncontainer}>
+      {/* <View style={styles.actioncontainer}>
         <View>
           <AntDesign
             name={item.reaction === 'like' ? 'like1' : 'like2'}
@@ -230,7 +230,7 @@ const DetailMedia = ({item, otherdata, ismyid, handlepostdelete}) => {
             color={colors.socialfeed.actionicons}
           />
         </View>
-      </View>
+      </View> */}
       <View style={styles.statscontainer}>
         <Text style={styles.headingtext4}>{item.like_count} Likes</Text>
         <Text style={styles.headingtext4}>{item.dislike_count} Dislikes</Text>

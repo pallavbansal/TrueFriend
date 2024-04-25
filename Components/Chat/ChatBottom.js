@@ -278,6 +278,9 @@ const ChatBottom = ({
           onChangeText={handleinput}
           // onChange={handleinput}
           value={typetext}
+          onSubmitEditing={sendTextMessage}
+          blurOnSubmit={false}
+          returnKeyType="send"
           style={{
             color: colors.login.headingtext2,
             // backgroundColor: 'black',
