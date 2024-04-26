@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Pressable,
   ScrollView,
+  Modal,
 } from 'react-native';
 import React, {useState} from 'react';
 import {colors} from '../../Styles/ColorData';
@@ -16,6 +17,7 @@ import {ActivityIndicator} from 'react-native';
 import {PinchGestureHandler, State} from 'react-native-gesture-handler';
 import {Dimensions} from 'react-native';
 const windowWidth = Dimensions.get('window').width;
+import ImageViewer from 'react-native-image-zoom-viewer';
 
 const DetailMedia = ({item, otherdata, ismyid, handlepostdelete}) => {
   const {id, caption} = item;
@@ -26,6 +28,7 @@ const DetailMedia = ({item, otherdata, ismyid, handlepostdelete}) => {
   const [translateX, setTranslateX] = useState(0);
   const [translateY, setTranslateY] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [imageViewerVisible, setImageViewerVisible] = useState(false);
   const handleBuffer = ({isBuffering}) => {
     setIsLoading(isBuffering);
   };
@@ -61,6 +64,10 @@ const DetailMedia = ({item, otherdata, ismyid, handlepostdelete}) => {
     setPlaymediaid('');
     setMutemediaid('');
   };
+
+  const images = item.post_media
+    .filter(media => media.media_type === '1')
+    .map(media => ({url: media.media_path}));
 
   return (
     <View style={styles.container}>
@@ -102,83 +109,89 @@ const DetailMedia = ({item, otherdata, ismyid, handlepostdelete}) => {
         scrollEventThrottle={16}>
         {item.post_media.map((media, index) => {
           return (
-            <PinchGestureHandler
-              key={index}
-              onGestureEvent={onPinchGestureEvent}
-              onHandlerStateChange={onPinchHandlerStateChange}>
-              <View style={[styles.profilecontainer]}>
-                {media.media_type == '1' ? (
-                  <View>
-                    <Image
-                      source={{uri: media.media_path}}
+            // <PinchGestureHandler
+            //   key={index}
+            //   onGestureEvent={onPinchGestureEvent}
+            //   onHandlerStateChange={onPinchHandlerStateChange}>
+
+            <View style={[styles.profilecontainer]} key={index}>
+              {media.media_type == '1' ? (
+                <Pressable
+                  onPress={() => {
+                    // Open the image in the ImageViewer
+                    setImageViewerVisible(true);
+                  }}>
+                  <Image
+                    source={{uri: media.media_path}}
+                    style={{
+                      width: '100%',
+                      aspectRatio: 1,
+                      transform: [{scale}, {translateX}, {translateY}],
+                    }}
+                    resizeMode="contain"
+                  />
+                </Pressable>
+              ) : (
+                <Pressable onPress={handlePlayPausein}>
+                  <Video
+                    source={{uri: media.media_path}}
+                    style={{
+                      aspectRatio: 16 / 9,
+                      width: '100%',
+                      transform: [{scale}],
+                    }}
+                    resizeMode="contain"
+                    muted={media.id === mutemediaid ? false : true}
+                    paused={media.id === playmediaid ? false : true}
+                    posterResizeMode="cover"
+                    poster="https://www.w3schools.com/w3images/lights.jpg"
+                    repeat={true}
+                    onBuffer={handleBuffer}
+                    onLoadStart={handleLoadStart}
+                    onLoad={handleLoad}
+                  />
+
+                  {isLoading && (
+                    <ActivityIndicator
+                      size="large"
+                      color={colors.profile.edit}
                       style={{
-                        width: '100%',
-                        aspectRatio: 1,
-                        transform: [{scale}, {translateX}, {translateY}],
+                        position: 'absolute',
+                        top: '40%',
+                        left: '45%',
+                        backgroundColor: 'white',
+                        padding: 2,
+                        borderRadius: 20,
                       }}
-                      resizeMode="contain"
                     />
-                  </View>
-                ) : (
-                  <Pressable onPress={handlePlayPausein}>
-                    <Video
-                      source={{uri: media.media_path}}
-                      style={{
-                        aspectRatio: 16 / 9,
-                        width: '100%',
-                        transform: [{scale}],
-                      }}
-                      resizeMode="contain"
-                      muted={media.id === mutemediaid ? false : true}
-                      paused={media.id === playmediaid ? false : true}
-                      posterResizeMode="cover"
-                      poster="https://www.w3schools.com/w3images/lights.jpg"
-                      repeat={true}
-                      onBuffer={handleBuffer}
-                      onLoadStart={handleLoadStart}
-                      onLoad={handleLoad}
+                  )}
+
+                  <TouchableOpacity
+                    onPress={() => handlePlayPausein(media.id)}
+                    style={styles.pausebutton}>
+                    <MaterialIcons
+                      name={media.id === playmediaid ? 'pause' : 'play-arrow'}
+                      size={28}
+                      color={colors.profile.edit}
                     />
+                  </TouchableOpacity>
 
-                    {isLoading && (
-                      <ActivityIndicator
-                        size="large"
-                        color={colors.profile.edit}
-                        style={{
-                          position: 'absolute',
-                          top: '40%',
-                          left: '45%',
-                          backgroundColor: 'white',
-                          padding: 2,
-                          borderRadius: 20,
-                        }}
-                      />
-                    )}
+                  <TouchableOpacity
+                    onPress={() => handleMuteUnmute(media.id)}
+                    style={styles.mutebutton}>
+                    <MaterialIcons
+                      name={
+                        media.id === mutemediaid ? 'volume-up' : 'volume-off'
+                      }
+                      size={28}
+                      color={colors.profile.edit}
+                    />
+                  </TouchableOpacity>
+                </Pressable>
+              )}
+            </View>
 
-                    <TouchableOpacity
-                      onPress={() => handlePlayPausein(media.id)}
-                      style={styles.pausebutton}>
-                      <MaterialIcons
-                        name={media.id === playmediaid ? 'pause' : 'play-arrow'}
-                        size={28}
-                        color={colors.profile.edit}
-                      />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      onPress={() => handleMuteUnmute(media.id)}
-                      style={styles.mutebutton}>
-                      <MaterialIcons
-                        name={
-                          media.id === mutemediaid ? 'volume-up' : 'volume-off'
-                        }
-                        size={28}
-                        color={colors.profile.edit}
-                      />
-                    </TouchableOpacity>
-                  </Pressable>
-                )}
-              </View>
-            </PinchGestureHandler>
+            // </PinchGestureHandler>
           );
         })}
       </ScrollView>
@@ -235,6 +248,18 @@ const DetailMedia = ({item, otherdata, ismyid, handlepostdelete}) => {
         <Text style={styles.headingtext4}>{item.like_count} Likes</Text>
         <Text style={styles.headingtext4}>{item.dislike_count} Dislikes</Text>
       </View>
+
+      <Modal
+        visible={imageViewerVisible}
+        transparent={true}
+        onRequestClose={() => setImageViewerVisible(false)}>
+        <ImageViewer
+          imageUrls={images}
+          index={currentHorIndex}
+          enableSwipeDown={true}
+          onCancel={() => setImageViewerVisible(false)}
+        />
+      </Modal>
     </View>
   );
 };

@@ -21,6 +21,7 @@ import CommentModal from './CommentModal';
 import {useNavigation} from '@react-navigation/native';
 import ProfileNavigator from '../Common/ProfileNavigator';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import ImageViewer from 'react-native-image-zoom-viewer';
 
 import {Dimensions} from 'react-native';
 const windowWidth = Dimensions.get('window').width;
@@ -36,6 +37,7 @@ const SingleFeedProfile = ({
   setShowDetailFeed,
 }) => {
   const navigation = useNavigation();
+  const [imageViewerVisible, setImageViewerVisible] = useState(false);
   const {id, caption} = item;
   const {mutate: likePost} = useLikePost();
   const {mutate: dislikePost} = useDislikePost();
@@ -173,6 +175,10 @@ const SingleFeedProfile = ({
     setCurrentHorIndex(currentIndex);
   };
 
+  const images = item.post_media
+    .filter(media => media.media_type == '1')
+    .map(media => ({url: media.media_path}));
+
   return (
     <View style={styles.container}>
       <View style={styles.topcontainer}>
@@ -213,7 +219,12 @@ const SingleFeedProfile = ({
               onHandlerStateChange={onPinchHandlerStateChange}>
               <View style={[styles.profilecontainer]}>
                 {media.media_type == '1' ? (
-                  <View>
+                  <Pressable
+                    Pressable
+                    onPress={() => {
+                      // Open the image in the ImageViewer
+                      setImageViewerVisible(true);
+                    }}>
                     <Image
                       source={{uri: media.media_path}}
                       style={{
@@ -223,7 +234,7 @@ const SingleFeedProfile = ({
                       }}
                       resizeMode="contain"
                     />
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                       style={styles.expandbutton}
                       onPress={() => handleDetaildata(item)}>
                       <FontAwesome5
@@ -231,8 +242,8 @@ const SingleFeedProfile = ({
                         size={18}
                         color={colors.profile.edit}
                       />
-                    </TouchableOpacity>
-                  </View>
+                    </TouchableOpacity> */}
+                  </Pressable>
                 ) : (
                   <Pressable onPress={handlePlayPausein}>
                     <Video
@@ -295,7 +306,7 @@ const SingleFeedProfile = ({
                       />
                     </TouchableOpacity>
 
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                       style={styles.expandbutton}
                       onPress={() => handleDetaildata(item)}>
                       <FontAwesome5
@@ -303,7 +314,7 @@ const SingleFeedProfile = ({
                         size={18}
                         color={colors.profile.edit}
                       />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                   </Pressable>
                 )}
               </View>
@@ -379,6 +390,17 @@ const SingleFeedProfile = ({
           setShowCommentModal(false);
         }}>
         <CommentModal feed={item} />
+      </Modal>
+      <Modal
+        visible={imageViewerVisible}
+        transparent={true}
+        onRequestClose={() => setImageViewerVisible(false)}>
+        <ImageViewer
+          imageUrls={images}
+          index={currentHorIndex}
+          enableSwipeDown={true}
+          onCancel={() => setImageViewerVisible(false)}
+        />
       </Modal>
     </View>
   );
