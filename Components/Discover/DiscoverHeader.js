@@ -89,8 +89,8 @@ const DiscoverHeader = () => {
               skeletonCardStyle={{
                 borderRadius: 10,
               }}
-              skeletonBackgroundColor="rgba(0,0,0,0.7)"
-              skeletonComponentColor="rgba(0,0,0,0.3)"
+              // skeletonBackgroundColor="rgba(0,0,0,0.7)"
+              // skeletonComponentColor="rgba(0,0,0,0.3)"
             />
           )}
         </View>

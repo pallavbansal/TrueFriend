@@ -22,6 +22,16 @@ const LiveStream = ({route}) => {
   const name = route.params.name ? route.params.name : 'Test User';
   const mode = route.params.mode ? route.params.mode : 'CONFERENCE';
 
+  console.log(
+    'LiveStream----------------------------------------------',
+    token,
+    meetingId,
+    micEnabled,
+    webcamEnabled,
+    name,
+    mode,
+  );
+
   return (
     <LinearGradient
       start={{x: 0, y: 0}}

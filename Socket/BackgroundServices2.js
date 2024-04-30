@@ -1,95 +1,99 @@
 import BackgroundService from 'react-native-background-actions';
-import {Linking, Notifications} from 'react-native';
+import PushNotification, {Importance} from 'react-native-push-notification';
 import socket from './Socket';
 
-// Import your socket library and initialize it
-// import Socket from 'your-socket-library';
-// const socket = new Socket('https://your-socket-server.com');
+PushNotification.createChannel(
+  {
+    channelId: '12345',
+    channelName: 'Wooing Channel',
+    channelDescription: 'A brief description of the channel',
+    playSound: true,
+    soundName: 'default',
+    importance: Importance.HIGH,
+  },
+  created =>
+    console.log(
+      `createChannel returned in background---------------- '${created}'`,
+    ),
+);
 
-// Register event handlers for socket events
-// socket.on('call', handleCallEvent);
-// socket.on('message', handleMessageEvent);
+const sleep = time => new Promise(resolve => setTimeout(() => resolve(), time));
 
-// Function to handle call event
-const handleCallEvent = async data => {
-  console.log('handleCallEvent', data);
-  // const {name, image, type} = data;
+const veryIntensiveTask = async taskDataArguments => {
+  const {delay} = taskDataArguments;
 
-  // Show notification for incoming call
-  const callNotification = new Notifications.Notification()
-    .setTitle(`Incoming  Call`)
-    .setBody(`From: Vivek`)
-    .setSound('default')
-    .setData({type: 'call', data});
+  // Connect to the socket
+  socket.connect();
 
-  // Display the notification
-  Notifications.showNotification(callNotification);
-};
+  socket.on('connect', () => {
+    console.log('Socket connected');
+  });
 
-// Function to handle message event
-const handleMessageEvent = async data => {
-  // const {name, message} = data;
-
-  // Show notification for new message
-  const messageNotification = new Notifications.Notification()
-    .setTitle('New Message')
-    .setBody(`From: Vivek`)
-    .setSound('default')
-    .setData({type: 'message', data});
-
-  // Display the notification
-  Notifications.showNotification(messageNotification);
-};
-
-// Background task to keep the socket connection alive
-const backgroundTask = async () => {
-  // Connect to the socket server
-  // await socket.connect();
-
-  // Keep the background task running indefinitely
-  while (BackgroundService.isRunning()) {
-    // Add any other background logic here
-    // ...
-    console.log('Background service is running...');
-    socket.on('call', handleCallEvent);
-    socket.on('message', handleMessageEvent);
-  }
-};
-
-// Start the background service
-export const startBackgroundSocketService = async () => {
-  console.log('Starting background service...');
-  try {
-    await BackgroundService.start(backgroundTask, {
-      taskName: 'SocketService',
-      taskTitle: 'Socket Service',
-      taskDesc: 'Keeping socket connection alive',
-      linkingURI: 'yourapp://open', // Deep linking URI
-      taskIcon: {
-        name: 'ic_launcher',
-        type: 'mipmap',
-      },
+  socket.on('chat message', data => {
+    console.log(
+      'Received message in background :====================================',
+      data,
+    );
+    PushNotification.localNotification({
+      channelId: '12345',
+      title: 'New Message',
+      message: 'New message from ' + data.sender.name,
     });
-  } catch (error) {
-    console.error('Error starting background service:', error);
-  }
+  });
+
+  socket.on('call', data => {
+    console.log(
+      'Received call in background :========================================',
+      data,
+    );
+    if (data.callaction == 'incoming') {
+      PushNotification.localNotification({
+        channelId: '12345',
+        title: 'Incoming Call',
+        message: 'Incoming call from ' + data.caller.name,
+        // actions: ['Answer', 'Decline'],
+      });
+    }
+  });
+
+  await new Promise(async resolve => {
+    for (let i = 0; BackgroundService.isRunning(); i++) {
+      console.log(i);
+      await sleep(delay);
+    }
+  });
+
+  socket.disconnect();
 };
 
-// Stop the background service
-export const stopBackgroundSocketService = async () => {
-  console.log('Stopping background service...');
-  try {
-    await BackgroundService.stop();
-  } catch (error) {
-    console.error('Error stopping background service:', error);
+const startBackgroundTask = async () => {
+  if (BackgroundService.isRunning()) {
+    console.log('Background service is already running');
+    return;
   }
+
+  const options = {
+    taskName: 'Example',
+    taskTitle: 'ExampleTask title',
+    taskDesc: 'ExampleTask description',
+    taskIcon: {
+      name: 'ic_launcher',
+      type: 'mipmap',
+    },
+    color: '#ff00ff',
+    parameters: {
+      delay: 1000,
+    },
+  };
+
+  await BackgroundService.start(veryIntensiveTask, options);
+  await BackgroundService.updateNotification({
+    taskDesc: 'New ExampleTask description',
+  });
 };
 
-// Handle incoming deep links
-Linking.addEventListener('url', event => {
-  const {url} = event;
-  if (url.startsWith('yourapp://open')) {
-    // Open the app when the notification is clicked
-    // You can navigate to a specific screen or perform any other action here
-  }
-});
+const stopBackgroundTask = async () => {
+  await BackgroundService.stop();
+};
+
+export {startBackgroundTask, stopBackgroundTask};

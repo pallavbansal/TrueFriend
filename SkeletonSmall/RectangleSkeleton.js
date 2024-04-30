@@ -11,8 +11,8 @@ const RectangleSkeleton = ({
   cardCount = 1,
   containerStyle,
   skeletonCardStyle,
-  skeletonBackgroundColor = 'rgba(0,0,0,0.7)',
-  skeletonComponentColor = 'rgba(0,0,0,0.3)',
+  skeletonBackgroundColor = '#f5f5f5',
+  skeletonComponentColor = '#e0e0e0',
 }) => {
   const containerWidth = 400;
 

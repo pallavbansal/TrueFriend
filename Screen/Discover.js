@@ -217,8 +217,8 @@ const Discover = () => {
                   <RectangleSkeleton
                     containerStyle={styles.containerstyle}
                     skeletonCardStyle={styles.skeletonCardstyle}
-                    skeletonBackgroundColor="rgba(0,0,0,0.7)"
-                    skeletonComponentColor="rgba(0,0,0,0.3)"
+                    // skeletonBackgroundColor="rgba(0,0,0,0.7)"
+                    // skeletonComponentColor="rgba(0,0,0,0.3)"j
                   />
                 ) : (
                   <SingleUser
