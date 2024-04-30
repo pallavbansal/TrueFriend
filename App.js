@@ -39,24 +39,38 @@ import Protect from './Auth/Protect';
 import socket from './Socket/Socket';
 import CallHandler from './Components/Common/CallHandler';
 import {
-  startBackgroundSocketService,
-  stopBackgroundSocketService,
-} from './Socket/BackgroundServices.js';
-import {createChannel, cancelNotifications} from './Socket/Notification.js';
+  startBackgroundTask,
+  stopBackgroundTask,
+} from './Socket/BackgroundServices2';
+// import {
+//   startBackgroundSocketService,
+//   stopBackgroundSocketService,
+// } from './Socket/BackgroundServices.js';
+// import {createChannel, cancelNotifications} from './Socket/Notification.js';
 
 const MainNavigator = () => {
   const Stack = createStackNavigator();
 
-  useEffect(() => {
-    // Create the notification channel
-    createChannel();
+  // useEffect(() => {
+  //   // Create the notification channel
+  //   createChannel();
 
-    // Start the background service
-    startBackgroundSocketService();
+  //   // Start the background service
+  //   startBackgroundSocketService();
+
+  //   return () => {
+  //     stopBackgroundSocketService();
+  //     cancelNotifications();
+  //   };
+  // }, []);
+
+  useEffect(() => {
+    // stopBackgroundTask();
+
+    startBackgroundTask();
 
     return () => {
-      stopBackgroundSocketService();
-      cancelNotifications();
+      // stopBackgroundTask();
     };
   }, []);
 
@@ -214,9 +228,9 @@ function App() {
     // };
   }, []);
 
-  useEffect(() => {
-    createChannel();
-  }, []);
+  // useEffect(() => {
+  //   createChannel();
+  // }, []);
 
   return (
     <>

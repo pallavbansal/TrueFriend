@@ -33,11 +33,16 @@ export default function MeetingViewer({}) {
   } = useMeeting({
     onError: data => {
       const {code, message} = data;
-      // Toast.show({
-      //   type: 'error',
-      //   text1: `Error: ${code}`,
-      //   text2: message,
-      // });
+      console.log(
+        '--------------------------------error-----------------------',
+        code,
+        message,
+      );
+      Toast.show({
+        type: 'error',
+        text1: `Error: ${code}`,
+        text2: message,
+      });
     },
   });
 
@@ -163,9 +168,7 @@ export default function MeetingViewer({}) {
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
-              onPress={() => {
-                // _handleHLS();
-              }}
+              onPress={() => {}}
               activeOpacity={1}
               style={{
                 padding: 4,
