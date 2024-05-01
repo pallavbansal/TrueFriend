@@ -47,6 +47,7 @@ export const useFetchChatting = receiver_id => {
       const page = match ? Number(match[1]) : undefined;
       return page;
     },
+    retry: 1,
   });
 
   return {

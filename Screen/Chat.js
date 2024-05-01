@@ -9,6 +9,7 @@ import ChatBottom from '../Components/Chat/ChatBottom';
 import {useSelector} from 'react-redux';
 import {useFetchChatting} from '../Hooks/Query/ChatQuery';
 import Loading from './Loading';
+import FriendsListSkeleton from '../Skeletons/FriendsListSkeleton';
 import socket from '../Socket/Socket';
 const Chat = ({route}) => {
   const [MessageData, setMessageData] = useState([]);
@@ -91,7 +92,8 @@ const Chat = ({route}) => {
   }, [data]);
 
   if (isPending) {
-    return <Loading />;
+    // return <Loading />;
+    return <FriendsListSkeleton />;
   }
 
   return (

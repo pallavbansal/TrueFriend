@@ -81,6 +81,7 @@ const Recharge = () => {
   }
 
   function handlepayclick() {
+    console.log('selectedplan', selectedplan, RAZORPAY_KEY, profiledata);
     if (!selectedplan.id) {
       return;
     }
@@ -110,6 +111,7 @@ const Recharge = () => {
         handleSendTransactionBackend(data.razorpay_payment_id, 'success');
       })
       .catch(error => {
+        console.log('error', error);
         handleSendTransactionBackend(error.error.metadata.payment_id, 'failed');
       });
   }
