@@ -1,5 +1,6 @@
 import BackgroundService from 'react-native-background-actions';
 import PushNotification, {Importance} from 'react-native-push-notification';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import socket from './Socket';
 
 PushNotification.createChannel(
@@ -20,13 +21,22 @@ PushNotification.createChannel(
 const sleep = time => new Promise(resolve => setTimeout(() => resolve(), time));
 
 const veryIntensiveTask = async taskDataArguments => {
+  console.log(
+    'taskDataArguments:============================',
+    taskDataArguments,
+  );
   const {delay} = taskDataArguments;
+
+  // Fetch userId from AsyncStorage once
+  const userid = JSON.parse(await AsyncStorage.getItem('userid'));
 
   // Connect to the socket
   socket.connect();
 
   socket.on('connect', () => {
-    console.log('Socket connected');
+    socket.emit('register', userid, response => {
+      console.log('Registration response in background services:', response);
+    });
   });
 
   socket.on('chat message', data => {
@@ -34,11 +44,16 @@ const veryIntensiveTask = async taskDataArguments => {
       'Received message in background :====================================',
       data,
     );
-    PushNotification.localNotification({
-      channelId: '12345',
-      title: 'New Message',
-      message: 'New message from ' + data.sender.name,
-    });
+    if (userid && data.sender_id !== userid) {
+      console.log(
+        'Received message in background in:====================================',
+      );
+      PushNotification.localNotification({
+        channelId: '12345',
+        title: 'New Message',
+        message: 'New message from ' + data.sender.name,
+      });
+    }
   });
 
   socket.on('call', data => {
@@ -46,7 +61,7 @@ const veryIntensiveTask = async taskDataArguments => {
       'Received call in background :========================================',
       data,
     );
-    if (data.callaction == 'incoming') {
+    if (userid && data.callaction == 'incoming') {
       PushNotification.localNotification({
         channelId: '12345',
         title: 'Incoming Call',
@@ -74,8 +89,8 @@ const startBackgroundTask = async () => {
 
   const options = {
     taskName: 'Example',
-    taskTitle: 'ExampleTask title',
-    taskDesc: 'ExampleTask description',
+    taskTitle: 'Wooing',
+    taskDesc: 'Wooing Notifications Services',
     taskIcon: {
       name: 'ic_launcher',
       type: 'mipmap',

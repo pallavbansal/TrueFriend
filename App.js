@@ -42,11 +42,6 @@ import {
   startBackgroundTask,
   stopBackgroundTask,
 } from './Socket/BackgroundServices2';
-// import {
-//   startBackgroundSocketService,
-//   stopBackgroundSocketService,
-// } from './Socket/BackgroundServices.js';
-// import {createChannel, cancelNotifications} from './Socket/Notification.js';
 
 const MainNavigator = () => {
   const Stack = createStackNavigator();
@@ -64,15 +59,9 @@ const MainNavigator = () => {
   //   };
   // }, []);
 
-  useEffect(() => {
-    // stopBackgroundTask();
-
-    startBackgroundTask();
-
-    return () => {
-      // stopBackgroundTask();
-    };
-  }, []);
+  // useEffect(() => {
+  //   createChannel();
+  // }, []);
 
   return (
     <CallHandler>
@@ -211,6 +200,16 @@ function App() {
   } = useNetInfoInstance();
 
   useEffect(() => {
+    // stopBackgroundTask();
+    console.log('starting background task in app.js');
+    startBackgroundTask();
+    return () => {
+      // console.log('stopping background task in app.js');
+      // stopBackgroundTask();
+    };
+  }, []);
+
+  useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {});
     return () => {
       unsubscribe();
@@ -227,10 +226,6 @@ function App() {
     //   socket.off('connect');
     // };
   }, []);
-
-  // useEffect(() => {
-  //   createChannel();
-  // }, []);
 
   return (
     <>
