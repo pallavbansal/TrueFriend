@@ -1,22 +1,33 @@
 import BackgroundService from 'react-native-background-actions';
-import PushNotification, {Importance} from 'react-native-push-notification';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
+import notifee, {AndroidImportance} from '@notifee/react-native';
 import socket from './Socket';
 
-PushNotification.createChannel(
-  {
-    channelId: '12345',
-    channelName: 'Wooing Channel',
-    channelDescription: 'A brief description of the channel',
-    playSound: true,
-    soundName: 'default',
-    importance: Importance.HIGH,
-  },
-  created =>
-    console.log(
-      `createChannel returned in background---------------- '${created}'`,
-    ),
-);
+async function onDisplayNotification(title, message) {
+  // Request permissions (required for iOS)
+  await notifee.requestPermission();
+
+  // Create a channel (required for Android)
+  const channelId = await notifee.createChannel({
+    id: 'default',
+    name: 'Default Channel',
+    vibration: true,
+    sound: 'default',
+    importance: AndroidImportance.HIGH,
+  });
+
+  // Display a notification
+  await notifee.displayNotification({
+    title: title,
+    body: message,
+    android: {
+      channelId,
+      importance: AndroidImportance.HIGH,
+      pressAction: {
+        id: 'default',
+      },
+    },
+  });
+}
 
 const sleep = time => new Promise(resolve => setTimeout(() => resolve(), time));
 
@@ -27,17 +38,7 @@ const veryIntensiveTask = async taskDataArguments => {
   );
   const {delay} = taskDataArguments;
 
-  // Fetch userId from AsyncStorage once
-  // const userid = JSON.parse(await AsyncStorage.getItem('userid'));
-
-  // Connect to the socket
   socket.connect();
-
-  // socket.on('connect', () => {
-  //   socket.emit('register', userid, response => {
-  //     console.log('Registration response in background services:', response);
-  //   });
-  // });
 
   socket.on('chat message', data => {
     console.log(
@@ -48,11 +49,10 @@ const veryIntensiveTask = async taskDataArguments => {
       console.log(
         'Received message in background in:====================================',
       );
-      PushNotification.localNotification({
-        channelId: '12345',
-        title: 'New Message',
-        message: 'New message from ' + data.sender.name,
-      });
+      onDisplayNotification(
+        'Incoming Message',
+        'New message from ' + data.sender.name,
+      );
     }
   });
 
@@ -62,12 +62,10 @@ const veryIntensiveTask = async taskDataArguments => {
       data,
     );
     if (data.callaction == 'incoming') {
-      PushNotification.localNotification({
-        channelId: '12345',
-        title: 'Incoming Call',
-        message: 'Incoming call from ' + data.caller.name,
-        // actions: ['Answer', 'Decline'],
-      });
+      console.log(
+        'Received call in background in:====================================',
+      );
+      onDisplayNotification('Incoming Call', 'Call from ' + data.sender.name);
     }
   });
 

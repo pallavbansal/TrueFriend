@@ -1,4 +1,5 @@
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import notifee, {AndroidImportance} from '@notifee/react-native';
 import React from 'react';
 import {colors} from '../../Styles/ColorData';
 import LinearGradient from 'react-native-linear-gradient';
@@ -9,8 +10,37 @@ import {useSelector} from 'react-redux';
 
 const WalletTopBalance = () => {
   const navigation = useNavigation();
+
   const myuserid = useSelector(state => state.Auth.userid);
   const {isPending, error, data, isError} = useGetWallet(myuserid);
+
+  async function onDisplayNotification(title, message) {
+    // Request permissions (required for iOS)
+    await notifee.requestPermission();
+
+    // Create a channel (required for Android)
+    const channelId = await notifee.createChannel({
+      id: 'default',
+      name: 'Default Channel',
+      sound: 'notification',
+      vibration: true,
+      importance: AndroidImportance.HIGH,
+    });
+
+    // Display a notification
+    await notifee.displayNotification({
+      title: title,
+      body: message,
+      android: {
+        channelId,
+        sound: 'notification',
+        importance: AndroidImportance.HIGH,
+        pressAction: {
+          id: 'default',
+        },
+      },
+    });
+  }
 
   function handlerecharge() {
     navigation.navigate('Payment');
@@ -92,6 +122,26 @@ const WalletTopBalance = () => {
             </Text>
           </TouchableOpacity>
         </View>
+        <TouchableOpacity
+          onPress={() =>
+            onDisplayNotification(
+              'Test Notification',
+              'This is a test notification',
+            )
+          }
+          style={{
+            backgroundColor: colors.arrow.primary,
+            padding: 7,
+            paddingHorizontal: 15,
+            borderRadius: 50,
+          }}>
+          <Text
+            style={{
+              color: 'white',
+            }}>
+            Test Notification
+          </Text>
+        </TouchableOpacity>
       </View>
     </LinearGradient>
   );
