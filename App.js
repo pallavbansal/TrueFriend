@@ -38,10 +38,14 @@ import {
 import Protect from './Auth/Protect';
 import socket from './Socket/Socket';
 import CallHandler from './Components/Common/CallHandler';
+// import {
+//   startBackgroundTask,
+//   stopBackgroundTask,
+// } from './Socket/BackgroundServices2';
 import {
   startBackgroundTask,
   stopBackgroundTask,
-} from './Socket/BackgroundServices2';
+} from './Socket/BackgroundServicesWithNotifee';
 
 const MainNavigator = () => {
   const Stack = createStackNavigator();
