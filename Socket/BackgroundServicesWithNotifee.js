@@ -4,6 +4,7 @@ import socket from './Socket';
 
 async function onDisplayNotification(title, message) {
   // Request permissions (required for iOS)
+
   await notifee.requestPermission();
 
   // Create a channel (required for Android)
@@ -65,7 +66,7 @@ const veryIntensiveTask = async taskDataArguments => {
       console.log(
         'Received call in background in:====================================',
       );
-      onDisplayNotification('Incoming Call', 'Call from ' + data.sender.name);
+      onDisplayNotification('Incoming Call', 'Call from ' + data.caller.name);
     }
   });
 

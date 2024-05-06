@@ -4,6 +4,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import Toast from 'react-native-toast-message';
+import notifee, {AndroidImportance} from '@notifee/react-native';
 import {Provider} from 'react-redux';
 import {store} from './Store/store';
 import NetInfo from '@react-native-community/netinfo';
@@ -202,6 +203,20 @@ function App() {
     netInfo: {type, isConnected},
     refresh,
   } = useNetInfoInstance();
+
+  useEffect(() => {
+    async function createChannel() {
+      await notifee.requestPermission();
+      const channelId = await notifee.createChannel({
+        id: 'default',
+        name: 'Default Channel',
+        vibration: true,
+        sound: 'default',
+        importance: AndroidImportance.HIGH,
+      });
+    }
+    createChannel();
+  }, []);
 
   useEffect(() => {
     // stopBackgroundTask();
