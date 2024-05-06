@@ -1,21 +1,31 @@
 import React from 'react';
-import {View, StyleSheet, ScrollView, TouchableOpacity} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  RefreshControl,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
+import {useRefreshData} from '../Hooks/Custom/useRefreshData';
 import BottomBar from '../Layouts/BottomBar';
 import GradientScreen from '../Layouts/GradientScreen';
 import WalletTopBalance from '../Components/Wallet/WalletTopBalance';
 import WalletOptionsList from '../Components/Wallet/WalletOptionsList';
 import {colors} from '../Styles/ColorData';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MyLoadingIndicator from '../Components/Common/MyLoadingIndicator';
 import {useNavigation} from '@react-navigation/native';
 
 const Wallet = () => {
   const navigation = useNavigation();
+  const {refreshing, onRefresh} = useRefreshData();
   return (
     <GradientScreen>
       <View
         style={{
           flex: 1,
         }}>
+        <MyLoadingIndicator isRefreshing={refreshing} />
         <View style={styles.headerbackcontainer}>
           <TouchableOpacity
             onPress={() => {
@@ -29,7 +39,21 @@ const Wallet = () => {
             />
           </TouchableOpacity>
         </View>
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView
+          contentContainerStyle={styles.container}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() =>
+                onRefresh([
+                  'getWallet',
+                  'diamondtransactions',
+                  'paymenttransactions',
+                ])
+              }
+              progressViewOffset={-500}
+            />
+          }>
           <WalletTopBalance />
           <WalletOptionsList />
         </ScrollView>
