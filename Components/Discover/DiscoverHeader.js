@@ -14,8 +14,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useDispatch} from 'react-redux';
 import {LogoutRed} from '../../Store/Auth';
 import {useFetchProfile} from '../../Hooks/Query/ProfileQuery';
-import Loading from '../../Screen/Loading';
-import RectangleSkeleton from '../../SkeletonSmall/RectangleSkeleton';
+import DiscoverSkeleton from '../../Skeletons/DiscoverSkeleton';
 
 const DiscoverHeader = () => {
   const navigation = useNavigation();
@@ -38,9 +37,9 @@ const DiscoverHeader = () => {
     return navigation.navigate('Profile');
   };
 
-  // if (isPending) {
-  //   return <Loading />;
-  // }
+  if (isPending) {
+    return <DiscoverSkeleton />;
+  }
 
   return (
     <View style={styles.headercontainer}>
@@ -48,51 +47,28 @@ const DiscoverHeader = () => {
         <TouchableOpacity
           style={styles.headerimagecontainer}
           onPress={handleprofile}>
-          {!isPending ? (
-            <Image
-              style={{
-                width: 75,
-                height: 75,
-                borderRadius: 50,
-                borderWidth: 3,
-                borderColor: 'white',
-              }}
-              source={{
-                uri: UserProfileData?.data?.profile.profile_picture,
-              }}
-            />
-          ) : (
-            <RectangleSkeleton
-              containerStyle={styles.containerstyle}
-              skeletonCardStyle={styles.skeletonCardstyle}
-            />
-          )}
+          <Image
+            style={{
+              width: 75,
+              height: 75,
+              borderRadius: 50,
+              borderWidth: 3,
+              borderColor: 'white',
+            }}
+            source={{
+              uri: UserProfileData?.data?.profile.profile_picture,
+            }}
+          />
         </TouchableOpacity>
         <View style={styles.headerdetailcontainer}>
-          {!isPending ? (
-            <Text
-              style={{
-                color: 'white',
-                fontSize: 20,
-                fontWeight: 900,
-              }}>
-              {UserProfileData.data.profile?.name}
-            </Text>
-          ) : (
-            <RectangleSkeleton
-              containerStyle={{
-                width: 75,
-                height: 20,
-                borderRadius: 10,
-                backgroundColor: colors.text.primary,
-              }}
-              skeletonCardStyle={{
-                borderRadius: 10,
-              }}
-              // skeletonBackgroundColor="rgba(0,0,0,0.7)"
-              // skeletonComponentColor="rgba(0,0,0,0.3)"
-            />
-          )}
+          <Text
+            style={{
+              color: 'white',
+              fontSize: 20,
+              fontWeight: 900,
+            }}>
+            {UserProfileData.data.profile?.name}
+          </Text>
         </View>
         <View style={styles.headericoncontainer}>
           <TouchableOpacity onPress={() => setshowsearch(!showsearch)}>

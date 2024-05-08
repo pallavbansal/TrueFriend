@@ -30,7 +30,7 @@ const ViewerContainer = ({userid, streamotherdata}) => {
   const isCreator = true;
   const videoPlayer = useRef(null);
   const bottomSheetRef = useRef();
-  const [bottomSheetView, setBottomSheetView] = useState('');
+  const [bottomSheetView, setBottomSheetView] = useState('CHAT');
   const [friendrequest, setFriendRequest] = useState('');
   const {isPending, error, mutate, reset} = useSendRequest();
   const {

@@ -16,44 +16,9 @@ import {
 } from '../Hooks/Query/HomeQuery';
 import MyLoadingIndicator from '../Components/Common/MyLoadingIndicator';
 import {useRefreshData} from '../Hooks/Custom/useRefreshData';
-import Toast from 'react-native-toast-message';
 import DiscoverSkeleton from '../Skeletons/DiscoverSkeleton';
-import RectangleSkeleton from '../SkeletonSmall/RectangleSkeleton';
 import OptionsContainer from '../Components/Discover/OptionsContainer';
 import useLocationStatus from '../Hooks/Custom/useLocationStatus';
-
-const emptyData = [
-  {
-    user: {
-      id: 1,
-    },
-  },
-  {
-    user: {
-      id: 2,
-    },
-  },
-  {
-    user: {
-      id: 3,
-    },
-  },
-  {
-    user: {
-      id: 4,
-    },
-  },
-  {
-    user: {
-      id: 5,
-    },
-  },
-  {
-    user: {
-      id: 6,
-    },
-  },
-];
 
 const Discover = () => {
   const {refreshing, onRefresh} = useRefreshData();
@@ -161,10 +126,10 @@ const Discover = () => {
     setshowfilter(!showfilter);
   };
 
-  // if (isDiscoverPending) {
-  //   return <DiscoverSkeleton />;
-  // }
-  // return <DiscoverSkeleton />;
+  if (isDiscoverPending) {
+    return <DiscoverSkeleton />;
+  }
+
   return (
     <LinearGradient
       start={{x: 0, y: 0}}
@@ -191,9 +156,7 @@ const Discover = () => {
             style={{
               marginBottom: 120,
               alignItems:
-                isDiscoverPending || discoverData?.data?.profiles?.length > 2
-                  ? 'center'
-                  : 'stretch',
+                discoverData?.data?.profiles?.length > 2 ? 'center' : 'stretch',
               height: '100%',
               paddingBottom: 70,
             }}>
@@ -207,28 +170,16 @@ const Discover = () => {
                   progressViewOffset={-500}
                 />
               }
-              // discoverData?.data?.profiles
-              data={
-                isDiscoverPending ? emptyData : discoverData?.data?.profiles
-              }
+              data={discoverData?.data?.profiles}
               keyExtractor={item => item.user.id.toString()}
-              renderItem={({item, index}) =>
-                isDiscoverPending ? (
-                  <RectangleSkeleton
-                    containerStyle={styles.containerstyle}
-                    skeletonCardStyle={styles.skeletonCardstyle}
-                    // skeletonBackgroundColor="rgba(0,0,0,0.7)"
-                    // skeletonComponentColor="rgba(0,0,0,0.3)"j
-                  />
-                ) : (
-                  <SingleUser
-                    item={item}
-                    index={index}
-                    myuserid={myuserid}
-                    socket={socket}
-                  />
-                )
-              }
+              renderItem={({item, index}) => (
+                <SingleUser
+                  item={item}
+                  index={index}
+                  myuserid={myuserid}
+                  socket={socket}
+                />
+              )}
               onEndReachedThreshold={0.1}
               showsVerticalScrollIndicator={false}
               numColumns={3}

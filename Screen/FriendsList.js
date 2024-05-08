@@ -39,6 +39,7 @@ const FriendsList = () => {
   const [showgroupmodal, setshowgroupmodal] = useState(false);
   const [filteredchattingfriendsdata, setfilteredchattingfriendsdata] =
     useState([]);
+  const [showsearch, setshowsearch] = useState(false);
   const [filteredfriendsdata, setfilteredfriendsdata] = useState([]);
   const [filteredrequestdata, setfilteredrequestdata] = useState([]);
   const [searchfilter, setsearchfilter] = useState('');
@@ -231,58 +232,76 @@ const FriendsList = () => {
               style={{marginLeft: 20}}
             />
           </TouchableOpacity>
-
-          {selectedoptiontype !== 'requests' && (
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 20,
+            }}>
             <TouchableOpacity
+              onPress={() => setshowsearch(!showsearch)}
               style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginRight: 20,
-                gap: 3,
-              }}
-              onPress={() => setshowgroupmodal(true)}>
-              <View
-                style={{
-                  backgroundColor: '#FF5A90',
-                  padding: 5,
-                  borderRadius: 50,
-                }}>
-                <AntDesign
-                  name="plus"
-                  size={24}
-                  color="white"
-                  style={{fontWeight: '900'}}
-                />
-              </View>
-              <Text style={styles.headingtext2}> Create Group</Text>
+                padding: 5,
+                backgroundColor: '#FF5A90',
+                borderRadius: 50,
+              }}>
+              <MaterialIcons name="search" size={20} color="white" />
             </TouchableOpacity>
-          )}
+
+            {selectedoptiontype !== 'requests' && (
+              <TouchableOpacity
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginRight: 20,
+                  gap: 3,
+                }}
+                onPress={() => setshowgroupmodal(true)}>
+                <View
+                  style={{
+                    backgroundColor: '#FF5A90',
+                    padding: 5,
+                    borderRadius: 50,
+                  }}>
+                  <AntDesign
+                    name="plus"
+                    size={20}
+                    color="white"
+                    style={{fontWeight: '900'}}
+                  />
+                </View>
+                <Text style={styles.headingtext2}> Create Group</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
         <View style={styles.headingsearchcontainer}>
-          <GradientInput style={styles.gradientborder}>
-            <View style={styles.inputcontainer}>
-              <MaterialIcons
-                name="search"
-                size={18}
-                color={colors.text.secondary}
-              />
-              <TextInput
-                placeholder={
-                  selectedoptiontype === 'friends'
-                    ? 'Search All Friends'
-                    : selectedoptiontype === 'requests'
-                    ? 'Search Requests'
-                    : 'Search Chats'
-                }
-                keyboardType="email-address"
-                placeholderTextColor={colors.login.headingtext2}
-                onChangeText={text => setsearchfilter(text)}
-                value={searchfilter}
-                cursorColor={colors.login.headingtext2}
-                style={{color: colors.login.headingtext2, flex: 1}}
-              />
-            </View>
-          </GradientInput>
+          {showsearch && (
+            <GradientInput style={styles.gradientborder}>
+              <View style={styles.inputcontainer}>
+                <MaterialIcons
+                  name="search"
+                  size={18}
+                  color={colors.text.secondary}
+                />
+                <TextInput
+                  placeholder={
+                    selectedoptiontype === 'friends'
+                      ? 'Search All Friends'
+                      : selectedoptiontype === 'requests'
+                      ? 'Search Requests'
+                      : 'Search Chats'
+                  }
+                  keyboardType="email-address"
+                  placeholderTextColor={colors.login.headingtext2}
+                  onChangeText={text => setsearchfilter(text)}
+                  value={searchfilter}
+                  cursorColor={colors.login.headingtext2}
+                  style={{color: colors.login.headingtext2, flex: 1}}
+                />
+              </View>
+            </GradientInput>
+          )}
         </View>
         <View style={styles.optionscontainer}>
           <TouchableOpacity onPress={() => setselectedoptiontype('chats')}>
@@ -363,7 +382,7 @@ const FriendsList = () => {
                     fontWeight: '900',
                     textAlign: 'center',
                   }}>
-                  No Requests Found
+                  No Friend Found
                 </Text>
               )}
             />
