@@ -7,6 +7,7 @@ import {
   Image,
   ScrollView,
   FlatList,
+  ActivityIndicator,
 } from 'react-native';
 import GradientScreen from '../Layouts/GradientScreen';
 import GradientButton from '../Components/Common/GradientButton';
@@ -86,8 +87,6 @@ const CreatePost = () => {
     let newImages = postinputs.Image.filter((item, i) => i !== index);
     setPostInputs({...postinputs, Image: newImages});
   };
-
-  console.log('postinputs', postinputs.Image);
 
   return (
     <GradientScreen>
@@ -222,6 +221,14 @@ const CreatePost = () => {
               </Text>
             </GradientButton>
           </TouchableOpacity>
+
+          {isPending && (
+            <ActivityIndicator
+              size="large"
+              color={colors.arrow.tertiary}
+              style={{marginTop: 20}}
+            />
+          )}
 
           {postinputs.showerror && (
             <GradientText
