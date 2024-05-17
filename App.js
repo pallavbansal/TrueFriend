@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, SafeAreaView, StatusBar} from 'react-native';
 import Record from './Screen/Record';
 import Recordings from './Screen/Recordings';
 import RecordingDetails from './Screen/RecordingDetails';
@@ -11,8 +11,10 @@ import TrackPlayer, {
   RatingType,
   RepeatMode,
 } from 'react-native-track-player';
+import {colorData} from './utils/colorData';
 
 const App = () => {
+  const isDarkMode = true;
   const [activescreen, setActivescreen] = useState('Recordings');
 
   const renderScreen = () => {
@@ -59,25 +61,31 @@ const App = () => {
   };
 
   return (
-    <View style={styles.container}>
-      {renderScreen()}
-      <View
-        style={{
-          position: 'absolute',
-          bottom: 70,
-          left: 0,
-          right: 0,
-          marginHorizontal: 5,
-          elevation: 10,
-        }}>
-        <AudioPlayer />
-      </View>
-
-      <BottomBar
-        activescreen={activescreen}
-        setActivescreen={setActivescreen}
+    <SafeAreaView style={styles.container}>
+      <StatusBar
+        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        backgroundColor={colorData.back2}
       />
-    </View>
+      <View style={styles.container}>
+        {renderScreen()}
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 70,
+            left: 0,
+            right: 0,
+            marginHorizontal: 5,
+            elevation: 10,
+          }}>
+          <AudioPlayer />
+        </View>
+
+        <BottomBar
+          activescreen={activescreen}
+          setActivescreen={setActivescreen}
+        />
+      </View>
+    </SafeAreaView>
   );
 };
 
