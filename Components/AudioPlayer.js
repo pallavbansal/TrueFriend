@@ -16,8 +16,8 @@ const AudioPlayer = () => {
   const isPlaying = useIsPlaying();
   const progress = useProgress();
 
-  console.log('Active Track:', activeTrack);
-  console.log('Is Playing:', isPlaying);
+  // console.log('Active Track:', activeTrack);
+  // console.log('Is Playing:', isPlaying);
   if (!activeTrack) return null;
 
   const togglePlayback = async () => {
@@ -36,12 +36,17 @@ const AudioPlayer = () => {
     console.log('Previous');
   };
 
+  const closePlayer = async () => {
+    await TrackPlayer.reset();
+  };
+
   return (
     <View style={styles.playerContainer}>
       <View
         style={{
           flexDirection: 'row',
           alignItems: 'center',
+          // justifyContent: 'space-between',
         }}>
         <TouchableOpacity
           onPress={togglePlayback}
@@ -53,6 +58,28 @@ const AudioPlayer = () => {
           />
         </TouchableOpacity>
         <Text style={styles.fileName}>{activeTrack.title}</Text>
+        <View
+          style={{
+            marginLeft: 'auto',
+          }}>
+          <TouchableOpacity
+            onPress={closePlayer}
+            style={styles.buttonContainer}>
+            <Ionicons
+              name="close-circle-outline"
+              size={26}
+              color={colorData.white}
+            />
+          </TouchableOpacity>
+        </View>
+        {/* <View
+          style={{
+            flexDirection: 'row',
+          }}>
+          <Text>{progress.position}</Text>
+          <Text>/</Text>
+          <Text>{progress.duration}</Text>
+        </View> */}
       </View>
       {/* <View
         style={{

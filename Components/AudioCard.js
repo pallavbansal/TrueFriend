@@ -8,10 +8,12 @@ import {
   Modal,
   TouchableHighlight,
 } from 'react-native';
+
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import TrackPlayer from 'react-native-track-player';
 import AnimatedIcon from './Common/AnimatedIcon';
 
-const AudioCard = ({file, handlePlay, isPlaying}) => {
+const AudioCard = ({file, handlePlay, isPlaying, handleDelete}) => {
   const {name, size, mtime} = file;
 
   const formattedSize = (size / (1024 * 1024)).toFixed(2);
@@ -75,6 +77,14 @@ const AudioCard = ({file, handlePlay, isPlaying}) => {
         <Text style={styles.details}>
           {formattedDate} - {formattedSize} MB
         </Text>
+      </View>
+      <View>
+        <MaterialIcons
+          name="delete"
+          size={30}
+          color="white"
+          onPress={() => handleDelete(file)}
+        />
       </View>
     </TouchableOpacity>
   );

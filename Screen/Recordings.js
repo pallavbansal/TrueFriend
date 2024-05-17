@@ -1,12 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import {colorData} from '../utils/colorData';
-import {View, Text, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
+import {View, Text, StyleSheet, FlatList, Alert} from 'react-native';
 import AudioCard from '../Components/AudioCard';
 import NoData from '../Components/NoData';
+import TrackPlayer, {useActiveTrack} from 'react-native-track-player';
 import RNFS from 'react-native-fs';
-import AudioPlayer from '../Components/AudioPlayer';
 
 const Recordings = () => {
+  const activeTrack = useActiveTrack();
   const [recordings, setRecordings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -37,21 +38,37 @@ const Recordings = () => {
     setSelectedFile(file);
   };
 
+  const deleteRecording = async path => {
+    try {
+      await RNFS.unlink(path);
+      loadRecordings();
+      if (activeTrack && activeTrack.id === path) {
+        await TrackPlayer.reset();
+      }
+    } catch (error) {
+      console.error('Failed to delete recording:', error);
+    }
+  };
+
+  const handleDelete = file => {
+    Alert.alert(
+      'Delete Recording',
+      'Are you sure you want to delete this recording?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {text: 'OK', onPress: () => deleteRecording(file.path)},
+      ],
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Recordings</Text>
       </View>
-
-      {/* {selectedFile && (
-        <View
-          style={{
-            paddingHorizontal: 10,
-            marginTop: 10,
-          }}>
-          <AudioPlayer />
-        </View>
-      )} */}
 
       {recordings.length === 0 ? (
         <View
@@ -70,7 +87,6 @@ const Recordings = () => {
             alignItems: recordings > 2 ? 'center' : 'stretch',
             width: '100%',
             height: '100%',
-            // padding: 5,
             paddingBottom: 70,
           }}>
           <FlatList
@@ -80,6 +96,7 @@ const Recordings = () => {
               <AudioCard
                 file={item}
                 handlePlay={handlePlay}
+                handleDelete={handleDelete}
                 isPlaying={selectedFile && selectedFile.path === item.path}
               />
             )}
@@ -97,9 +114,9 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: colorData.back2,
-    padding: 20,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    padding: 12,
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
   },
   title: {
     fontSize: 20,
