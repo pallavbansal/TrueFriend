@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import {View, TouchableOpacity, Text, StyleSheet} from 'react-native';
+import {View, TouchableOpacity, Text, StyleSheet, Modal} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import RecordingDetails from '../Screen/RecordingDetails';
 // import {PlayerProgressBar} from './PlayerProgressBar';
 import TrackPlayer, {
   State,
@@ -12,6 +13,7 @@ import TrackPlayer, {
 import {colorData} from '../utils/colorData';
 
 const AudioPlayer = () => {
+  const [modalVisible, setModalVisible] = useState(false);
   const activeTrack = useActiveTrack();
   const isPlaying = useIsPlaying();
   const progress = useProgress();
@@ -41,7 +43,11 @@ const AudioPlayer = () => {
   };
 
   return (
-    <View style={styles.playerContainer}>
+    <TouchableOpacity
+      style={styles.playerContainer}
+      onPress={() => {
+        setModalVisible(true);
+      }}>
       <View
         style={{
           flexDirection: 'row',
@@ -105,7 +111,17 @@ const AudioPlayer = () => {
         <Text>{progress.position}</Text>
         <Text>{progress.duration}</Text>
       </View> */}
-    </View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}>
+        <RecordingDetails />
+      </Modal>
+    </TouchableOpacity>
   );
 };
 

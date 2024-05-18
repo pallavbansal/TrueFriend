@@ -4,6 +4,7 @@ import {View, Text, StyleSheet, FlatList, Alert} from 'react-native';
 import AudioCard from '../Components/AudioCard';
 import NoData from '../Components/NoData';
 import TrackPlayer, {useActiveTrack} from 'react-native-track-player';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNFS from 'react-native-fs';
 
 const Recordings = () => {
@@ -19,8 +20,31 @@ const Recordings = () => {
   const loadRecordings = async () => {
     try {
       setLoading(true);
+      let time = 2 * 24 * 60 * 60 * 1000; // default time
+      const savedDeleteTime = await AsyncStorage.getItem('autoDeleteTime');
+      if (savedDeleteTime) {
+        time = JSON.parse(savedDeleteTime) * 24 * 60 * 60 * 1000;
+      }
       const files = await RNFS.readDir(RNFS.ExternalDirectoryPath);
-      const audioFiles = files.filter(file => file.name.endsWith('.mp3'));
+      const now = Date.now();
+
+      const audioFiles = files.filter(file => {
+        if (file.name.endsWith('.mp3')) {
+          // Check if the file is older than the specified time
+          if (now - new Date(file.mtime).getTime() > time) {
+            // Delete the file
+            RNFS.unlink(file.path)
+              .then(() => console.log(`Deleted ${file.name}`))
+              .catch(err =>
+                console.error(`Failed to delete ${file.name}:`, err),
+              );
+            return false;
+          }
+          return true;
+        }
+        return false;
+      });
+
       setRecordings(audioFiles);
     } catch (error) {
       console.error('Failed to load recordings:', error);
@@ -28,7 +52,6 @@ const Recordings = () => {
       setLoading(false);
     }
   };
-
   const handlePlay = file => {
     console.log('Playing:', file);
     if (selectedFile && selectedFile.path === file.path) {
