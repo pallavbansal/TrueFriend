@@ -3,6 +3,7 @@ import {colorData} from '../utils/colorData';
 import {View, Text, StyleSheet, FlatList, Alert} from 'react-native';
 import AudioCard from '../Components/AudioCard';
 import NoData from '../Components/NoData';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import TrackPlayer, {useActiveTrack} from 'react-native-track-player';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNFS from 'react-native-fs';
@@ -87,10 +88,45 @@ const Recordings = () => {
     );
   };
 
+  const handleAllDelete = () => {
+    Alert.alert(
+      'Delete All Recordings',
+      'Are you sure you want to delete all recordings?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: async () => {
+            try {
+              await Promise.all(recordings.map(file => RNFS.unlink(file.path)));
+              loadRecordings();
+              if (activeTrack) {
+                await TrackPlayer.reset();
+              }
+            } catch (error) {
+              console.error('Failed to delete recordings:', error);
+            }
+          },
+        },
+      ],
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Recordings</Text>
+        <View>
+          <MaterialIcons
+            name="delete"
+            size={26}
+            color="white"
+            onPress={() => handleAllDelete()}
+          />
+        </View>
       </View>
 
       {recordings.length === 0 ? (
@@ -136,6 +172,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     backgroundColor: colorData.back2,
     padding: 12,
     borderBottomLeftRadius: 25,

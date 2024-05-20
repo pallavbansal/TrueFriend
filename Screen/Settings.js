@@ -109,15 +109,17 @@ const Settings = () => {
     }
   };
 
-  if (loading)
-    return (
-      <Text
-        style={{
-          color: 'black',
-        }}>
-        Loading...
-      </Text>
-    );
+  if (loading) return null;
+
+  // if (loading)
+  //   return (
+  //     <Text
+  //       style={{
+  //         color: 'black',
+  //       }}>
+  //       Loading...
+  //     </Text>
+  //   );
 
   return (
     <View style={styles.container}>

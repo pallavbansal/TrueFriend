@@ -18,8 +18,8 @@ const AudioPlayer = () => {
   const isPlaying = useIsPlaying();
   const progress = useProgress();
 
-  // console.log('Active Track:', activeTrack);
-  // console.log('Is Playing:', isPlaying);
+  console.log('Active Track:', activeTrack);
+  console.log('Is Playing:', isPlaying);
   if (!activeTrack) return null;
 
   const togglePlayback = async () => {

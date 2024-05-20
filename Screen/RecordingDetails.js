@@ -1,5 +1,7 @@
 import {StyleSheet, Text, View} from 'react-native';
 import {colorData} from '../utils/colorData';
+// import Player from '../Extra/player';
+import DetailedPlayer from '../Components/DetailedPlayer';
 import React from 'react';
 
 const RecordingDetails = () => {
@@ -13,7 +15,10 @@ const RecordingDetails = () => {
         borderTopRightRadius: 25,
         marginHorizontal: 0.5,
       }}>
-      <View>
+      <View
+        style={{
+          flex: 1,
+        }}>
         <Text
           style={{
             textAlign: 'center',
@@ -24,6 +29,8 @@ const RecordingDetails = () => {
           }}>
           RecordingDetails
         </Text>
+        <DetailedPlayer />
+        {/* <Player /> */}
       </View>
     </View>
   );

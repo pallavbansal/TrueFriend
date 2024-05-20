@@ -15,7 +15,7 @@ import {colorData} from './utils/colorData';
 
 const App = () => {
   const isDarkMode = true;
-  const [activescreen, setActivescreen] = useState('Recordings');
+  const [activescreen, setActivescreen] = useState('Record');
 
   const renderScreen = () => {
     useEffect(() => {
