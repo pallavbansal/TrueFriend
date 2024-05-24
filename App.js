@@ -1,8 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import {View, StyleSheet, SafeAreaView, StatusBar} from 'react-native';
 import Record from './Screen/Record';
+import RecordNew from './Screen/RecordNew';
 import Recordings from './Screen/Recordings';
-import RecordingDetails from './Screen/RecordingDetails';
 import Settings from './Screen/Settings';
 import BottomBar from './Components/Common/BottomBar';
 import AudioPlayer from './Components/AudioPlayer';
@@ -55,10 +55,8 @@ const App = () => {
         return <Record />;
       case 'Recordings':
         return <Recordings />;
-      case 'RecordingDetails':
-        return <RecordingDetails />;
       case 'Settings':
-        return <Settings />;
+        return <RecordNew />;
       default:
         return <Record />;
     }

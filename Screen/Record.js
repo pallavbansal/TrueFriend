@@ -10,18 +10,10 @@ import {
   RESULTS,
 } from 'react-native-permissions';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-// import {
-//   startBackgroundTask,
-//   stopBackgroundTask,
-// } from '../utils/BackgroundServices';
-// import {
-//   startBackgroundTask,
-//   stopBackgroundTask,
-// } from '../utils/BackgroundServicesVoice';
 import {
   startBackgroundTask,
   stopBackgroundTask,
-} from '../utils/BackgroundServicesSound';
+} from '../utils/BackgroundServices';
 
 const Record = () => {
   const [isBackgroundServiceRunning, setIsBackgroundServiceRunning] =
@@ -60,6 +52,7 @@ const Record = () => {
       console.error('Error checking microphone permission:', error);
     }
   };
+
   const handleStopRecording = async () => {
     try {
       await stopBackgroundTask();
