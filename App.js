@@ -9,7 +9,9 @@ import TrackPlayer, {
   Capability,
   RatingType,
   RepeatMode,
+  AppKilledPlaybackBehavior,
 } from 'react-native-track-player';
+
 import {colorData} from './utils/colorData';
 
 const App = () => {
@@ -33,10 +35,10 @@ const App = () => {
               Capability.SkipToPrevious,
               Capability.Stop,
             ],
-            // android: {
-            //   appKilledPlaybackBehavior:
-            //     AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
-            // },
+            android: {
+              appKilledPlaybackBehavior:
+                AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
+            },
           });
 
           await TrackPlayer.setVolume(0.5); // not too loud
