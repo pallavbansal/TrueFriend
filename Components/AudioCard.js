@@ -1,62 +1,202 @@
-import React, {useState} from 'react';
-import {colorData} from '../utils/colorData';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Modal,
-  TouchableHighlight,
-} from 'react-native';
+// import React from 'react';
+// import {colorData} from '../utils/colorData';
+// import {View, Text, TouchableOpacity, StyleSheet, Alert} from 'react-native';
+// import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+// import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+// import TrackPlayer from 'react-native-track-player';
+// import RNFS from 'react-native-fs';
+// import AnimatedIcon from './Common/AnimatedIcon';
 
+// const AudioCard = ({file, handlePlay, isPlaying, handleDelete}) => {
+//   const {name, size, mtime} = file;
+
+//   const formattedSize = (size / (1024 * 1024)).toFixed(2);
+
+//   const formattedDate = new Date(mtime).toLocaleString();
+
+//   const saveFile = async () => {
+//     Alert.alert('Save File', 'Are you sure you want to save this file?', [
+//       {
+//         text: 'Cancel',
+//         onPress: () => console.log('Cancel Pressed'),
+//         style: 'cancel',
+//       },
+//       {
+//         text: 'OK',
+//         onPress: async () => {
+//           const folderPath = `${RNFS.DownloadDirectoryPath}/TrueFriend`;
+//           const destPath = `${folderPath}/${file.name}`;
+
+//           // Check if the directory exists, if not, create it
+//           RNFS.exists(folderPath).then(exists => {
+//             if (!exists) {
+//               RNFS.mkdir(folderPath).then(() => {
+//                 console.log('Folder created');
+//               });
+//             }
+//           });
+
+//           RNFS.copyFile(file.path, destPath)
+//             .then(() => console.log('File saved'))
+//             .catch(err => console.error('Error saving file:', err));
+//         },
+//       },
+//     ]);
+//   };
+
+//   const setTrack = async () => {
+//     // await TrackPlayer.add({
+//     //   id: file.path,
+//     //   url: `file://${file.path}`,
+//     //   title: file.name,
+//     //   artist: 'Unknown',
+//     // });
+//     await TrackPlayer.load({
+//       id: file.path,
+//       url: `file://${file.path}`,
+//       title: file.name,
+//       artist: 'Unknown',
+//     });
+//     await TrackPlayer.play();
+//     handlePlay(file);
+//   };
+
+//   return (
+//     <TouchableOpacity
+//       style={[
+//         styles.card,
+//         {
+//           backgroundColor: isPlaying ? colorData.back2 : colorData.back1,
+//         },
+//       ]}
+//       // onPress={() => handlePlay(file)}
+//       onPress={setTrack}>
+//       <View
+//         style={{
+//           backgroundColor: 'white',
+//           borderRadius: 50,
+//           padding: 2,
+//           marginRight: 10,
+//         }}>
+//         <AnimatedIcon
+//           source={require('../assets/icons/music-note.json')}
+//           width={40}
+//           height={40}
+//           autoPlay={isPlaying}
+//           loop={isPlaying}
+//         />
+//       </View>
+//       <View
+//         style={{
+//           flexDirection: 'column',
+//           flex: 1,
+//           gap: 8,
+//         }}>
+//         <Text style={styles.title}>{name}</Text>
+//         <Text style={styles.details}>
+//           {formattedDate} - {formattedSize} MB
+//         </Text>
+//       </View>
+//       <View
+//         style={{
+//           flexDirection: 'column',
+//           gap: 2,
+//         }}>
+//         <MaterialIcons
+//           name="delete"
+//           size={26}
+//           color="white"
+//           onPress={() => handleDelete(file)}
+//         />
+
+//         <MaterialIcons name="save" size={26} color="white" onPress={saveFile} />
+//       </View>
+//     </TouchableOpacity>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   card: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     padding: 10,
+//     margin: 5,
+//     backgroundColor: colorData.back1,
+//     borderRadius: 10,
+//   },
+//   title: {
+//     fontSize: 16,
+//     color: 'white',
+//     fontWeight: 'bold',
+//   },
+// });
+
+// export default AudioCard;
+
+import React, {useState, useEffect} from 'react';
+import {colorData} from '../utils/colorData';
+import {View, Text, TouchableOpacity, StyleSheet, Alert} from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import TrackPlayer from 'react-native-track-player';
+import RNFS from 'react-native-fs';
 import AnimatedIcon from './Common/AnimatedIcon';
 
 const AudioCard = ({file, handlePlay, isPlaying, handleDelete}) => {
   const {name, size, mtime} = file;
-
   const formattedSize = (size / (1024 * 1024)).toFixed(2);
-  // const formattedDate = new Intl.DateTimeFormat('default', {
-  //   year: 'numeric',
-  //   month: 'long',
-  //   day: 'numeric',
-  //   hour: '2-digit',
-  //   minute: '2-digit',
-  // }).format(new Date(mtime));
   const formattedDate = new Date(mtime).toLocaleString();
+  const [isSaved, setIsSaved] = useState(false);
 
-  const setupPlayer = async () => {
-    try {
-      await TrackPlayer.setupPlayer({
-        maxCacheSize: 1024 * 10,
-      });
+  useEffect(() => {
+    const folderPath = `${RNFS.DownloadDirectoryPath}/TrueFriend`;
+    const destPath = `${folderPath}/${file.name}`;
 
-      await TrackPlayer.updateOptions({
-        ratingType: RatingType.Heart,
-        capabilities: [
-          Capability.Play,
-          Capability.Pause,
-          Capability.SkipToNext,
-          Capability.SkipToPrevious,
-          Capability.Stop,
-        ],
-      });
+    RNFS.exists(destPath).then(exists => {
+      setIsSaved(exists);
+    });
+  }, [file.name]);
 
-      await TrackPlayer.setVolume(0.5); // not too loud
-      await TrackPlayer.setRepeatMode(RepeatMode.Queue);
-    } catch (e) {
-      console.error('Error setting up player:', e);
+  const saveFile = async () => {
+    if (isSaved) {
+      Alert.alert(
+        'File already saved',
+        'This file is already saved in the destination folder.',
+      );
+    } else {
+      Alert.alert('Save File', 'Are you sure you want to save this file?', [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: async () => {
+            const folderPath = `${RNFS.DownloadDirectoryPath}/TrueFriend`;
+            const destPath = `${folderPath}/${file.name}`;
+
+            RNFS.exists(folderPath).then(exists => {
+              if (!exists) {
+                RNFS.mkdir(folderPath).then(() => {
+                  console.log('Folder created');
+                });
+              }
+            });
+
+            RNFS.copyFile(file.path, destPath)
+              .then(() => {
+                console.log('File saved');
+                setIsSaved(true);
+              })
+              .catch(err => console.error('Error saving file:', err));
+          },
+        },
+      ]);
     }
   };
 
   const setTrack = async () => {
-    // await TrackPlayer.add({
-    //   id: file.path,
-    //   url: `file://${file.path}`,
-    //   title: file.name,
-    //   artist: 'Unknown',
-    // });
     await TrackPlayer.load({
       id: file.path,
       url: `file://${file.path}`,
@@ -71,11 +211,8 @@ const AudioCard = ({file, handlePlay, isPlaying, handleDelete}) => {
     <TouchableOpacity
       style={[
         styles.card,
-        {
-          backgroundColor: isPlaying ? colorData.back2 : colorData.back1,
-        },
+        {backgroundColor: isPlaying ? colorData.back2 : colorData.back1},
       ]}
-      // onPress={() => handlePlay(file)}
       onPress={setTrack}>
       <View
         style={{
@@ -92,24 +229,39 @@ const AudioCard = ({file, handlePlay, isPlaying, handleDelete}) => {
           loop={isPlaying}
         />
       </View>
-      <View
-        style={{
-          flexDirection: 'column',
-          flex: 1,
-          gap: 8,
-        }}>
+      <View style={{flexDirection: 'column', flex: 1, gap: 8}}>
         <Text style={styles.title}>{name}</Text>
         <Text style={styles.details}>
           {formattedDate} - {formattedSize} MB
         </Text>
       </View>
-      <View>
+      <View style={{flexDirection: 'column', gap: 4}}>
         <MaterialIcons
           name="delete"
-          size={30}
+          size={28}
           color="white"
           onPress={() => handleDelete(file)}
         />
+        {isSaved ? (
+          <MaterialCommunityIcons
+            name="content-save-check"
+            size={28}
+            color="white"
+            onPress={() =>
+              Alert.alert(
+                'File already saved',
+                'This file is already saved in the destination folder.',
+              )
+            }
+          />
+        ) : (
+          <MaterialIcons
+            name="save"
+            size={26}
+            color="white"
+            onPress={saveFile}
+          />
+        )}
       </View>
     </TouchableOpacity>
   );
@@ -119,7 +271,7 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 10,
+    padding: 8,
     margin: 5,
     backgroundColor: colorData.back1,
     borderRadius: 10,
