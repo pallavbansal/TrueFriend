@@ -44,7 +44,7 @@ const AudioCard = ({file, handlePlay, isPlaying, handleDelete}) => {
             RNFS.exists(folderPath).then(exists => {
               if (!exists) {
                 RNFS.mkdir(folderPath).then(() => {
-                  console.log('Folder created');
+                  console.log('Folder created.');
                 });
               }
             });
